@@ -7,9 +7,13 @@
     "jquery-validation-unobtrusive": "4.0.0",
     "bootstrap": "5.3.3",
     "bootstrap-table": "1.22.6",
-    "font-awesome": "4.7.0"
+    "@fortawesome/fontawesome-free": "6.5.2"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "1.0.6",
+    "@types/bootstrap": "5.2.10",
+    "ts-loader": "9.5.1",
+    "typescript": "5.5.2",
     "webpack": "5.92.1",
     "webpack-cli": "5.1.4",
     "css-loader": "7.1.2",
