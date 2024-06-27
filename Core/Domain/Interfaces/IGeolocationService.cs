@@ -1,6 +1,6 @@
 namespace Domain.Interfaces;
 
-public interface IGeolocation
+public interface IGeolocationService
 {
     decimal CalculateDistance(decimal latitude, decimal longtitude);
 }

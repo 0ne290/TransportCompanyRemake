@@ -35,6 +35,14 @@ public class Order
 
     public string Address { get; set; } = null!;
     
+    public decimal StartLatitude { get; set; }
+
+    public decimal StartLongtitude { get; set; }
+
+    public decimal EndLatitude { get; set; }
+
+    public decimal EndLongtitude { get; set; }
+    
     public decimal LengthInKilometers { get; set; }
 
     public decimal ClassAdr
