@@ -2,5 +2,6 @@ namespace Domain.Interfaces;
 
 public interface IGeolocationService
 {
-    decimal CalculateDistance(decimal latitude, decimal longtitude);
+    double CalculateDistanceInKilometersByDegrees((double Latitude, double Longitude) point1,
+        (double Latitude, double Longitude) point2);
 }

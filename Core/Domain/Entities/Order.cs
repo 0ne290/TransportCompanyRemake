@@ -25,11 +25,12 @@ public class Order
         get => _dateEnd;
         set
         {
+            var isAvailable = value != null;
             _dateEnd = value;
-            Truck.IsAvailable = true;
-            Driver1.IsAvailable = true;
+            Truck.IsAvailable = isAvailable;
+            Driver1.IsAvailable = isAvailable;
             if (Driver2 != null)
-                Driver2.IsAvailable = true;
+                Driver2.IsAvailable = isAvailable;
         }
     }
 
