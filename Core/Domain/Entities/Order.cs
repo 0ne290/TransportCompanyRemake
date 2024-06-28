@@ -2,7 +2,7 @@ using Domain.Constants;
 
 namespace Domain.Entities;
 
-public class Order
+public class Order : IServiceProviderRequired
 {
     public Order()
     {
@@ -14,6 +14,15 @@ public class Order
     {
         Guid = guid;
         DateBegin = dateBegin;
+    }
+
+    public void CalculateAndSetDistanceInKm()
+    {
+        var distanceFromBranchToStart = Branch.CalculateDistanceInKmByDegrees((StartLatitude, StartLongitude));
+        var distanceFromStartToEnd = ServiceProvider.GetRequiredService<IGeolocationService>().CalculateDistanceInKmByDegrees((StartLatitude, StartLongitude), (EndLatitude, EndLongitude));
+        var distanceFromEndToBranch = Branch.CalculateDistanceInKmByDegrees((EndLatitude, EndLongitude));
+
+        DistanceInKm = distanceFromBranchToStart + distanceFromStartToEnd + distanceFromEndToBranch;
     }
     
     public string Guid { get; } = null!;
@@ -38,13 +47,13 @@ public class Order
     
     public decimal StartLatitude { get; set; }
 
-    public decimal StartLongtitude { get; set; }
+    public decimal StartLongitude { get; set; }
 
     public decimal EndLatitude { get; set; }
 
-    public decimal EndLongtitude { get; set; }
+    public decimal EndLongitude { get; set; }
     
-    public decimal LengthInKilometers { get; set; }
+    public decimal DistanceInKm { get; private set; }
 
     public decimal ClassAdr
     {
@@ -71,6 +80,8 @@ public class Order
     
     public string? Driver2Id { get; set; }
 
+    public string BranchAddress { get; set; }
+
     public virtual Truck Truck { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
@@ -78,6 +89,10 @@ public class Order
     public virtual Driver Driver1 { get; set; } = null!;
 
     public virtual Driver? Driver2 { get; set; }
+
+    public virtual Branch Branch { get; set; } = null!;
+
+    public IServiceProvider ServiceProvider { get; set; } = DefaultServiceProvider.Instance;
 
     private decimal _classAdr;
 
