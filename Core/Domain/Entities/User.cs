@@ -5,21 +5,35 @@ namespace Domain.Entities;
 
 public class User
 {
-    public User()
+    private User()
     {
         DynamicPartOfSalt = RandomNumberGenerator.GetHexString(128);
     }
-
-    // Constructor for EF
+    
     private User(string dynamicPartOfSalt, string password)
     {
         DynamicPartOfSalt = dynamicPartOfSalt;
         _password = password;
     }
+    
+    public static User New(string login, string password, string name, bool certificatAdr, string branchAddress)
+    {
+        var branch = branchRepository.Find(b => b.Address == branchAddress);
+        if (branch == null)
+            throw new ArgumentOutOfRangeException(nameof(branchAddress), branchAddress,
+                "The branch repository does not contain a branch with the specified address.");
+
+        return new Driver(null)
+        {
+            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, IsAvailable = false,
+            CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0, BranchAddress = branchAddress,
+            Branch = branch
+        };
+    }
 
     public override string ToString() => Login;
 
-    public string DynamicPartOfSalt { get; } = null!;
+    public string DynamicPartOfSalt { get; private set; } = null!;
 
     public long? VkUserId
     {
@@ -35,6 +49,8 @@ public class User
             _vkUserId = value;
         }
     }
+    
+    public string Guid { get; private set; } = null!;
 
     public string Login { get; set; } = null!;
 

@@ -16,7 +16,7 @@ public class Branch
 
     public double Longitude { get; set; }
 
-    public virtual ICollection<Truck> Trucks { get; set; } = new List<Truck>();
+    public virtual ICollection<Truck> Trucks { get; private set; } = new List<Truck>();
 
-    public virtual ICollection<Driver> Drivers { get; set; } = new List<Driver>();
+    public virtual ICollection<Driver> Drivers { get; private set; } = new List<Driver>();
 }

@@ -11,35 +11,18 @@ public class Driver
         _dismissalDate = dismissalDate;
     }
 
-    public static Driver New(IBranchRepository branchRepository, string name, bool certificatAdr, string branchAddress)
+    public static Driver New(string name, bool certificatAdr, Branch branch) => new Driver(null)
     {
-        var branch = branchRepository.Find(b => b.Address == branchAddress);
-        if (branch == null)
-            throw new ArgumentOutOfRangeException(nameof(branchAddress), branchAddress,
-                "The branch repository does not contain a branch with the specified address.");
+        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, IsAvailable = true,
+        CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0, BranchAddress = branch.Address,
+        Branch = branch
+    };
 
-        return new Driver(null)
-        {
-            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, IsAvailable = false,
-            CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0, BranchAddress = branchAddress,
-            Branch = branch
-        };
-    }
-
-    public static Driver New(IBranchRepository branchRepository, string name, bool certificatAdr, Branch branch)
+    public void SetBranch(Branch branch)
     {
-        if (!branchRepository.Exists(b => b.Address == branch.Address))
-            throw new ArgumentOutOfRangeException(nameof(branch), branch,
-                "The branch repository does not contain the specified branch.");
-
-        return new Driver(null)
-        {
-            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, IsAvailable = false,
-            CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0, BranchAddress = branch.Address,
-            Branch = branch
-        };
+        Branch = branch;
+        BranchAddress = branch.Address;
     }
-
     
     public override string ToString() => Name;
 
@@ -57,15 +40,15 @@ public class Driver
         }
     }
 
-    public string Name { get; private set; } = null!;
+    public string Name { get; set; } = null!;
     
-    public bool IsAvailable { get; private set; }
+    public bool IsAvailable { get; set; }
 
-    public bool CertificatAdr { get; private set; }
+    public bool CertificatAdr { get; set; }
     
-    public int HoursWorkedPerWeek { get; private set; }
+    public int HoursWorkedPerWeek { get; set; }
     
-    public int TotalHoursWorked { get; private set; }
+    public int TotalHoursWorked { get; set; }
 
     public string BranchAddress { get; private set; } = null!;
 
