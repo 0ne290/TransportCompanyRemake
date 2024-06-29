@@ -1,8 +1,10 @@
 using Domain.Constants;
+using Domain.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Domain.Entities;
 
-public class Order : IServiceProviderRequired
+public class Order
 {
     public Order()
     {
@@ -16,11 +18,11 @@ public class Order : IServiceProviderRequired
         DateBegin = dateBegin;
     }
 
-    public void CalculateAndSetDistanceInKm()
+    public void CalculateAndSetDistanceInKm(IGeolocationService geolocationService)
     {
-        var distanceFromBranchToStart = Branch.CalculateDistanceInKmByDegrees((StartLatitude, StartLongitude));
-        var distanceFromStartToEnd = ServiceProvider.GetRequiredService<IGeolocationService>().CalculateDistanceInKmByDegrees((StartLatitude, StartLongitude), (EndLatitude, EndLongitude));
-        var distanceFromEndToBranch = Branch.CalculateDistanceInKmByDegrees((EndLatitude, EndLongitude));
+        var distanceFromBranchToStart = Branch.CalculateDistanceInKmByDegrees(geolocationService, (StartLatitude, StartLongitude));
+        var distanceFromStartToEnd = geolocationService.CalculateDistanceInKmByDegrees((StartLatitude, StartLongitude), (EndLatitude, EndLongitude));
+        var distanceFromEndToBranch = Branch.CalculateDistanceInKmByDegrees(geolocationService, (EndLatitude, EndLongitude));
 
         DistanceInKm = distanceFromBranchToStart + distanceFromStartToEnd + distanceFromEndToBranch;
     }
@@ -45,15 +47,15 @@ public class Order : IServiceProviderRequired
 
     public string Address { get; set; } = null!;
     
-    public decimal StartLatitude { get; set; }
+    public double StartLatitude { get; set; }
 
-    public decimal StartLongitude { get; set; }
+    public double StartLongitude { get; set; }
 
-    public decimal EndLatitude { get; set; }
+    public double EndLatitude { get; set; }
 
-    public decimal EndLongitude { get; set; }
+    public double EndLongitude { get; set; }
     
-    public decimal DistanceInKm { get; private set; }
+    public double DistanceInKm { get; private set; }
 
     public decimal ClassAdr
     {
@@ -91,8 +93,6 @@ public class Order : IServiceProviderRequired
     public virtual Driver? Driver2 { get; set; }
 
     public virtual Branch Branch { get; set; } = null!;
-
-    public IServiceProvider ServiceProvider { get; set; } = DefaultServiceProvider.Instance;
 
     private decimal _classAdr;
 

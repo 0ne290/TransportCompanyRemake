@@ -1,15 +1,14 @@
 using Domain.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Domain.Entities;
 
-public class Branch : IServiceProviderRequired
+public class Branch
 {
     public override string ToString() => Address;
 
-    public double CalculateDistanceInKilometersByDegrees((double Latitude, double Longitude) point) => ServiceProvider
-        .GetRequiredService<IGeolocationService>()
-        .CalculateDistanceInKilometersByDegrees((Latitude, Longitude), (point.Latitude, point.Longitude));
+    public double CalculateDistanceInKmByDegrees(IGeolocationService geolocationService,
+        (double Latitude, double Longitude) point) =>
+        geolocationService.CalculateDistanceInKmByDegrees((Latitude, Longitude), (point.Latitude, point.Longitude));
     
     public string Address { get; set; } = null!;
     
@@ -20,6 +19,4 @@ public class Branch : IServiceProviderRequired
     public virtual ICollection<Truck> Trucks { get; set; } = new List<Truck>();
 
     public virtual ICollection<Driver> Drivers { get; set; } = new List<Driver>();
-    
-    public IServiceProvider ServiceProvider { get; set; } = DefaultServiceProviderSingleton.Instance;
 }

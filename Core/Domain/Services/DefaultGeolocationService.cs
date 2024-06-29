@@ -4,7 +4,7 @@ namespace Domain.Services;
 
 public class DefaultGeolocationService : IGeolocationService
 {
-    public double CalculateDistanceInKilometersByDegrees((double Latitude, double Longitude) point1,
+    public double CalculateDistanceInKmByDegrees((double Latitude, double Longitude) point1,
         (double Latitude, double Longitude) point2)
     {
         point1.Latitude *= NumberOfRadiansInOneDegree;
