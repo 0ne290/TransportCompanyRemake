@@ -46,14 +46,15 @@ public class Truck
     // моделирует наличие/отсутствие у совокупности Фура-Полуприцеп сертификата по всем 20 подклассам. Например, если
     // 17-ый бит равен 1, то Фура-Полуприцеп имеет сертификат по 17 подклассу (в терминах ГОСТ Р 57479 это будет
     // подкласс 6.2 - "Инфекционные вещества")
-    public int FlagsOfAvailableHazardClasses
+    public int HazardClassesFlag
     {
-        get => _flagsOfAvailableHazardClasses;
+        get => _hazardClassesFlag;
         set
         {
             if (value is < 0 or > 0b1111_1111_1111_1111_1111)
                 throw new ArgumentOutOfRangeException(nameof(value), value,
-                    "The branch repository does not contain the specified branch.");
+                    "The flag describes 20 attributes. This means that its value must be in the range [0; 2^20 (1 048 576)].");
+            
             if (value != 0)
             {
                 // TODO: Это всего-лишь концептуальный код для преобразования Int32 в bool[], моделирующий массив битов
@@ -61,7 +62,7 @@ public class Truck
                 var bits = new bool[bitArray.Length];
                 bitArray.CopyTo(bits, 0);
             }
-            _flagsOfAvailableHazardClasses = value;
+            _hazardClassesFlag = value;
         }
     }
 
@@ -83,5 +84,5 @@ public class Truck
 
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
 
-    private int _flagsOfAvailableHazardClasses;
+    private int _hazardClassesFlag;
 }
