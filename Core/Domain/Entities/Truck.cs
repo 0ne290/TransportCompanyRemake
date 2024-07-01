@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Domain.Entities;
 
 public class Truck
@@ -9,7 +11,7 @@ public class Truck
         _dismissalDate = dismissalDate;
     }
 
-    public static Driver New(string name, bool certificatAdr, Branch branch) => new Driver(null)
+    public static Truck New(string name, bool certificatAdr, Branch branch) => new Driver(null)
     {
         Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, IsAvailable = true,
         CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0, BranchAddress = branch.Address,
@@ -38,16 +40,28 @@ public class Truck
 
     public string Number { get; set; } = null!;
 
-    public string TypeAdr
+    // В соответствии с действующим на момент 01.07.2024 ГОСТ Р 57479, существует 20 подклассов опасности грузов. Для
+    // перевозки груза с тем или иным подклассом опасности, фура и ее полуприцеп должны быть сертифицированы на
+    // соответствие всем требованиям перевозки грузов с данным подклассом опасности. Флаговое свойство ниже как раз и
+    // моделирует наличие/отсутствие у совокупности Фура-Полуприцеп сертификата по всем 20 подклассам. Например, если
+    // 17-ый бит равен 1, то Фура-Полуприцеп имеет сертификат по 17 подклассу (в терминах ГОСТ Р 57479 это будет
+    // подкласс 6.2 - "Инфекционные вещества")
+    public int FlagsOfAvailableHazardClasses
     {
-        get => _typeAdr;
+        get => _flagsOfAvailableHazardClasses;
         set
         {
-            if (!string.IsNullOrWhiteSpace(value))
+            if (value is < 0 or > 0b1111_1111_1111_1111_1111)
+                throw new ArgumentOutOfRangeException(nameof(value), value,
+                    "The branch repository does not contain the specified branch.");
+            if (value != 0)
             {
-                
+                // TODO: Это всего-лишь концептуальный код для преобразования Int32 в bool[], моделирующий массив битов
+                var bitArray = new BitArray(new[] { _flagsOfAvailableHazardClasses });
+                var bits = new bool[bitArray.Length];
+                bitArray.CopyTo(bits, 0);
             }
-            _typeAdr = value;
+            _flagsOfAvailableHazardClasses = value;
         }
     }
 
@@ -63,11 +77,11 @@ public class Truck
     
     public decimal PricePerKm { get; set; }
     
-    public string BranchAddress { get; set; } = null!;
+    public string BranchAddress { get; private set; } = null!;
 
-    public virtual Branch Branch { get; set; } = null!;
+    public virtual Branch Branch { get; private set; } = null!;
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-    
-    private string _typeAdr { get; set; } = null!;
+    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
+
+    private int _flagsOfAvailableHazardClasses;
 }
