@@ -7,17 +7,17 @@ public class Truck
 {
     private Truck() { }
 
-    private Truck(DateTime? dismissalDate, int permittedHazardClassesFlags)
+    private Truck(DateTime? writeOffDate, int permittedHazardClassesFlags)
     {
-        _dismissalDate = dismissalDate;
+        _writeOffDate = writeOffDate;
         _permittedHazardClassesFlags = permittedHazardClassesFlags;
     }
 
     public static Truck New(string number, int? permittedHazardClassesFlags, bool tank, decimal volumeMax, decimal volumePrice,
         decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch) => new()
     {
-        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, _dismissalDate = null, Number = number,
-        PermittedHazardClassesFlags = permittedHazardClassesFlags, IsAvailable = true, Tank = tank, VolumeMax = volumeMax,
+        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, WriteOffDate = null, Number = number,
+        PermittedHazardClassesFlags = permittedHazardClassesFlags, Tank = tank, VolumeMax = volumeMax,
         VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice, PricePerKm = pricePerKm,
         BranchAddress = branch.Address, Branch = branch
     };
@@ -42,15 +42,15 @@ public class Truck
 
     public string Guid { get; private set; } = null!;
     
-    public DateTime HireDate { get; private set; }
+    public DateTime WriteOnDate { get; private set; }
     
-    public DateTime? DismissalDate 
+    public DateTime? WriteOffDate 
     {
-        get => _dismissalDate;
+        get => _writeOffDate;
         set
         {
             IsAvailable = value == null;
-            _dismissalDate = value;
+            _writeOffDate = value;
         }
     }
 
@@ -96,7 +96,7 @@ public class Truck
 
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
     
-    private DateTime? _dismissalDate;
+    private DateTime? _writeOffDate;
 
     private int? _permittedHazardClassesFlags;
 }
