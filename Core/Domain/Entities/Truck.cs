@@ -70,7 +70,7 @@ public class Truck
             if (value != null)
                 if (!HazardClassesFlags.IsFlagCombination(value.Value))
                     throw new ArgumentOutOfRangeException(nameof(value), value,
-                        "The flags describe 20 hazard subclasses. This means that the value of their combination must be in the range [0; 2^20 (1048576)].");
+                        "The flags describe 20 hazard subclasses. This means that the value of their combination must be in the range [0; 2^20 (1048576)).");
             
             _permittedHazardClassesFlags = value;
         }

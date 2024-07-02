@@ -1,3 +1,4 @@
+using Domain.Constants;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
@@ -27,10 +28,10 @@ public class Driver
         _dismissalDate = dismissalDate;
     }
 
-    public static Driver New(string name, bool certificatAdr, Branch branch) => new()
+    public static Driver New(string name, int? adrQualificationsFlags, Branch branch) => new()
     {
         Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, _dismissalDate = null, Name = name,
-        IsAvailable = true, CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0,
+        IsAvailable = true, AdrQualificationsFlags = adrQualificationsFlags, HoursWorkedPerWeek = 0, TotalHoursWorked = 0,
         BranchAddress = branch.Address, Branch = branch
     };
 
@@ -60,7 +61,19 @@ public class Driver
     
     public bool IsAvailable { get; set; }
 
-    public bool CertificatAdr { get; set; }
+    public int? AdrQualificationsFlags
+    {
+        get => _adrQualificationsFlags;
+        set
+        {
+            if (value != null)
+                if (!AdrDriverQualificationsFlags.IsFlagCombination(value.Value))
+                    throw new ArgumentOutOfRangeException(nameof(value), value,
+                        "The flags describe 4 ADR driver qualifications. This means that the value of their combination must be in the range [0; 2^4 (16)).");
+            
+            _adrQualificationsFlags = value;
+        }
+    }
     
     public int HoursWorkedPerWeek { get; set; }
     
@@ -73,4 +86,6 @@ public class Driver
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
     
     private DateTime? _dismissalDate;
+    
+    private int? _adrQualificationsFlags;
 }
