@@ -30,8 +30,8 @@ public class Driver
 
     public static Driver New(string name, int? adrQualificationsFlags, Branch branch) => new()
     {
-        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, _dismissalDate = null, Name = name,
-        IsAvailable = true, AdrQualificationsFlags = adrQualificationsFlags, HoursWorkedPerWeek = 0, TotalHoursWorked = 0,
+        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DdismissalDate = null, Name = name,
+        AdrQualificationsFlags = adrQualificationsFlags, HoursWorkedPerWeek = 0, TotalHoursWorked = 0,
         BranchAddress = branch.Address, Branch = branch
     };
 
