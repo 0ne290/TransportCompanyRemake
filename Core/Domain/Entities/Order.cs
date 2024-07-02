@@ -57,14 +57,17 @@ public class Order
     
     public double DistanceInKm { get; private set; }
 
-    public decimal ClassAdr
+    public int? HazardClassFlag
     {
-        get => _classAdr;
+        get => _hazardClassFlag;
         set
         {
-            if (!ClassesAdr.ClassExists(value))
-                throw new ArgumentException($"{value} is not an class adr", nameof(value));
-            _classAdr = value;
+            if (value != null)
+                if (!HazardClassesFlags.IsFlag(value.Value))
+                    throw new ArgumentOutOfRangeException(nameof(value), value,
+                        "The value is not a hazard class flag.");
+            
+            _hazardClassFlag = value;
         }
     }
 
@@ -94,7 +97,7 @@ public class Order
 
     public virtual Branch Branch { get; set; } = null!;
 
-    private decimal _classAdr;
+    private int? _hazardClassFlag;
 
     private DateTime? _dateEnd;
 }

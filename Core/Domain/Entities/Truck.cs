@@ -1,4 +1,5 @@
 using System.Collections;
+using Domain.Constants;
 
 namespace Domain.Entities;
 
@@ -6,16 +7,19 @@ public class Truck
 {
     private Truck() { }
 
-    private Truck(DateTime? dismissalDate)
+    private Truck(DateTime? dismissalDate, int permittedHazardClassesFlags)
     {
         _dismissalDate = dismissalDate;
+        _permittedHazardClassesFlags = permittedHazardClassesFlags;
     }
 
-    public static Truck New(string name, bool certificatAdr, Branch branch) => new Driver(null)
+    public static Truck New(string number, int? permittedHazardClassesFlags, bool tank, decimal volumeMax, decimal volumePrice,
+        decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch) => new()
     {
-        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, IsAvailable = true,
-        CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0, BranchAddress = branch.Address,
-        Branch = branch
+        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, _dismissalDate = null, Number = number,
+        PermittedHazardClassesFlags = permittedHazardClassesFlags, IsAvailable = true, Tank = tank, VolumeMax = volumeMax,
+        VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice, PricePerKm = pricePerKm,
+        BranchAddress = branch.Address, Branch = branch
     };
 
     public void SetBranch(Branch branch)
@@ -37,6 +41,18 @@ public class Truck
     public override string ToString() => Number;
 
     public string Guid { get; private set; } = null!;
+    
+    public DateTime HireDate { get; private set; }
+    
+    public DateTime? DismissalDate 
+    {
+        get => _dismissalDate;
+        set
+        {
+            IsAvailable = value == null;
+            _dismissalDate = value;
+        }
+    }
 
     public string Number { get; set; } = null!;
 
@@ -46,27 +62,23 @@ public class Truck
     // моделирует наличие/отсутствие у совокупности Фура-Полуприцеп сертификата по всем 20 подклассам. Например, если
     // 17-ый бит равен 1, то Фура-Полуприцеп имеет сертификат по 17 подклассу (в терминах ГОСТ Р 57479 это будет
     // подкласс 6.2 - "Инфекционные вещества")
-    public int HazardClassesFlag
+    public int? PermittedHazardClassesFlags
     {
-        get => _hazardClassesFlag;
+        get => _permittedHazardClassesFlags;
         set
         {
-            if (value is < 0 or > 0b1111_1111_1111_1111_1111)
-                throw new ArgumentOutOfRangeException(nameof(value), value,
-                    "The flag describes 20 attributes. This means that its value must be in the range [0; 2^20 (1 048 576)].");
+            if (value != null)
+                if (!HazardClassesFlags.IsFlagCombination(value.Value))
+                    throw new ArgumentOutOfRangeException(nameof(value), value,
+                        "The flags describe 20 hazard subclasses. This means that the value of their combination must be in the range [0; 2^20 (1048576)].");
             
-            if (value != 0)
-            {
-                // TODO: Это всего-лишь концептуальный код для преобразования Int32 в bool[], моделирующий массив битов
-                var bitArray = new BitArray(new[] { _flagsOfAvailableHazardClasses });
-                var bits = new bool[bitArray.Length];
-                bitArray.CopyTo(bits, 0);
-            }
-            _hazardClassesFlag = value;
+            _permittedHazardClassesFlags = value;
         }
     }
 
     public bool IsAvailable { get; set; }
+    
+    public bool Tank { get; set; }
 
     public decimal VolumeMax { get; set; }
     
@@ -83,6 +95,8 @@ public class Truck
     public virtual Branch Branch { get; private set; } = null!;
 
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
+    
+    private DateTime? _dismissalDate;
 
-    private int _hazardClassesFlag;
+    private int? _permittedHazardClassesFlags;
 }
