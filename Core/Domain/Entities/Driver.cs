@@ -23,9 +23,10 @@ public class Driver
     // 2. Свойство имеет только геттер. В этом случае инициализация свойства возможна только из конструктора, так что
     // этот прием, на первый взгляд, необходим. Но зачем тебе вообще GetOnly-свойство? Добавь приватный сеттер и не
     // парься - для клиентов класса абсолютно ничего не изменится.
-    private Driver(DateTime? dismissalDate)
+    private Driver(DateTime? dismissalDate, int? adrQualificationsFlags)
     {
         _dismissalDate = dismissalDate;
+        _adrQualificationsFlags = adrQualificationsFlags;
     }
 
     public static Driver New(string name, int? adrQualificationsFlags, Branch branch) => new()
