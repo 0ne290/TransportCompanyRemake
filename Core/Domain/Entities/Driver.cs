@@ -31,15 +31,15 @@ public class Driver
 
     public static Driver New(string name, int? adrQualificationsFlags, Branch branch) => new()
     {
-        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DdismissalDate = null, Name = name,
+        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DismissalDate = null, Name = name,
         AdrQualificationsFlags = adrQualificationsFlags, HoursWorkedPerWeek = 0, TotalHoursWorked = 0,
-        BranchAddress = branch.Address, Branch = branch
+        BranchGuid = branch.Guid, Branch = branch
     };
 
     public void SetBranch(Branch branch)
     {
         Branch = branch;
-        BranchAddress = branch.Address;
+        BranchGuid = branch.Guid;
     }
     
     public override string ToString() => Name;
@@ -70,7 +70,8 @@ public class Driver
             if (value != null)
                 if (!AdrDriverQualificationsFlags.IsFlagCombination(value.Value))
                     throw new ArgumentOutOfRangeException(nameof(value), value,
-                        "The flags describe 4 ADR driver qualifications. This means that the value of their combination must be in the range [0; 2^4 (16)).");
+                        "The flags describe 4 ADR driver qualifications. This means that the value of their " +
+                        "combination must be in the range [0; 2^4 (16)).");
             
             _adrQualificationsFlags = value;
         }
@@ -80,7 +81,7 @@ public class Driver
     
     public int TotalHoursWorked { get; set; }
 
-    public string BranchAddress { get; private set; } = null!;
+    public string BranchGuid { get; private set; } = null!;
 
     public virtual Branch Branch { get; private set; } = null!;
     

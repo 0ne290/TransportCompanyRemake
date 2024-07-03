@@ -13,19 +13,20 @@ public class Truck
         _permittedHazardClassesFlags = permittedHazardClassesFlags;
     }
 
-    public static Truck New(string number, int? permittedHazardClassesFlags, bool tank, decimal volumeMax, decimal volumePrice,
-        decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch) => new()
+    public static Truck
+        New(string number, int? permittedHazardClassesFlags, bool tank, decimal volumeMax, decimal volumePrice,
+            decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch) => new()
     {
-        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, WriteOffDate = null, Number = number,
+        Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, WriteOffDate = null, Number = number,
         PermittedHazardClassesFlags = permittedHazardClassesFlags, Tank = tank, VolumeMax = volumeMax,
         VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice, PricePerKm = pricePerKm,
-        BranchAddress = branch.Address, Branch = branch
+        BranchGuid = branch.Guid, Branch = branch
     };
 
     public void SetBranch(Branch branch)
     {
         Branch = branch;
-        BranchAddress = branch.Address;
+        BranchGuid = branch.Guid;
     }
 
     public decimal CalculateOrderPrice(Order order)
@@ -70,7 +71,8 @@ public class Truck
             if (value != null)
                 if (!HazardClassesFlags.IsFlagCombination(value.Value))
                     throw new ArgumentOutOfRangeException(nameof(value), value,
-                        "The flags describe 20 hazard subclasses. This means that the value of their combination must be in the range [0; 2^20 (1048576)).");
+                        "The flags describe 20 hazard subclasses. This means that the value of their " +
+                        "combination must be in the range [0; 2^20 (1048576)).");
             
             _permittedHazardClassesFlags = value;
         }
@@ -90,7 +92,7 @@ public class Truck
     
     public decimal PricePerKm { get; set; }
     
-    public string BranchAddress { get; private set; } = null!;
+    public string BranchGuid { get; private set; } = null!;
 
     public virtual Branch Branch { get; private set; } = null!;
 

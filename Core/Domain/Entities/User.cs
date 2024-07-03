@@ -5,52 +5,21 @@ namespace Domain.Entities;
 
 public class User
 {
-    private User()
-    {
-        DynamicPartOfSalt = RandomNumberGenerator.GetHexString(128);
-    }
+    private User() { }
     
-    private User(string dynamicPartOfSalt, string password)
-    {
-        DynamicPartOfSalt = dynamicPartOfSalt;
-        _password = password;
-    }
+    private User(string password) => _password = password;
     
-    public static User New(string login, string password, string name, bool certificatAdr, string branchAddress)
-    {
-        var branch = branchRepository.Find(b => b.Address == branchAddress);
-        if (branch == null)
-            throw new ArgumentOutOfRangeException(nameof(branchAddress), branchAddress,
-                "The branch repository does not contain a branch with the specified address.");
-
-        return new Driver(null)
-        {
-            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, IsAvailable = false,
-            CertificatAdr = certificatAdr, HoursWorkedPerWeek = 0, TotalHoursWorked = 0, BranchAddress = branchAddress,
-            Branch = branch
-        };
-    }
+    public static User New(string login, string password, string name, string contact) => new() { Guid = System.Guid.NewGuid().ToString(), DynamicPartOfSalt = RandomNumberGenerator.GetHexString(128), RegistrationDate = DateTime.Now }
 
     public override string ToString() => Login;
-
-    public string DynamicPartOfSalt { get; private set; } = null!;
-
-    public long? VkUserId
-    {
-        get => _vkUserId;
-        set
-        {
-            if (value != null)
-            {
-                Login = Guid.NewGuid().ToString();
-                Password = Guid.NewGuid().ToString();
-            }
-            
-            _vkUserId = value;
-        }
-    }
     
     public string Guid { get; private set; } = null!;
+    
+    public string DynamicPartOfSalt { get; private set; } = null!;
+    
+    public DateTime RegistrationDate { get; private set; }
+    
+    public long? VkUserId { get; set; }
 
     public string Login { get; set; } = null!;
 
@@ -84,9 +53,7 @@ public class User
 
     public string Contact { get; set; } = null!;
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
-    private long? _vkUserId;
+    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
 
     private string _password = null!;
 
