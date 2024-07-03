@@ -1,6 +1,5 @@
 using Domain.Constants;
 using Domain.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Domain.Entities;
 

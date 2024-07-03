@@ -1,5 +1,4 @@
 using Domain.Constants;
-using Domain.Interfaces;
 
 namespace Domain.Entities;
 
@@ -62,27 +61,27 @@ public class Driver
         BranchGuid = branch.Guid;
     }
 
-    public override string ToString() => Name;
+    public override string ToString() => $"Name = {Name}";
 
     public string Guid { get; private set; } = null!;
     
     public DateTime HireDate { get; private set; }
     
     public DateTime? DismissalDate { get; private set; }
-
-    public string Name { get; set; } = null!;
     
-    public bool IsAvailable { get; set; }
-
     public int? AdrQualificationsFlags { get; private set; }
     
-    public int HoursWorkedPerWeek { get; set; }
-    
-    public int TotalHoursWorked { get; set; }
-
     public string BranchGuid { get; private set; } = null!;
 
     public virtual Branch Branch { get; private set; } = null!;
     
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
+
+    public string Name { get; set; } = null!;
+    
+    public bool IsAvailable { get; set; }
+    
+    public int HoursWorkedPerWeek { get; set; }
+    
+    public int TotalHoursWorked { get; set; }
 }

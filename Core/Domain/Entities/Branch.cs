@@ -13,17 +13,17 @@ public class Branch
         (double Latitude, double Longitude) point) =>
         geolocationService.CalculateDistanceInKmByDegrees((Latitude, Longitude), (point.Latitude, point.Longitude));
     
-    public override string ToString() => Address;
+    public override string ToString() => $"Address = {Address}";
     
     public string Guid { get; private set; } = null!;
+    
+    public virtual ICollection<Truck> Trucks { get; private set; } = new List<Truck>();
+
+    public virtual ICollection<Driver> Drivers { get; private set; } = new List<Driver>();
     
     public string Address { get; set; } = null!;
     
     public double Latitude { get; set; }
 
     public double Longitude { get; set; }
-
-    public virtual ICollection<Truck> Trucks { get; private set; } = new List<Truck>();
-
-    public virtual ICollection<Driver> Drivers { get; private set; } = new List<Driver>();
 }

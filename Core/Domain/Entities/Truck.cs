@@ -1,4 +1,3 @@
-using System.Collections;
 using Domain.Constants;
 
 namespace Domain.Entities;
@@ -7,21 +6,44 @@ public class Truck
 {
     private Truck() { }
 
-    private Truck(DateTime? writeOffDate, int permittedHazardClassesFlags)
+    public static Truck New(string number, int? permittedHazardClassesFlags, bool tank, decimal volumeMax,
+        decimal volumePrice, decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch)
     {
-        _writeOffDate = writeOffDate;
-        _permittedHazardClassesFlags = permittedHazardClassesFlags;
+        var truck = new Truck
+        {
+            Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, Number = number, Tank = tank,
+            VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice,
+            PricePerKm = pricePerKm
+        };
+        truck.SetWriteOffDate(null);
+        truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags);
+        truck.SetBranch(branch);
+
+        return truck;
     }
 
-    public static Truck
-        New(string number, int? permittedHazardClassesFlags, bool tank, decimal volumeMax, decimal volumePrice,
-            decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch) => new()
+    public void SetWriteOffDate(DateTime? writeOffDate)
     {
-        Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, WriteOffDate = null, Number = number,
-        PermittedHazardClassesFlags = permittedHazardClassesFlags, Tank = tank, VolumeMax = volumeMax,
-        VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice, PricePerKm = pricePerKm,
-        BranchGuid = branch.Guid, Branch = branch
-    };
+        IsAvailable = writeOffDate == null;
+        WriteOffDate = writeOffDate;
+    }
+    
+    // В соответствии с действующим на момент 01.07.2024 ГОСТ Р 57479, существует 20 подклассов опасности грузов. Для
+    // перевозки груза с тем или иным подклассом опасности, фура и ее полуприцеп должны быть сертифицированы на
+    // соответствие всем требованиям перевозки грузов с данным подклассом опасности. Флаговое свойство ниже как раз и
+    // моделирует наличие/отсутствие у совокупности Фура-Полуприцеп сертификата по всем 20 подклассам. Например, если
+    // 16-ый и 17-ый биты равны 1, то Фура-Полуприцеп имеет сертификат по 16-му 17-му подклассам (в терминах ГОСТ Р
+    // 57479 это будут подклассы 6.1 "Токсичные вещества" и 6.2 "Инфекционные вещества")
+    public void SetPermittedHazardClassesFlags(int? permittedHazardClassesFlags)
+    {
+        if (permittedHazardClassesFlags != null)
+            if (!HazardClassesFlags.IsFlagCombination(permittedHazardClassesFlags.Value))
+                throw new ArgumentOutOfRangeException(nameof(permittedHazardClassesFlags), permittedHazardClassesFlags,
+                    "The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
+                    "value of their combination must be in the range [0; 2^20 (1048576)).");
+            
+        PermittedHazardClassesFlags = permittedHazardClassesFlags;
+    }
 
     public void SetBranch(Branch branch)
     {
@@ -39,44 +61,23 @@ public class Truck
         return orderPrice;
     }
 
-    public override string ToString() => Number;
+    public override string ToString() => $"Number = {Number}";
 
     public string Guid { get; private set; } = null!;
     
     public DateTime WriteOnDate { get; private set; }
     
-    public DateTime? WriteOffDate 
-    {
-        get => _writeOffDate;
-        set
-        {
-            IsAvailable = value == null;
-            _writeOffDate = value;
-        }
-    }
+    public DateTime? WriteOffDate { get; private set; }
+    
+    public int? PermittedHazardClassesFlags { get; private set; }
+    
+    public string BranchGuid { get; private set; } = null!;
 
+    public virtual Branch Branch { get; private set; } = null!;
+
+    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
+    
     public string Number { get; set; } = null!;
-
-    // В соответствии с действующим на момент 01.07.2024 ГОСТ Р 57479, существует 20 подклассов опасности грузов. Для
-    // перевозки груза с тем или иным подклассом опасности, фура и ее полуприцеп должны быть сертифицированы на
-    // соответствие всем требованиям перевозки грузов с данным подклассом опасности. Флаговое свойство ниже как раз и
-    // моделирует наличие/отсутствие у совокупности Фура-Полуприцеп сертификата по всем 20 подклассам. Например, если
-    // 17-ый бит равен 1, то Фура-Полуприцеп имеет сертификат по 17 подклассу (в терминах ГОСТ Р 57479 это будет
-    // подкласс 6.2 - "Инфекционные вещества")
-    public int? PermittedHazardClassesFlags
-    {
-        get => _permittedHazardClassesFlags;
-        set
-        {
-            if (value != null)
-                if (!HazardClassesFlags.IsFlagCombination(value.Value))
-                    throw new ArgumentOutOfRangeException(nameof(value), value,
-                        "The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
-                        "value of their combination must be in the range [0; 2^20 (1048576)).");
-            
-            _permittedHazardClassesFlags = value;
-        }
-    }
 
     public bool IsAvailable { get; set; }
     
@@ -91,14 +92,4 @@ public class Truck
     public decimal WeightPrice { get; set; }
     
     public decimal PricePerKm { get; set; }
-    
-    public string BranchGuid { get; private set; } = null!;
-
-    public virtual Branch Branch { get; private set; } = null!;
-
-    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
-    
-    private DateTime? _writeOffDate;
-
-    private int? _permittedHazardClassesFlags;
 }
