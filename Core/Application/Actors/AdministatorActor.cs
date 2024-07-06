@@ -1,10 +1,10 @@
-using Applications.Dtos;
+using Application.Dtos;
 using Domain.Entities;
 using Domain.Interfaces;
 
-namespace Applications.Web.Interactors;
+namespace Application.Actors;
 
-public class AdministatorInteractor(IEntityRepository<Driver> driverRepository, IEntityRepository<Branch> branchRepository)
+public class AdministatorActor(IEntityRepository<Driver> driverRepository, IEntityRepository<Branch> branchRepository)
 {
     public void RegisterDriver(DriverRegistrationRequestDto requestDto)
     {

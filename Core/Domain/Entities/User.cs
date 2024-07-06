@@ -7,7 +7,7 @@ public class User
 {
     private User() { }
     
-    public static User New(ICryptographicService cryptographicService, string login, string password, string name, string contact)
+    public static User New(string name, string contact, string login, string password, ICryptographicService cryptographicService)
     {
         var user = new User
         {
@@ -19,7 +19,7 @@ public class User
         return user;
     }
     
-    public static User New(long vkUserId, string name, string contact)
+    public static User New(string name, string contact, long vkUserId)
     {
         var user = new User
         {

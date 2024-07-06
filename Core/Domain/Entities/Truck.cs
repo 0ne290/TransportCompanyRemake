@@ -6,8 +6,9 @@ public class Truck
 {
     private Truck() { }
 
-    public static Truck New(string number, int? permittedHazardClassesFlags, bool tank, decimal volumeMax,
-        decimal volumePrice, decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch)
+    public static Truck New(string number, bool tank, decimal volumeMax,
+        decimal volumePrice, decimal weightMax, decimal weightPrice, decimal pricePerKm,
+        int? permittedHazardClassesFlags, Branch branch)
     {
         var truck = new Truck
         {

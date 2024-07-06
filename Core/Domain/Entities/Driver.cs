@@ -43,6 +43,14 @@ public class Driver
         IsAvailable = dismissalDate == null;
         DismissalDate = dismissalDate;
     }
+
+    public void AddHoursWorked(double hoursWorked)
+    {
+        HoursWorkedPerWeek += hoursWorked;
+        TotalHoursWorked += hoursWorked;
+    }
+
+    public void ResetHoursWorkedPerWeek() => HoursWorkedPerWeek = 0;
     
     public void SetAdrQualificationsFlags(int? adrQualificationsFlags)
     {
@@ -69,6 +77,10 @@ public class Driver
     
     public DateTime? DismissalDate { get; private set; }
     
+    public double HoursWorkedPerWeek { get; private set; }
+    
+    public double TotalHoursWorked { get; private set; }
+    
     public int? AdrQualificationsFlags { get; private set; }
     
     public string BranchGuid { get; private set; } = null!;
@@ -80,8 +92,4 @@ public class Driver
     public string Name { get; set; } = null!;
     
     public bool IsAvailable { get; set; }
-    
-    public int HoursWorkedPerWeek { get; set; }
-    
-    public int TotalHoursWorked { get; set; }
 }

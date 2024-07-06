@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Core\Domain\Domai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dal", "Infrastructure\Dal\Dal.csproj", "{47EF6C70-F938-4CF9-95C6-C447D5334BB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Applications", "Core\Applications\Applications.csproj", "{B34C87DB-0EC6-4E75-A58B-DDB27367A423}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Core\Application\Application.csproj", "{B34C87DB-0EC6-4E75-A58B-DDB27367A423}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

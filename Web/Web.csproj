@@ -74,7 +74,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core\Applications\Applications.csproj" />
+      <ProjectReference Include="..\Core\Application\Application.csproj" />
       <ProjectReference Include="..\Core\Domain\Domain.csproj" />
       <ProjectReference Include="..\Infrastructure\Dal\Dal.csproj" />
     </ItemGroup>
