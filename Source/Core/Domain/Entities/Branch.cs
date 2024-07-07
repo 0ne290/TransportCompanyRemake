@@ -6,8 +6,11 @@ public class Branch
 {
     private Branch() { }
 
-    public static Branch New(string address, double latitude, double longitude) => new()
-        { Guid = System.Guid.NewGuid().ToString(), Address = address, Latitude = latitude, Longitude = longitude };
+    public static Branch New(string address, (double Latitude, double Longitude) point) => new()
+    {
+        Guid = System.Guid.NewGuid().ToString(), Address = address, Latitude = point.Latitude,
+        Longitude = point.Longitude
+    };
     
     public double CalculateDistanceInKmByDegrees(IGeolocationService geolocationService,
         (double Latitude, double Longitude) point) =>
