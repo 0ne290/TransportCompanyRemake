@@ -6,13 +6,13 @@ namespace Domain.Services;
 
 public class DefaultCryptographicService : ICryptographicService
 {
-    public string Hash(string value)
+    public string EncryptAndHash(string value)
     {
-        var sha256OfSaltyNewPassword = SHA512.HashData(Encrypt(value));
+        var sha512OfEncryptedValue = SHA512.HashData(Encrypt(value));
             
         var stringBuilder = new StringBuilder();
             
-        foreach (var b in sha256OfSaltyNewPassword)
+        foreach (var b in sha512OfEncryptedValue)
             stringBuilder.Append(b.ToString("x2"));
 
         return stringBuilder.ToString();

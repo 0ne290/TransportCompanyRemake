@@ -4,7 +4,6 @@ namespace Domain.Services;
 
 public class DefaultGeolocationService : IGeolocationService
 {
-    
     public double CalculateDistanceInKmByDegrees((double Latitude, double Longitude) point1,
         (double Latitude, double Longitude) point2)
     {

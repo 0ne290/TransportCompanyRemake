@@ -64,7 +64,7 @@ public class User
             throw new ArgumentOutOfRangeException(nameof(password), password,
                 "The Password passwod cannot be null only when the Login passwod are not null and VkUserId passwod are null.");
 
-        Password = password == null ? password : cryptographicService.Hash(Salt(password));
+        Password = password == null ? password : cryptographicService.EncryptAndHash(Salt(password));
     }
     
     public void SetLoginAndPassword(ICryptographicService cryptographicService, string? login, string? password)
@@ -77,7 +77,7 @@ public class User
                 "The Password value cannot be null only when the Login value are not null and VkUserId value are null.");
 
         Login = login;
-        Password = password == null ? password : cryptographicService.Hash(Salt(password));
+        Password = password == null ? password : cryptographicService.EncryptAndHash(Salt(password));
     }
 
     private string Salt(string value) => value + StaticPartOfSalt + Login + value + DynamicPartOfSalt + Login;

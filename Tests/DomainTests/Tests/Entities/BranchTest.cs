@@ -1,10 +1,11 @@
+using System.Text.RegularExpressions;
 using Domain.Entities;
 using Domain.Interfaces;
 using Moq;
 
 namespace DomainTests.Tests.Entities;
 
-public class BranchTest
+public partial class BranchTest
 {
     [Fact]
     public void New_SourceDataAndBranchAutoPropertiesAreEqual_Test()
@@ -27,6 +28,7 @@ public class BranchTest
     public void New_GuidsOfTwoBranchesAreNotEqual_Test()
     {
         // Arrange
+        var guidRegex = GuidRegex();
         var guids = new HashSet<string>(100);
         
         for (var i = 0; i < 100; i++)
@@ -36,6 +38,7 @@ public class BranchTest
             
             // Assert
             Assert.DoesNotContain(branch.Guid, guids);
+            Assert.Matches(guidRegex, branch.Guid);
 
             guids.Add(branch.Guid);
         }
@@ -71,4 +74,7 @@ public class BranchTest
             (double Latitude, double Longitude) point2) =>
             point1.Latitude + point1.Longitude + point2.Latitude + point2.Longitude;
     }
+
+    [GeneratedRegex(@"^(?i)[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$", RegexOptions.None, "ru-RU")]
+    private static partial Regex GuidRegex();
 }
