@@ -48,6 +48,40 @@ public partial class DriverTest
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => Driver.New("AnyName", adrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425))));
     }
+
+    [Fact]
+    public void Dismiss_SetTheDismissalDateToNowAndIsAvailableToFalse_Test()
+    {
+        // Arrange
+        var expectedDismissalDate = DateTime.Now;
+        var expectedDismissalDateError = TimeSpan.FromSeconds(10);
+        var expectedIsAvailable = true;
+        var driver = Driver.New("AnyName", adrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425)));
+
+        // Act
+        driver.Dismiss();
+
+        // Assert
+        Assert.Equal(expectedDismissalDate, driver.DismissalDate, expectedDismissalDateError);
+        Assert.Equal(expectedIsAvailable, driver.IsAvailable);
+    }
+
+    [Fact]
+    public void Reinstate_SetTheDismissalDateToNullAndIsAvailableToTrue_Test()
+    {
+        // Arrange
+        DateTime? expectedDismissalDate = null;
+        var expectedIsAvailable = true;
+        var driver = Driver.New("AnyName", adrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425)));
+        driver.Dismiss();
+
+        // Act
+        driver.Reinstate();
+
+        // Assert
+        Assert.Equal(expectedDismissalDate, driver.DismissalDate);
+        Assert.Equal(expectedIsAvailable, driver.IsAvailable);
+    }
     
     [GeneratedRegex(@"^(?i)[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$", RegexOptions.None, "ru-RU")]
     private static partial Regex GuidRegex();
