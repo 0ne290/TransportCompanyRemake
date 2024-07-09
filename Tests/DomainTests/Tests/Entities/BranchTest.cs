@@ -8,25 +8,36 @@ namespace DomainTests.Tests.Entities;
 public partial class BranchTest
 {
     [Fact]
-    public void New_ReturnTheBranchesWithUniqueGuids_Test()
+    public void New_ReturnTheBranch_Test()
     {
         // Arrange
         var guidRegex = GuidRegex();
-        var guids = new HashSet<string>(100);
         const string expectedAddress = "AnyAddress";
         const double expectedLatitude = 37.314;
         const double expectedLongitude = -2.425;
 
+        // Act
+        var branch = Branch.New(expectedAddress, (expectedLatitude, expectedLongitude));
+            
+        // Assert
+        Assert.Equal(expectedAddress, branch.Address);
+        Assert.Equal(expectedLatitude, branch.Latitude);
+        Assert.Equal(expectedLongitude, branch.Longitude);
+        Assert.Matches(guidRegex, branch.Guid);
+    }
+    
+    [Fact]
+    public void New_ReturnTheBranchesWithUniqueGuids_Test()
+    {
+        // Arrange
+        var guids = new HashSet<string>(100);
+
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var branch = Branch.New(expectedAddress, (expectedLatitude, expectedLongitude));
+            var branch = Branch.New("AnyAddress", (37.314,-2.425));
             
             // Assert
-            Assert.Equal(expectedAddress, branch.Address);
-            Assert.Equal(expectedLatitude, branch.Latitude);
-            Assert.Equal(expectedLongitude, branch.Longitude);
-            Assert.Matches(guidRegex, branch.Guid);
             Assert.DoesNotContain(branch.Guid, guids);
 
             guids.Add(branch.Guid);
