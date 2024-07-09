@@ -6,8 +6,11 @@ namespace DomainTests.Tests.Entities;
 
 public partial class DriverTest
 {
-    [Fact]
-    public void New_AdrDriverQualificationsFlagsIsOne_ReturnTheDriver_Test()
+    [Theory]
+    [InlineData(AdrDriverQualificationsFlags.Base)]
+    [InlineData(AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18)]
+    [InlineData(null)]
+    public void New_AdrDriverQualificationsFlagsIsValid_ReturnTheDriver_Test(int? expectedAdrQualificationsFlags)
     {
         // Arrange
         var guidRegex = GuidRegex();
@@ -16,7 +19,6 @@ public partial class DriverTest
         const double expectedTotalHoursWorked = 0;
         const bool expectedIsAvailable = true;
         const string expectedName = "AnyName";
-        const int expectedAdrQualificationsFlags = AdrDriverQualificationsFlags.Base;
         DateTime? expectedDismissalDate = null;
         var expectedHireDateError = TimeSpan.FromSeconds(10);
         var expectedHireDate = DateTime.Now;
@@ -35,32 +37,6 @@ public partial class DriverTest
         Assert.Equal(expectedBranch, driver.Branch);
         Assert.Equal(expectedBranch.Guid, driver.BranchGuid);
         Assert.Matches(guidRegex, driver.Guid);
-    }
-    
-    [Fact]
-    public void New_AdrDriverQualificationsFlagsIsMultiple_ReturnTheDriver_Test()
-    {
-        // Arrange
-        const int expectedAdrQualificationsFlags = AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18;
-
-        // Act
-        var driver = Driver.New("AnyName", expectedAdrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425)));
-            
-        // Assert
-        Assert.Equal(expectedAdrQualificationsFlags, driver.AdrQualificationsFlags);
-    }
-    
-    [Fact]
-    public void New_AdrDriverQualificationsFlagsIsNull_ReturnTheDriver_Test()
-    {
-        // Arrange
-        int? expectedAdrQualificationsFlags = null;
-
-        // Act
-        var driver = Driver.New("AnyName", expectedAdrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425)));
-            
-        // Assert
-        Assert.Equal(expectedAdrQualificationsFlags, driver.AdrQualificationsFlags);
     }
     
     [Fact]
