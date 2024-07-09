@@ -31,17 +31,23 @@ public class Driver
             Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, HoursWorkedPerWeek = 0,
             TotalHoursWorked = 0
         };
-        driver.SetDismissalDate(null);
+        Reinstate();
         driver.SetAdrQualificationsFlags(adrQualificationsFlags);
         driver.SetBranch(branch);
 
         return driver;
     }
-    
-    public void SetDismissalDate(DateTime? dismissalDate)
+
+    public void Reinstate()
     {
-        IsAvailable = dismissalDate == null;
-        DismissalDate = dismissalDate;
+        IsAvailable = true;
+        DismissalDate = null;
+    }
+    
+    public void Dismiss()
+    {
+        IsAvailable = false;
+        DismissalDate = DateTime.Now;
     }
 
     public void AddHoursWorked(double hoursWorked)
