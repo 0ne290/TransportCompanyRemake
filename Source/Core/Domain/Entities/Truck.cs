@@ -16,17 +16,23 @@ public class Truck
             VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice,
             PricePerKm = pricePerKm
         };
-        truck.SetWriteOffDate(null);
+        truck.Reinstate();
         truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags);
         truck.SetBranch(branch);
 
         return truck;
     }
 
-    public void SetWriteOffDate(DateTime? writeOffDate)
+    public void WriteOff()
     {
-        IsAvailable = writeOffDate == null;
-        WriteOffDate = writeOffDate;
+        IsAvailable = false;
+        WriteOffDate = DateTime.Now;
+    }
+
+    public void Reinstate()
+    {
+        IsAvailable = true;
+        WriteOffDate = null;
     }
     
     // В соответствии с действующим на момент 01.07.2024 ГОСТ Р 57479, существует 20 подклассов опасности грузов. Для
