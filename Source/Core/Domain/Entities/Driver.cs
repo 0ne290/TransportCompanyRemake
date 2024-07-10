@@ -31,7 +31,7 @@ public class Driver
             Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, HoursWorkedPerWeek = 0,
             TotalHoursWorked = 0
         };
-        Reinstate();
+        driver.Reinstate();
         driver.SetAdrQualificationsFlags(adrQualificationsFlags);
         driver.SetBranch(branch);
 
