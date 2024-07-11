@@ -6,7 +6,7 @@ public class DefaultCryptographicServiceTest
 {
     // Encryption algorithm: if the character code is less than 127, increase it by 43, otherwise decrease it by 21
     [Fact]
-    public void EncryptAndHash_ReturnTheSha512HashOfEncryptedValue_Test()
+    public void DefaultCryptographicService_EncryptAndHash_ContextAndArgumentIsValid_ReturnTheSha512HashOfEncryptedValue_Test()
     {
         // Arrange
         var defaultCryptographicService = new DefaultCryptographicService();

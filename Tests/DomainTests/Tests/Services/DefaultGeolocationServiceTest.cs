@@ -6,7 +6,7 @@ public class DefaultGeolocationServiceTest
 {
     [Fact]
     public void
-        CalculateDistanceInKmByDegrees_ReturnTheDistanceCalculatedUsingHaversineFormulaModifiedForAntipodes_Test()
+        DefaultGeolocationService_CalculateDistanceInKmByDegrees_ContextAndArgumentsIsValid_ReturnTheDistanceCalculatedUsingHaversineFormulaModifiedForAntipodes_Test()
     {
         // Arrange
         var point1 = (52, 103);

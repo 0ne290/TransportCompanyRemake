@@ -4,13 +4,13 @@ using Domain.Entities;
 
 namespace DomainTests.Tests.Entities;
 
-public partial class DriverTest
+public partial class TruckTest
 {
     [Theory]
     [InlineData(AdrDriverQualificationsFlags.Base)]
     [InlineData(AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18)]
     [InlineData(null)]
-    public void Driver_New_ArgumentsIsValid_ReturnTheDriver_Test(int? expectedAdrQualificationsFlags)
+    public void Truck_New_ArgumentsIsValid_ReturnTheTruck_Test(int? expectedAdrQualificationsFlags)
     {
         // Arrange
         var guidRegex = GuidRegex();
@@ -38,7 +38,7 @@ public partial class DriverTest
     }
     
     [Fact]
-    public void Driver_New_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
+    public void Truck_New_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
         const int adrQualificationsFlags = 10;
@@ -48,7 +48,7 @@ public partial class DriverTest
     }
     
     [Fact]
-    public void Driver_New_ArgumentsIsValid_ReturnThe100DriversWithUniqueGuids_Test()
+    public void Truck_New_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
     {
         // Arrange
         var branch = Branch.New("AnyAddress", (37.314, -2.425));
@@ -67,7 +67,7 @@ public partial class DriverTest
     }
 
     [Fact]
-    public void Driver_Dismiss_ContextIsValid_SetTheDismissalDateToNowAndIsAvailableToFalse_Test()
+    public void Truck_WriteOff_ContextIsValid_SetTheWriteOffDateToNowAndIsAvailableToFalse_Test()
     {
         // Arrange
         var expectedDismissalDateError = TimeSpan.FromSeconds(10);
@@ -84,7 +84,7 @@ public partial class DriverTest
     }
 
     [Fact]
-    public void Driver_Reinstate_ContextIsValid_SetTheDismissalDateToNullAndIsAvailableToTrue_Test()
+    public void Truck_Reinstate_ContextIsValid_SetTheWriteOffDateToNullAndIsAvailableToTrue_Test()
     {
         // Arrange
         var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
@@ -98,41 +98,11 @@ public partial class DriverTest
         Assert.True(driver.IsAvailable);
     }
     
-    [Fact]
-    public void Driver_AddHoursWorked_ContextAndArgumentIsValid_IncreaseTheHoursWorkedPerWeekAndTotalHoursWorked_Test()
-    {
-        // Arrange
-        const int increment = 17;
-        var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
-
-        // Act
-        driver.AddHoursWorked(increment);
-
-        // Assert
-        Assert.Equal(increment, driver.HoursWorkedPerWeek);
-        Assert.Equal(increment, driver.TotalHoursWorked);
-    }
-    
-    [Fact]
-    public void Driver_ResetHoursWorkedPerWeek_ContextIsValid_SetTheHoursWorkedPerWeekToZero_Test()
-    {
-        // Arrange
-        const int expectedHoursWorkedPerWeek = 0;
-        var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
-        driver.AddHoursWorked(17);
-
-        // Act
-        driver.ResetHoursWorkedPerWeek();
-
-        // Assert
-        Assert.Equal(expectedHoursWorkedPerWeek, driver.HoursWorkedPerWeek);
-    }
-    
     [Theory]
     [InlineData(AdrDriverQualificationsFlags.Base)]
     [InlineData(AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18)]
     [InlineData(null)]
-    public void Driver_SetAdrQualificationsFlags_ContextAndArgumentIsValid_SetTheAdrQualificationsFlags_Test(int? expectedAdrQualificationsFlags)
+    public void Truck_SetPermittedHazardClassesFlags_ContextAndArgumentIsValid_SetThePermittedHazardClassesFlags_Test(int? expectedAdrQualificationsFlags)
     {
         // Arrange
         var driver = Driver.New("AnyName", AdrDriverQualificationsFlags.Tank, Branch.New("AnyAddress", (37.314, -2.425)));
@@ -145,7 +115,7 @@ public partial class DriverTest
     }
     
     [Fact]
-    public void Driver_SetAdrQualificationsFlags_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
+    public void Truck_SetPermittedHazardClassesFlags_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
         const int adrQualificationsFlags = 10;
@@ -156,7 +126,7 @@ public partial class DriverTest
     }
     
     [Fact]
-    public void Driver_SetBranch_ContextAndArgumentIsValid_SetTheBranchAndBranchGuid_Test()
+    public void Truck_SetBranch_ContextAndArgumentIsValid_SetTheBranchAndBranchGuid_Test()
     {
         // Arrange
         var expectedBranch = Branch.New("ExpectedAddress", (13.8, -4));
