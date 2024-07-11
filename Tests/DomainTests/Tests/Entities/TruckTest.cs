@@ -7,44 +7,52 @@ namespace DomainTests.Tests.Entities;
 public partial class TruckTest
 {
     [Theory]
-    [InlineData(AdrDriverQualificationsFlags.Base)]
-    [InlineData(AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18)]
+    [InlineData(HazardClassesFlags.Class3)]
+    [InlineData(HazardClassesFlags.Class61 | HazardClassesFlags.Class62)]
     [InlineData(null)]
-    public void Truck_New_ArgumentsIsValid_ReturnTheTruck_Test(int? expectedAdrQualificationsFlags)
+    public void Truck_New_ArgumentsIsValid_ReturnTheTruck_Test(int? expectedPermittedHazardClassesFlags)
     {
         // Arrange
         var guidRegex = GuidRegex();
         var expectedBranch = Branch.New("AnyAddress", (37.314, -2.425));
-        const double expectedHoursWorkedPerWeek = 0;
-        const double expectedTotalHoursWorked = 0;
-        const string expectedName = "AnyName";
-        var expectedHireDateError = TimeSpan.FromSeconds(10);
-        var expectedHireDate = DateTime.Now;
+        const bool expectedTank = true;
+        const decimal expectedVolumeMax = 80;
+        const decimal expectedVolumePrice = 1.5m;
+        const decimal expectedWeightMax = 10008.4m;
+        const decimal expectedWeightPrice = 0.7m;
+        const decimal expectedPricePerKm = 1.1m;
+        const string expectedNumber = "С150ТО";
+        var expectedWriteOnDateError = TimeSpan.FromSeconds(10);
+        var expectedWriteOnDate = DateTime.Now;
 
         // Act
-        var driver = Driver.New(expectedName, expectedAdrQualificationsFlags, expectedBranch);
+        var truck = Truck.New(expectedNumber, expectedTank, expectedVolumeMax, expectedVolumePrice, expectedWeightMax,
+            expectedWeightPrice, expectedPricePerKm, expectedPermittedHazardClassesFlags, expectedBranch);
             
         // Assert
-        Assert.Equal(expectedHireDate, driver.HireDate, expectedHireDateError);
-        Assert.Null(driver.DismissalDate);
-        Assert.Equal(expectedHoursWorkedPerWeek, driver.HoursWorkedPerWeek);
-        Assert.Equal(expectedTotalHoursWorked, driver.TotalHoursWorked);
-        Assert.True(driver.IsAvailable);
-        Assert.Equal(expectedName, driver.Name);
-        Assert.Equal(expectedAdrQualificationsFlags, driver.AdrQualificationsFlags);
-        Assert.Equal(expectedBranch, driver.Branch);
-        Assert.Equal(expectedBranch.Guid, driver.BranchGuid);
-        Assert.Matches(guidRegex, driver.Guid);
+        Assert.Equal(expectedWriteOnDate, truck.WriteOnDate, expectedWriteOnDateError);
+        Assert.Null(truck.WriteOffDate);
+        Assert.Equal(expectedVolumeMax, truck.VolumeMax);
+        Assert.Equal(expectedVolumePrice, truck.VolumePrice);
+        Assert.Equal(expectedWeightMax, truck.WeightMax);
+        Assert.Equal(expectedWeightPrice, truck.WeightPrice);
+        Assert.Equal(expectedPricePerKm, truck.PricePerKm);
+        Assert.True(truck.IsAvailable);
+        Assert.Equal(expectedNumber, truck.Number);
+        Assert.Equal(expectedPermittedHazardClassesFlags, truck.PermittedHazardClassesFlags);
+        Assert.Equal(expectedBranch, truck.Branch);
+        Assert.Equal(expectedBranch.Guid, truck.BranchGuid);
+        Assert.Matches(guidRegex, truck.Guid);
     }
     
     [Fact]
     public void Truck_New_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
-        const int adrQualificationsFlags = 10;
+        const int permittedHazardClassesFlags = 1_048_576;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => Driver.New("AnyName", adrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425))));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Truck.New("С150ТО", true, 80, 1.5m, 1000.8m,0.7m, 1.1m, permittedHazardClassesFlags, Branch.New("AnyAddress", (37.314, -2.425))));
     }
     
     [Fact]
@@ -57,12 +65,12 @@ public partial class TruckTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var driver = Driver.New("AnyName", null, branch);
+            var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null, branch);
             
             // Assert
-            Assert.DoesNotContain(driver.Guid, guids);
+            Assert.DoesNotContain(truck.Guid, guids);
 
-            guids.Add(driver.Guid);
+            guids.Add(truck.Guid);
         }
     }
 
@@ -70,59 +78,62 @@ public partial class TruckTest
     public void Truck_WriteOff_ContextIsValid_SetTheWriteOffDateToNowAndIsAvailableToFalse_Test()
     {
         // Arrange
-        var expectedDismissalDateError = TimeSpan.FromSeconds(10);
-        var expectedDismissalDate = DateTime.Now;
-        var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
+        var expectedWriteOffDateError = TimeSpan.FromSeconds(10);
+        var expectedWriteOffDate = DateTime.Now;
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+            Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act
-        driver.Dismiss();
+        truck.WriteOff();
 
         // Assert
-        Assert.NotNull(driver.DismissalDate);
-        Assert.Equal(expectedDismissalDate, driver.DismissalDate.Value, expectedDismissalDateError);
-        Assert.False(driver.IsAvailable);
+        Assert.NotNull(truck.WriteOffDate);
+        Assert.Equal(expectedWriteOffDate, truck.WriteOffDate.Value, expectedWriteOffDateError);
+        Assert.False(truck.IsAvailable);
     }
 
     [Fact]
     public void Truck_Reinstate_ContextIsValid_SetTheWriteOffDateToNullAndIsAvailableToTrue_Test()
     {
         // Arrange
-        var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
-        driver.Dismiss();
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+            Branch.New("AnyAddress", (37.314, -2.425)));
+        truck.WriteOff();
 
         // Act
-        driver.Reinstate();
+        truck.Reinstate();
 
         // Assert
-        Assert.Null(driver.DismissalDate);
-        Assert.True(driver.IsAvailable);
+        Assert.Null(truck.WriteOffDate);
+        Assert.True(truck.IsAvailable);
     }
     
     [Theory]
-    [InlineData(AdrDriverQualificationsFlags.Base)]
-    [InlineData(AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18)]
+    [InlineData(HazardClassesFlags.Class7)]
+    [InlineData(HazardClassesFlags.Class11 | HazardClassesFlags.Class7 | HazardClassesFlags.Class9)]
     [InlineData(null)]
-    public void Truck_SetPermittedHazardClassesFlags_ContextAndArgumentIsValid_SetThePermittedHazardClassesFlags_Test(int? expectedAdrQualificationsFlags)
+    public void Truck_SetPermittedHazardClassesFlags_ContextAndArgumentIsValid_SetThePermittedHazardClassesFlags_Test(int? expectedPermittedHazardClassesFlags)
     {
         // Arrange
-        var driver = Driver.New("AnyName", AdrDriverQualificationsFlags.Tank, Branch.New("AnyAddress", (37.314, -2.425)));
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+            Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act
-        driver.SetAdrQualificationsFlags(expectedAdrQualificationsFlags);
+        truck.SetPermittedHazardClassesFlags(expectedPermittedHazardClassesFlags);
             
         // Assert
-        Assert.Equal(expectedAdrQualificationsFlags, driver.AdrQualificationsFlags);
+        Assert.Equal(expectedPermittedHazardClassesFlags, truck.PermittedHazardClassesFlags);
     }
     
     [Fact]
     public void Truck_SetPermittedHazardClassesFlags_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
-        const int adrQualificationsFlags = 10;
-        var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
+        const int permittedHazardClassesFlags = 1_048_576;
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m,0.7m, 1.1m, null, Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => driver.SetAdrQualificationsFlags(adrQualificationsFlags));
+        Assert.Throws<ArgumentOutOfRangeException>(() => truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags));
     }
     
     [Fact]
@@ -130,14 +141,21 @@ public partial class TruckTest
     {
         // Arrange
         var expectedBranch = Branch.New("ExpectedAddress", (13.8, -4));
-        var driver = Driver.New("AnyName", null, Branch.New("StubAddress", (37.314, -2.425)));
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+            Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act
-        driver.SetBranch(expectedBranch);
+        truck.SetBranch(expectedBranch);
         
         // Assert
-        Assert.Equal(expectedBranch, driver.Branch);
-        Assert.Equal(expectedBranch.Guid, driver.BranchGuid);
+        Assert.Equal(expectedBranch, truck.Branch);
+        Assert.Equal(expectedBranch.Guid, truck.BranchGuid);
+    }
+
+    [Fact]
+    public void Truck_CalculateOrderPrice_ContextAndArgumentIsValid_ReturnThePriceForFulfillingAnOrderByTruck_Test()
+    {
+        Assert.True(false);
     }
     
     [GeneratedRegex(@"^(?i)[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$", RegexOptions.None, "ru-RU")]

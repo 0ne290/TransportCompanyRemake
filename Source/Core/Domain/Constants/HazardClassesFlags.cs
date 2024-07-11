@@ -2,7 +2,7 @@ namespace Domain.Constants;
 
 public static class HazardClassesFlags
 {
-    public static bool IsFlagCombination(int value) => value is >= Class11 and <= Class9;
+    public static bool IsFlagCombination(int value) => value is >= 0b0000_0000_0000_0000_0001 and <= 0b1111_1111_1111_1111_1111;
 
     public static bool IsFlag(int value) => Flags.Contains(value);
     

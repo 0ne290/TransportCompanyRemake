@@ -8,7 +8,7 @@ public partial class DriverTest
 {
     [Theory]
     [InlineData(AdrDriverQualificationsFlags.Base)]
-    [InlineData(AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18)]
+    [InlineData(AdrDriverQualificationsFlags.Class7 | AdrDriverQualificationsFlags.Class8)]
     [InlineData(null)]
     public void Driver_New_ArgumentsIsValid_ReturnTheDriver_Test(int? expectedAdrQualificationsFlags)
     {
@@ -41,7 +41,7 @@ public partial class DriverTest
     public void Driver_New_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
-        const int adrQualificationsFlags = 10;
+        const int adrQualificationsFlags = 16;
 
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => Driver.New("AnyName", adrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425))));
@@ -130,7 +130,7 @@ public partial class DriverTest
     
     [Theory]
     [InlineData(AdrDriverQualificationsFlags.Base)]
-    [InlineData(AdrDriverQualificationsFlags.Class17 | AdrDriverQualificationsFlags.Class18)]
+    [InlineData(AdrDriverQualificationsFlags.Class7 | AdrDriverQualificationsFlags.Class8)]
     [InlineData(null)]
     public void Driver_SetAdrQualificationsFlags_ContextAndArgumentIsValid_SetTheAdrQualificationsFlags_Test(int? expectedAdrQualificationsFlags)
     {
@@ -148,7 +148,7 @@ public partial class DriverTest
     public void Driver_SetAdrQualificationsFlags_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
-        const int adrQualificationsFlags = 10;
+        const int adrQualificationsFlags = 16;
         var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act & Assert
