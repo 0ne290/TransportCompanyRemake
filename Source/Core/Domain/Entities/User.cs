@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using Domain.Interfaces;
 
@@ -14,7 +15,8 @@ public class User
             Guid = System.Guid.NewGuid().ToString(), DynamicPartOfSalt = RandomNumberGenerator.GetHexString(128),
             RegistrationDate = DateTime.Now, VkUserId = null, Name = name, Contact = contact
         };
-        user.SetLoginAndPassword(cryptographicService, login, password);
+        user.SetLogin(login);
+        user.SetPassword(cryptographicService, password);
         
         return user;
     }
@@ -24,63 +26,29 @@ public class User
         var user = new User
         {
             Guid = System.Guid.NewGuid().ToString(), DynamicPartOfSalt = RandomNumberGenerator.GetHexString(128),
-            RegistrationDate = DateTime.Now, Login = null, Password = null, Name = name, Contact = contact
+            RegistrationDate = DateTime.Now, VkUserId = vkUserId, Login = null, Password = null, Name = name, Contact = contact
         };
-        user.SetVkUserId(vkUserId);
         
         return user;
     }
-
-    public void SetVkUserId(long? vkUserId)
-    {
-        if (vkUserId == null && (Login == null || Password == null))
-            throw new ArgumentOutOfRangeException(nameof(vkUserId), vkUserId,
-                "The VkUserId value can be null only when the Login and Password values are not null.");
-        if (vkUserId != null && (Login != null || Password != null))
-            throw new ArgumentOutOfRangeException(nameof(vkUserId), vkUserId,
-                "The VkUserId value cannot be null only when the login and password values are null.");
-
-        VkUserId = vkUserId;
-    }
     
-    public void SetLogin(string? login)
+    public void SetLogin(string login)
     {
-        if (login == null && (Password != null || VkUserId == null))
-            throw new ArgumentOutOfRangeException(nameof(login), login,
-                "The Login login can be null only when the Password login are null and VkUserId login are not null.");
-        if (login != null && (Password == null || VkUserId != null))
-            throw new ArgumentOutOfRangeException(nameof(login), login,
-                "The Login login cannot be null only when the Password login are not null and VkUserId login are null.");
+        if (VkUserId != null)
+            throw new InvalidOperationException("VkUserId must be null.");
 
         Login = login;
     }
     
-    public void SetPassword(ICryptographicService cryptographicService, string? password)
+    public void SetPassword(ICryptographicService cryptographicService, string password)
     {
-        if (password == null && (Login != null || VkUserId == null))
-            throw new ArgumentOutOfRangeException(nameof(password), password,
-                "The Password passwod can be null only when the Login passwod are null and VkUserId passwod are not null.");
-        if (password != null && (Login == null || VkUserId != null))
-            throw new ArgumentOutOfRangeException(nameof(password), password,
-                "The Password passwod cannot be null only when the Login passwod are not null and VkUserId passwod are null.");
-
-        Password = password == null ? password : cryptographicService.EncryptAndHash(Salt(password));
-    }
-    
-    public void SetLoginAndPassword(ICryptographicService cryptographicService, string? login, string? password)
-    {
-        if (login == null && (password != null || VkUserId == null))
-            throw new ArgumentOutOfRangeException(nameof(login), login,
-                "The Login value can be null only when the Password value are null and VkUserId value are not null.");
-        if (password != null && (login == null || VkUserId != null))
-            throw new ArgumentOutOfRangeException(nameof(password), password,
-                "The Password value cannot be null only when the Login value are not null and VkUserId value are null.");
-
-        Login = login;
-        Password = password == null ? password : cryptographicService.EncryptAndHash(Salt(password));
+        if (VkUserId != null)
+            throw new InvalidOperationException("VkUserId must be null.");
+        
+        Password = cryptographicService.EncryptAndHash(Salt(password));
     }
 
-    private string Salt(string value) => value + StaticPartOfSalt + Login + value + DynamicPartOfSalt + Login;
+    private string Salt(string value) => value + RegistrationDate.ToString(CultureInfo.InvariantCulture) + StaticPartOfSalt + Login + value + DynamicPartOfSalt + Login;
     
     public override string ToString() => (Login == null ? $"VkUserId = {VkUserId}" : $"Login = {Login}")!;
     

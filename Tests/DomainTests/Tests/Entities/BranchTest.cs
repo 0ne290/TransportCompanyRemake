@@ -59,13 +59,13 @@ public partial class BranchTest
             gs.CalculateDistanceInKmByDegrees(It.IsAny<ValueTuple<double, double>>(),
                 It.IsAny<ValueTuple<double, double>>())).Returns(StubOfCalculateDistanceInKmByDegrees);
 
-        var stubOfgeolocationService = mock.Object;
+        var stubOfGeolocationService = mock.Object;
 
         var branch = Branch.New("Anything", branchPoint);
 
         //Act
         var actualDistance =
-            branch.CalculateDistanceInKmByDegrees(stubOfgeolocationService, givenPoint);
+            branch.CalculateDistanceInKmByDegrees(stubOfGeolocationService, givenPoint);
 
         // Assert
         Assert.Equal(expectedDistance, actualDistance);

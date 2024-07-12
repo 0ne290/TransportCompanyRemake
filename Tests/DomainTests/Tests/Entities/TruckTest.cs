@@ -152,6 +152,8 @@ public partial class TruckTest
         Assert.Equal(expectedBranch.Guid, truck.BranchGuid);
     }
 
+    // Price calculation formula:
+    // (Truck.WeightPrice * Order.CargoWeight + Truck.VolumePrice * Order.CargoVolume) * Truck.PricePerKm * Order.DistanceInKm
     [Fact]
     public void Truck_CalculateOrderPrice_ContextAndArgumentIsValid_ReturnThePriceForFulfillingAnOrderByTruck_Test()
     {
