@@ -50,7 +50,7 @@ public class User
 
     private string Salt(string value) => value + RegistrationDate.ToString(CultureInfo.InvariantCulture) + StaticPartOfSalt + Login + value + DynamicPartOfSalt + Login;
     
-    public override string ToString() => (Login == null ? $"VkUserId = {VkUserId}" : $"Login = {Login}")!;
+    public override string ToString() => Login == null ? $"VkUserId = {VkUserId}" : $"Login = {Login}";
     
     public string Guid { get; private set; } = null!;
     
