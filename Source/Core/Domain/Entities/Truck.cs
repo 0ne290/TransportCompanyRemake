@@ -47,7 +47,7 @@ public class Truck
             if (!HazardClassesFlags.IsFlagCombination(permittedHazardClassesFlags.Value))
                 throw new ArgumentOutOfRangeException(nameof(permittedHazardClassesFlags), permittedHazardClassesFlags,
                     "The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
-                    "value of their combination must be in the range [0; 2^20 (1048576)).");
+                    "value of their combination must be in the range [1; 2^20 (1048576)).");
             
         PermittedHazardClassesFlags = permittedHazardClassesFlags;
     }

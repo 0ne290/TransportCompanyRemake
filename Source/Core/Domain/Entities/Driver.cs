@@ -61,10 +61,9 @@ public class Driver
     public void SetAdrQualificationsFlags(int? adrQualificationsFlags)
     {
         if (adrQualificationsFlags != null)
-            if (!AdrDriverQualificationsFlags.IsFlagCombination(adrQualificationsFlags.Value))
+            if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationsFlags.Value))
                 throw new ArgumentOutOfRangeException(nameof(adrQualificationsFlags), adrQualificationsFlags,
-                    "The AdrQualificationsFlags describe 4 ADR driver qualifications. This means that the" +
-                    " value of their combination must be in the range [0; 2^4 (16)).");
+                    "AdrQualificationsFlags describes the 3 ADR driver qualifications. Valid values for their combinations: Base (655359), Class7 (786431), Class8 (917503), Full (1048575).");
             
         AdrQualificationsFlags = adrQualificationsFlags;
     }

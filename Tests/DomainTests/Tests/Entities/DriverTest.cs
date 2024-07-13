@@ -8,7 +8,7 @@ public partial class DriverTest
 {
     [Theory]
     [InlineData(AdrDriverQualificationsFlags.Base)]
-    [InlineData(AdrDriverQualificationsFlags.Class7 | AdrDriverQualificationsFlags.Class8)]
+    [InlineData(AdrDriverQualificationsFlags.Full)]
     [InlineData(null)]
     public void Driver_New_ArgumentsIsValid_ReturnTheDriver_Test(int? expectedAdrQualificationsFlags)
     {
@@ -36,16 +36,14 @@ public partial class DriverTest
         Assert.Equal(expectedBranch.Guid, driver.BranchGuid);
         Assert.Matches(guidRegex, driver.Guid);
     }
-    
-    [Fact]
-    public void Driver_New_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
-    {
-        // Arrange
-        const int adrQualificationsFlags = 16;
 
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => Driver.New("AnyName", adrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425))));
-    }
+    [Theory]
+    [InlineData(AdrDriverQualificationsFlags.Full + 1)]
+    [InlineData(AdrDriverQualificationsFlags.Base + 1)]
+    public void
+        Driver_New_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test(
+            int adrQualificationsFlags) => Assert.Throws<ArgumentOutOfRangeException>(() =>
+        Driver.New("AnyName", adrQualificationsFlags, Branch.New("AnyAddress", (37.314, -2.425))));
     
     [Fact]
     public void Driver_New_ArgumentsIsValid_ReturnThe100DriversWithUniqueGuids_Test()
@@ -130,12 +128,12 @@ public partial class DriverTest
     
     [Theory]
     [InlineData(AdrDriverQualificationsFlags.Base)]
-    [InlineData(AdrDriverQualificationsFlags.Class7 | AdrDriverQualificationsFlags.Class8)]
+    [InlineData(AdrDriverQualificationsFlags.Full)]
     [InlineData(null)]
     public void Driver_SetAdrQualificationsFlags_ContextAndArgumentIsValid_SetTheAdrQualificationsFlags_Test(int? expectedAdrQualificationsFlags)
     {
         // Arrange
-        var driver = Driver.New("AnyName", AdrDriverQualificationsFlags.Tank, Branch.New("AnyAddress", (37.314, -2.425)));
+        var driver = Driver.New("AnyName", AdrDriverQualificationsFlags.Class7, Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act
         driver.SetAdrQualificationsFlags(expectedAdrQualificationsFlags);
@@ -144,11 +142,12 @@ public partial class DriverTest
         Assert.Equal(expectedAdrQualificationsFlags, driver.AdrQualificationsFlags);
     }
     
-    [Fact]
-    public void Driver_SetAdrQualificationsFlags_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
+    [Theory]
+    [InlineData(AdrDriverQualificationsFlags.Full + 1)]
+    [InlineData(AdrDriverQualificationsFlags.Base + 1)]
+    public void Driver_SetAdrQualificationsFlags_AdrDriverQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test(int adrQualificationsFlags)
     {
         // Arrange
-        const int adrQualificationsFlags = 16;
         var driver = Driver.New("AnyName", null, Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act & Assert
