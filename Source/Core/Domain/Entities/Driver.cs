@@ -24,7 +24,21 @@ public class Driver
     // вычисляемых полей в отдельные методы-сеттеры.
     private Driver() { }
 
-    public static Driver New(string name, int? adrQualificationsFlags, Branch branch)
+    public static Driver New(string name, int adrQualificationsFlags, bool adrQualificationOfTank, Branch branch)
+    {
+        var driver = new Driver
+        {
+            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, HoursWorkedPerWeek = 0,
+            TotalHoursWorked = 0, AdrQualificationOfTank = adrQualificationOfTank
+        };
+        driver.Reinstate();
+        driver.QualifyAdr(adrQualificationsFlags);
+        driver.SetBranch(branch);
+
+        return driver;
+    }
+    
+    public static Driver New(string name, Branch branch)
     {
         var driver = new Driver
         {
@@ -32,7 +46,7 @@ public class Driver
             TotalHoursWorked = 0
         };
         driver.Reinstate();
-        driver.SetAdrQualificationsFlags(adrQualificationsFlags);
+        driver.DequalifyAdr();
         driver.SetBranch(branch);
 
         return driver;
@@ -57,16 +71,32 @@ public class Driver
     }
 
     public void ResetHoursWorkedPerWeek() => HoursWorkedPerWeek = 0;
-    
-    public void SetAdrQualificationsFlags(int? adrQualificationsFlags)
+
+    public void DequalifyAdr()
     {
-        if (adrQualificationsFlags != null)
-            if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationsFlags.Value))
-                throw new ArgumentOutOfRangeException(nameof(adrQualificationsFlags), adrQualificationsFlags,
-                    "AdrQualificationsFlags describes the 3 ADR driver qualifications. Valid values for their combinations: Base (655359), Class7 (786431), Class8 (917503), Full (1048575).");
-            
-        AdrQualificationsFlags = adrQualificationsFlags;
+        AdrQualificationOfTank = false;
+        AdrQualificationFlag = null;
     }
+    
+    public void QualifyAdr(int adrQualificationsFlags)
+    {
+        if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationsFlags))
+            throw new ArgumentOutOfRangeException(nameof(adrQualificationsFlags), adrQualificationsFlags,
+                "AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (655359), Class7 (786431), Class8 (917503), Full (1048575).");
+        
+        AdrQualificationFlag = adrQualificationsFlags;
+    }
+    
+    public void QualifyAdrTank()
+    {
+        if (AdrQualificationFlag == null)
+            throw new InvalidOperationException(
+                "The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
+
+        AdrQualificationOfTank = true;
+    }
+
+    public void DequalifyAdrTank() => AdrQualificationOfTank = false;
 
     public void SetBranch(Branch branch)
     {
@@ -86,7 +116,9 @@ public class Driver
     
     public double TotalHoursWorked { get; private set; }
     
-    public int? AdrQualificationsFlags { get; private set; }
+    public int? AdrQualificationFlag { get; private set; }
+    
+    public bool AdrQualificationOfTank { get; private set; }
     
     public string BranchGuid { get; private set; } = null!;
 

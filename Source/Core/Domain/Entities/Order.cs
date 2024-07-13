@@ -7,10 +7,10 @@ public class Order
 {
     private Order() { }
 
-    public static Order New(string address, string cargoDescription, double startLatitude, double startLongitude,
-        double endLatitude, double endLongitude, decimal cargoVolume, decimal cargoWeight, int? hazardClassFlag,
+    public static Order New(string startAddress, string endAddress, string cargoDescription, (double Latitude, double Longitude) startPoint,
+        (double Latitude, double Longitude) endPoint, decimal cargoVolume, decimal cargoWeight, int? hazardClassFlag,
         User user, Truck truck,
-        Driver driver1, Driver driver2, Branch branch, IGeolocationService geolocationService)
+        Driver driver1, Driver driver2, IGeolocationService geolocationService)
     {
         if (!truck.IsAvailable)
             throw new ArgumentException("To assign a truck to an order, it must be available.", nameof(truck));
@@ -18,52 +18,56 @@ public class Order
             throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver1));
         if (!driver2.IsAvailable)
             throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver2));
+        if (truck.BranchGuid != driver1.BranchGuid || truck.BranchGuid != driver2.BranchGuid)
+            throw new ArgumentException("To assign drivers and truck to an order, they must belong to the same branch");
         
         var order = new Order
         {
-            Guid = System.Guid.NewGuid().ToString(), DateBegin = DateTime.Now, DateEnd = null, Address = address,
-            CargoDescription = cargoDescription, StartLatitude = startLatitude, StartLongitude = startLongitude,
-            EndLatitude = endLatitude, EndLongitude = endLongitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight
+            Guid = System.Guid.NewGuid().ToString(), DateBegin = DateTime.Now, DateEnd = null, StartAddress = startAddress, EndAddress = endAddress,
+            CargoDescription = cargoDescription, StartPointLatitude = startPoint.Latitude, StartPointLongitude = startPoint.Longitude,
+            EndPointLatitude = endPoint.Latitude, EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight
         };
         order.SetHazardClassFlag(hazardClassFlag);
         order.SetUser(user);
         order.SetTruck(truck);
         order.SetDrivers(driver1, driver2);
-        order.SetBranch(branch);
+        order.SetBranch(truck.Branch);
         order.CalculateAndSetDistanceInKm(geolocationService);
         order.CalculateAndSetPrice();
 
         return order;
     }
     
-    public static Order New(string address, string cargoDescription, double startLatitude, double startLongitude,
-        double endLatitude, double endLongitude, decimal cargoVolume, decimal cargoWeight, int? hazardClassFlag,
+    public static Order New(string startAddress, string endAddress, string cargoDescription, (double Latitude, double Longitude) startPoint,
+        (double Latitude, double Longitude) endPoint, decimal cargoVolume, decimal cargoWeight, int? hazardClassFlag,
         User user, Truck truck,
-        Driver driver1, Branch branch, IGeolocationService geolocationService)
+        Driver driver1, IGeolocationService geolocationService)
     {
         if (!truck.IsAvailable)
             throw new ArgumentException("To assign a truck to an order, it must be available.", nameof(truck));
         if (!driver1.IsAvailable)
             throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver1));
+        if (truck.BranchGuid != driver1.BranchGuid)
+            throw new ArgumentException("To assign drivers and truck to an order, they must belong to the same branch");
         
         var order = new Order
         {
-            Guid = System.Guid.NewGuid().ToString(), DateBegin = DateTime.Now, DateEnd = null, Address = address,
-            CargoDescription = cargoDescription, StartLatitude = startLatitude, StartLongitude = startLongitude,
-            EndLatitude = endLatitude, EndLongitude = endLongitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight
+            Guid = System.Guid.NewGuid().ToString(), DateBegin = DateTime.Now, DateEnd = null, StartAddress = startAddress, EndAddress = endAddress,
+            CargoDescription = cargoDescription, StartPointLatitude = startPoint.Latitude, StartPointLongitude = startPoint.Longitude,
+            EndPointLatitude = endPoint.Latitude, EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight
         };
         order.SetHazardClassFlag(hazardClassFlag);
         order.SetUser(user);
         order.SetTruck(truck);
         order.SetDriver(driver1);
-        order.SetBranch(branch);
+        order.SetBranch(truck.Branch);
         order.CalculateAndSetDistanceInKm(geolocationService);
         order.CalculateAndSetPrice();
 
         return order;
     }
 
-    public void SetHazardClassFlag(int? hazardClassFlag)
+    private void SetHazardClassFlag(int? hazardClassFlag)
     {
         if (hazardClassFlag != null)
             if (!HazardClassesFlags.IsFlag(hazardClassFlag.Value))
@@ -73,18 +77,18 @@ public class Order
         HazardClassFlag = hazardClassFlag;
     }
 
-    public void CalculateAndSetDistanceInKm(IGeolocationService geolocationService)
+    private void CalculateAndSetDistanceInKm(IGeolocationService geolocationService)
     {
-        var distanceFromBranchToStart = Branch.CalculateDistanceInKmByDegrees(geolocationService, (StartLatitude, StartLongitude));
-        var distanceFromStartToEnd = geolocationService.CalculateDistanceInKmByDegrees((StartLatitude, StartLongitude), (EndLatitude, EndLongitude));
-        var distanceFromEndToBranch = Branch.CalculateDistanceInKmByDegrees(geolocationService, (EndLatitude, EndLongitude));
+        var distanceFromBranchToStart = Branch.CalculateDistanceInKmByDegrees(geolocationService, (StartPointLatitude, StartPointLongitude));
+        var distanceFromStartToEnd = geolocationService.CalculateDistanceInKmByDegrees((StartPointLatitude, StartPointLongitude), (EndPointLatitude, EndPointLongitude));
+        var distanceFromEndToBranch = Branch.CalculateDistanceInKmByDegrees(geolocationService, (EndPointLatitude, EndPointLongitude));
 
         DistanceInKm = distanceFromBranchToStart + distanceFromStartToEnd + distanceFromEndToBranch;
     }
 
-    public void CalculateAndSetPrice() => Price = Truck.CalculateOrderPrice(this);
+    private void CalculateAndSetPrice() => Price = Truck.CalculateOrderPrice(this);
 
-    public void CalculateAndSetExpectedHoursWorkedByDrivers()
+    private void CalculateAndSetExpectedHoursWorkedByDrivers()
     {
         var drivingHours = DistanceInKm / AverageTruckSpeedInKmPerHour;
         var numberOfDrivers = Driver2Guid == null ? 1 : 2;
@@ -119,19 +123,19 @@ public class Order
         DateEnd = DateTime.Now;
     }
 
-    public void SetUser(User user)
+    private void SetUser(User user)
     {
         UserGuid = user.Guid;
         User = user;
     }
     
-    public void SetTruck(Truck truck)
+    private void SetTruck(Truck truck)
     {
         TruckGuid = truck.Guid;
         Truck = truck;
     }
     
-    public void SetDriver(Driver driver1)
+    private void SetDriver(Driver driver1)
     {
         Driver1Guid = driver1.Guid;
         Driver1 = driver1;
@@ -140,7 +144,7 @@ public class Order
         Driver2 = null;
     }
 
-    public void SetDrivers(Driver driver1, Driver driver2)
+    private void SetDrivers(Driver driver1, Driver driver2)
     {
         Driver1Guid = driver1.Guid;
         Driver1 = driver1;
@@ -149,7 +153,7 @@ public class Order
         Driver2 = driver2;
     }
 
-    public void SetBranch(Branch branch)
+    private void SetBranch(Branch branch)
     {
         Branch = branch;
         BranchGuid = branch.Guid;
@@ -193,17 +197,19 @@ public class Order
 
     public virtual Branch Branch { get; private set; } = null!;
 
-    public string Address { get; set; } = null!;
+    public string StartAddress { get; set; } = null!;
+    
+    public string EndAddress { get; set; } = null!;
     
     public string CargoDescription { get; set; } = null!;
     
-    public double StartLatitude { get; set; }
+    public double StartPointLatitude { get; set; }
 
-    public double StartLongitude { get; set; }
+    public double StartPointLongitude { get; set; }
 
-    public double EndLatitude { get; set; }
+    public double EndPointLatitude { get; set; }
 
-    public double EndLongitude { get; set; }
+    public double EndPointLongitude { get; set; }
 
     public decimal CargoVolume { get; set; }
 
