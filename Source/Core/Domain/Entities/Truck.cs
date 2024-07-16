@@ -8,7 +8,7 @@ public class Truck
 
     public static Truck New(string number, bool tank, decimal volumeMax,
         decimal volumePrice, decimal weightMax, decimal weightPrice, decimal pricePerKm,
-        int? permittedHazardClassesFlags, Branch branch)
+        int permittedHazardClassesFlags, Branch branch)
     {
         var truck = new Truck
         {
@@ -18,6 +18,21 @@ public class Truck
         };
         truck.Reinstate();
         truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags);
+        truck.SetBranch(branch);
+
+        return truck;
+    }
+    
+    public static Truck New(string number, bool tank, decimal volumeMax,
+        decimal volumePrice, decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch)
+    {
+        var truck = new Truck
+        {
+            Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, PermittedHazardClassesFlags = null, Number = number, Tank = tank,
+            VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice,
+            PricePerKm = pricePerKm
+        };
+        truck.Reinstate();
         truck.SetBranch(branch);
 
         return truck;

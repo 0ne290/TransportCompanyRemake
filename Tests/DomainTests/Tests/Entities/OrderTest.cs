@@ -8,59 +8,50 @@ namespace DomainTests.Tests.Entities;
 
 public partial class OrderTest
 {
+    public OrderTest()
+    {
+        _guidRegex = GuidRegex();
+                
+        var mock = new Mock<IGeolocationService>();
+                mock.Setup(gs => gs.CalculateDistanceInKmByDegrees(It.IsAny<ValueTuple<double, double>>(),
+                    It.IsAny<ValueTuple<double, double>>())).Returns(StubOfCalculateDistanceInKmByDegrees);
+        
+        _stubOfGeolocationService = mock.Object;
+    }
+    
     [Fact]
-    public void Order_New_ArgumentsIsValid_ReturnTheOrderWithTwoDriversAndHazardClassFlag()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
     {
         // Arrange1
-        var guidRegex = GuidRegex();
-        
-        var mock = new Mock<IGeolocationService>();
-        mock.Setup(gs => gs.CalculateDistanceInKmByDegrees(It.IsAny<ValueTuple<double, double>>(),
-            It.IsAny<ValueTuple<double, double>>())).Returns(StubOfCalculateDistanceInKmByDegrees);
-
-        var stubOfGeolocationService = mock.Object;
-        
-        const string expectedStartAddress = "AnyStartAddress";
-        const string expectedEndAddress = "AnyEndAddress";
-        const string expectedDescription = "AnyDescription";
-        const double expectedStartPointLatitude = 56.9;
-        const double expectedStartPointLongitude = 4.8;
-        const int expectedEndPointLatitude = -9;
-        const int expectedEndPointLongitude = 8;
-        const int expectedCargoVolume = 60;
-        const int expectedCargoWeight = 6000;
-        const int expectedHazardClassFlag = HazardClassesFlags.Class21;
-        const bool expectedTank = true;
-        var expectedUser = User.New("AnyName", "AnyContact", 364);
-        var expectedBranch = Branch.New("AnyAddress", (34, 75));
-        var expectedTruck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, expectedBranch);
-        var expectedDriver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, expectedBranch);
+        var expectedUser = ;
+        var expectedBranch = ;
+        var expectedTruck = ;
+        var expectedDriver1 = );
         var expectedDriver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, expectedBranch);
-        var expectedDistanceInKm = expectedBranch.CalculateDistanceInKmByDegrees(stubOfGeolocationService, (expectedStartPointLatitude, expectedStartPointLongitude)) + stubOfGeolocationService.CalculateDistanceInKmByDegrees((expectedStartPointLatitude, expectedStartPointLongitude),
-            (expectedEndPointLatitude, expectedEndPointLongitude)) + expectedBranch.CalculateDistanceInKmByDegrees(stubOfGeolocationService, (expectedEndPointLatitude, expectedEndPointLongitude));
+        var expectedDistanceInKm = expectedBranch.CalculateDistanceInKmByDegrees(_stubOfGeolocationService, (StartPointLatitude, StartPointLongitude)) + _stubOfGeolocationService.CalculateDistanceInKmByDegrees((StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude)) + expectedBranch.CalculateDistanceInKmByDegrees(_stubOfGeolocationService, (EndPointLatitude, EndPointLongitude));
         var expectedExpectedHoursWorkedByDrivers = expectedDistanceInKm / AverageTruckSpeedInKmPerHour / 2;
-        var expextedActualHoursWorkedByDriver1 = 0;
-        var expextedActualHoursWorkedByDriver2 = 0;
+        const int expextedActualHoursWorkedByDriver1 = 0;
+        const int expextedActualHoursWorkedByDriver2 = 0;
         var expextedDateBegin = DateTime.Now;
         var expextedDateBeginError = TimeSpan.FromSeconds(10);
         
         // Act
-        var order = Order.New(expectedStartAddress, expectedEndAddress, expectedDescription,
-            (expectedStartPointLatitude, expectedStartPointLongitude),
-            (expectedEndPointLatitude, expectedEndPointLongitude), expectedCargoVolume, expectedCargoWeight,
-            expectedHazardClassFlag, expectedTank, expectedUser, expectedTruck, expectedDriver1, expectedDriver2,
-            stubOfGeolocationService);
+        var order = Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, Tank, expectedUser, expectedTruck, expectedDriver1, expectedDriver2,
+            _stubOfGeolocationService);
         
         // Arrange2
         var expectedPrice = expectedTruck.CalculateOrderPrice(order);
         
         // Assert
-        Assert.Matches(guidRegex, order.Guid);
+        Assert.Matches(_guidRegex, order.Guid);
         Assert.Equal(expextedDateBegin, order.DateBegin, expextedDateBeginError);
         Assert.Null(order.DateEnd);
-        Assert.Equal(expectedHazardClassFlag, order.HazardClassFlag);
-        Assert.Equal(expectedTank, order.Tank);
+        Assert.Equal(HazardClassFlag, order.HazardClassFlag);
+        Assert.Equal(Tank, order.Tank);
         Assert.Equal(expectedDistanceInKm, order.DistanceInKm);
         Assert.Equal(expectedPrice, order.Price);
         Assert.Equal(expectedExpectedHoursWorkedByDrivers, order.ExpectedHoursWorkedByDrivers);
@@ -77,24 +68,277 @@ public partial class OrderTest
         Assert.Equal(expectedBranch, order.Branch);
         Assert.Equal(expectedBranch.Guid, order.BranchGuid);
         Assert.Equal(expectedUser.Guid, order.UserGuid);
-        Assert.Equal(expectedStartAddress, order.StartAddress);
-        Assert.Equal(expectedEndAddress, order.EndAddress);
-        Assert.Equal(expectedDescription, order.CargoDescription);
-        Assert.Equal(expectedStartPointLatitude, order.StartPointLatitude);
-        Assert.Equal(expectedStartPointLongitude, order.StartPointLongitude);
-        Assert.Equal(expectedEndPointLatitude, order.EndPointLatitude);
-        Assert.Equal(expectedEndPointLongitude, order.EndPointLongitude);
-        Assert.Equal(expectedCargoVolume, order.CargoVolume);
-        Assert.Equal(expectedCargoWeight, order.CargoWeight);
-        return;
-        
-        double StubOfCalculateDistanceInKmByDegrees((double Latitude, double Longitude) point1,
-            (double Latitude, double Longitude) point2) =>
-            point1.Latitude + point1.Longitude + point2.Latitude + point2.Longitude;
+        Assert.Equal(StartAddress, order.StartAddress);
+        Assert.Equal(EndAddress, order.EndAddress);
+        Assert.Equal(Description, order.CargoDescription);
+        Assert.Equal(StartPointLatitude, order.StartPointLatitude);
+        Assert.Equal(StartPointLongitude, order.StartPointLongitude);
+        Assert.Equal(EndPointLatitude, order.EndPointLatitude);
+        Assert.Equal(EndPointLongitude, order.EndPointLongitude);
+        Assert.Equal(CargoVolume, order.CargoVolume);
+        Assert.Equal(CargoWeight, order.CargoWeight);
     }
+    
+    [Fact]
+    public void Order_New_TruckIsAvailableIsInvalid_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        truck.IsAvailable = false;
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, Tank, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+    
+    [Fact]
+    public void Order_New_Driver1IsAvailableIsInvalid_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        driver1.IsAvailable = false;
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, Tank, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+    
+    [Fact]
+    public void Order_New_Driver2IsAvailableIsInvalid_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        driver2.IsAvailable = false;
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, Tank, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+    
+    [Fact]
+    public void Order_New_TankAndDriver1AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, false, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, true, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+    
+    [Fact]
+    public void Order_New_TankAndDriver2AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, false, branch);
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, true, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+    
+    [Fact]
+    public void Order_New_TankIsTrueAndTruckTankIsFalse_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", false, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, true, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+    
+    [Fact]
+    public void Order_New_TankIsFalseAndTruckTankIsTrue_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, false, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+    
+    [Fact]
+    public void Order_New_Driver1BranchIsInvalid_ThrowArgumentException()
+    {
+        // Arrange1
+        var user = User.New("AnyName", "AnyContact", 364);
+        var branch = Branch.New("AnyAddress", (34, 75));
+        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
+            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
+        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
+        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
+            (StartPointLatitude, StartPointLongitude),
+            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
+            HazardClassFlag, Tank, user, truck, driver1, driver2,
+            _stubOfGeolocationService));
+    }
+
+    private static Order DefaultOrderWithTwoDriversAndHazardClassFlag(User user, Truck truck, Driver driver1,
+        Driver driver2, IGeolocationService geolocationService, string startAddress = DefaultOrderStartAddress,
+        string endAddress = DefaultOrderEndAddress, string cargoDescription = DefaultOrderCargoDescription,
+        double startPointLatitude = DefaultOrderStartPointLatitude, double startPointLongitude = DefaultOrderStartPointLongitude,
+        double endPointLatitude = DefaultOrderEndPointLatitude, double endPointLongitude = DefaultOrderEndPointLongitude,
+        decimal cargoVolume = DefaultOrderCargoVolume, decimal cargoWeight = DefaultOrderCargoWeight,
+        int hazardClassFlag = DefaultOrderHazardClassFlag, bool tank = DefaultOrderTank) => Order.New(startAddress, endAddress,
+        cargoDescription, (startPointLatitude, startPointLongitude), (endPointLatitude, endPointLongitude), cargoVolume,
+        cargoWeight, hazardClassFlag, tank, user, truck, driver1, driver2, geolocationService);
+
+    private static User DefaultUser(string name = DefaultUserName, string contact = DefaultUserContact,
+        long vkUserId = DefaultUserVkUserId) => User.New(name, contact, vkUserId);
+
+    private static Branch DefaultBranch(string address = DefaultBranchAddress, double latitude = DefaultBranchLatitude,
+        double longitude = DefaultBranchLongitude) => Branch.New(address, (latitude, longitude));
+
+    private static Truck DefaultTruck(Branch branch, string number = DefaultTruckNumber, bool tank = DefaultTruckTank,
+        decimal volumeMax = DefaultTruckVolumeMax, decimal volumePrice = DefaultTruckVolumePrice,
+        decimal weightMax = DefaultTruckWeightMax, decimal weightPrice = DefaultTruckWeightPrice,
+        decimal pricePerKm = DefaultTruckPricePerKm,
+        int permittedHazardClassessFlags = DefaultTruckPermittedHazardClassessFlags) => Truck.New(number, tank,
+        volumeMax, volumePrice, weightMax, weightPrice, pricePerKm, permittedHazardClassessFlags, branch);
+
+    private static Driver DefaultDriver1(Branch branch, string name = DefaultDriver1Name,
+        int adrQualificationFlag = DefaultDriver1AdrDriverQualificationFlag,
+        bool adrQualificationOfTank = DefaultDriver1AdrQualificationOfTank) =>
+        Driver.New(name, adrQualificationFlag, adrQualificationOfTank, branch);
+    
+    private static Driver DefaultDriver2(Branch branch, string name = DefaultDriver2Name,
+        int adrQualificationFlag = DefaultDriver2AdrDriverQualificationFlag,
+        bool adrQualificationOfTank = DefaultDriver2AdrQualificationOfTank) =>
+        Driver.New(name, adrQualificationFlag, adrQualificationOfTank, branch);
+    
+    private static double StubOfCalculateDistanceInKmByDegrees((double Latitude, double Longitude) point1,
+        (double Latitude, double Longitude) point2) =>
+        point1.Latitude + point1.Longitude + point2.Latitude + point2.Longitude;
     
     [GeneratedRegex(@"^(?i)[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$", RegexOptions.None, "ru-RU")]
     private static partial Regex GuidRegex();
     
     private const double AverageTruckSpeedInKmPerHour = 70;
+
+    private readonly IGeolocationService _stubOfGeolocationService;
+
+    private readonly Regex _guidRegex;
+    
+    private const string DefaultOrderStartAddress = "AnyStartAddress";
+    
+    private const string DefaultOrderEndAddress = "AnyEndAddress";
+    
+    private const string DefaultOrderCargoDescription = "AnyDescription";
+    
+    private const double DefaultOrderStartPointLatitude = 56.9;
+    
+    private const double DefaultOrderStartPointLongitude = 4.8;
+    
+    private const int DefaultOrderEndPointLatitude = -9;
+    
+    private const int DefaultOrderEndPointLongitude = 8;
+    
+    private const int DefaultOrderCargoVolume = 60;
+    
+    private const int DefaultOrderCargoWeight = 6000;
+    
+    private const int DefaultOrderHazardClassFlag = HazardClassesFlags.Class21;
+    
+    private const bool DefaultOrderTank = true;
+
+    private const string DefaultUserName = "AnyName";
+    
+    private const string DefaultUserContact = "AnyContact";
+    
+    private const long DefaultUserVkUserId = 364;
+    
+    private const string DefaultBranchAddress = "AnyAddress";
+    
+    private const double DefaultBranchLatitude = 34;
+    
+    private const double DefaultBranchLongitude = 75;
+    
+    private const string DefaultTruckNumber = "AnyNumber";
+    
+    private const bool DefaultTruckTank = true;
+    
+    private const decimal DefaultTruckVolumeMax = 78;
+    
+    private const decimal DefaultTruckVolumePrice = 1.2m;
+    
+    private const decimal DefaultTruckWeightMax = 17000;
+    
+    private const decimal DefaultTruckWeightPrice = 0.15m;
+    
+    private const decimal DefaultTruckPricePerKm = 1;
+    
+    private const int DefaultTruckPermittedHazardClassessFlags = HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23;
+    
+    private const string DefaultDriver1Name = "AnyDriver1Name";
+    
+    private const int DefaultDriver1AdrDriverQualificationFlag = AdrDriverQualificationsFlags.Base;
+    
+    private const bool DefaultDriver1AdrQualificationOfTank = true;
+    
+    private const string DefaultDriver2Name = "AnyDriver2Name";
+    
+    private const int DefaultDriver2AdrDriverQualificationFlag = AdrDriverQualificationsFlags.Base;
+    
+    private const bool DefaultDriver2AdrQualificationOfTank = true;
 }

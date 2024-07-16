@@ -24,7 +24,7 @@ public class Driver
     // вычисляемых полей в отдельные методы-сеттеры.
     private Driver() { }
 
-    public static Driver New(string name, int adrQualificationsFlags, bool adrQualificationOfTank, Branch branch)
+    public static Driver New(string name, int adrQualificationFlag, bool adrQualificationOfTank, Branch branch)
     {
         var driver = new Driver
         {
@@ -32,7 +32,7 @@ public class Driver
             TotalHoursWorked = 0, AdrQualificationOfTank = adrQualificationOfTank
         };
         driver.Reinstate();
-        driver.QualifyAdr(adrQualificationsFlags);
+        driver.QualifyAdr(adrQualificationFlag);
         driver.SetBranch(branch);
 
         return driver;
@@ -78,13 +78,13 @@ public class Driver
         AdrQualificationFlag = null;
     }
     
-    public void QualifyAdr(int adrQualificationsFlags)
+    public void QualifyAdr(int adrQualificationFlag)
     {
-        if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationsFlags))
-            throw new ArgumentOutOfRangeException(nameof(adrQualificationsFlags), adrQualificationsFlags,
+        if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag))
+            throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
                 "AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (655359), Class7 (786431), Class8 (917503), Full (1048575).");
         
-        AdrQualificationFlag = adrQualificationsFlags;
+        AdrQualificationFlag = adrQualificationFlag;
     }
     
     public void QualifyAdrTank()
