@@ -79,7 +79,7 @@ public partial class OrderTest
     }
     
     [Fact]
-    public void Order_New_TruckIsAvailableIsInvalid_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckIsAvailableIsInvalid_ThrowArgumentException()
     {
         // Arrange
         var user = CreateUser();
@@ -94,138 +94,120 @@ public partial class OrderTest
     }
     
     [Fact]
-    public void Order_New_Driver1IsAvailableIsInvalid_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver1IsAvailableIsInvalid_ThrowArgumentException()
     {
-        // Arrange1
-        var user = User.New("AnyName", "AnyContact", 364);
-        var branch = Branch.New("AnyAddress", (34, 75));
-        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
-        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
-        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        // Arrange
+        var user = CreateUser();
+        var branch = CreateBranch();
+        var truck = CreateTruck(branch);
+        var driver1 = CreateDriver1(branch);
         driver1.IsAvailable = false;
+        var driver2 = CreateDriver2(branch);
         
         // Act
-        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
-            (StartPointLatitude, StartPointLongitude),
-            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
-            HazardClassFlag, Tank, user, truck, driver1, driver2,
-            _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
     }
     
     [Fact]
-    public void Order_New_Driver2IsAvailableIsInvalid_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver2IsAvailableIsInvalid_ThrowArgumentException()
     {
-        // Arrange1
-        var user = User.New("AnyName", "AnyContact", 364);
-        var branch = Branch.New("AnyAddress", (34, 75));
-        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
-        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
-        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        // Arrange
+        var user = CreateUser();
+        var branch = CreateBranch();
+        var truck = CreateTruck(branch);
+        var driver1 = CreateDriver1(branch);
+        var driver2 = CreateDriver2(branch);
         driver2.IsAvailable = false;
         
         // Act
-        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
-            (StartPointLatitude, StartPointLongitude),
-            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
-            HazardClassFlag, Tank, user, truck, driver1, driver2,
-            _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
     }
     
     [Fact]
-    public void Order_New_TankAndDriver1AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankAndDriver1AdrQualificationOfTankIsInvalid_ThrowArgumentException()
     {
-        // Arrange1
-        var user = User.New("AnyName", "AnyContact", 364);
-        var branch = Branch.New("AnyAddress", (34, 75));
-        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
-        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, false, branch);
-        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        // Arrange
+        var user = CreateUser();
+        var branch = CreateBranch();
+        var truck = CreateTruck(branch);
+        var driver1 = CreateDriver1(branch, adrQualificationOfTank: false);
+        var driver2 = CreateDriver2(branch);
         
         // Act
-        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
-            (StartPointLatitude, StartPointLongitude),
-            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
-            HazardClassFlag, true, user, truck, driver1, driver2,
-            _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
     }
     
     [Fact]
-    public void Order_New_TankAndDriver2AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankAndDriver2AdrQualificationOfTankIsInvalid_ThrowArgumentException()
     {
-        // Arrange1
-        var user = User.New("AnyName", "AnyContact", 364);
-        var branch = Branch.New("AnyAddress", (34, 75));
-        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
-        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
-        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, false, branch);
+        // Arrange
+        var user = CreateUser();
+        var branch = CreateBranch();
+        var truck = CreateTruck(branch);
+        var driver1 = CreateDriver1(branch);
+        var driver2 = CreateDriver2(branch, adrQualificationOfTank: false);
         
         // Act
-        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
-            (StartPointLatitude, StartPointLongitude),
-            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
-            HazardClassFlag, true, user, truck, driver1, driver2,
-            _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
     }
     
     [Fact]
-    public void Order_New_TankIsTrueAndTruckTankIsFalse_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankIsTrueAndTruckTankIsFalse_ThrowArgumentException()
     {
-        // Arrange1
-        var user = User.New("AnyName", "AnyContact", 364);
-        var branch = Branch.New("AnyAddress", (34, 75));
-        var truck = Truck.New("AnyNumber", false, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
-        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
-        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        // Arrange
+        var user = CreateUser();
+        var branch = CreateBranch();
+        var truck = CreateTruck(branch, tank: false);
+        var driver1 = CreateDriver1(branch);
+        var driver2 = CreateDriver2(branch);
         
         // Act
-        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
-            (StartPointLatitude, StartPointLongitude),
-            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
-            HazardClassFlag, true, user, truck, driver1, driver2,
-            _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
     }
     
     [Fact]
-    public void Order_New_TankIsFalseAndTruckTankIsTrue_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankIsFalseAndTruckTankIsTrue_ThrowArgumentException()
     {
-        // Arrange1
-        var user = User.New("AnyName", "AnyContact", 364);
-        var branch = Branch.New("AnyAddress", (34, 75));
-        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
-        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
-        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        // Arrange
+        var user = CreateUser();
+        var branch = CreateBranch();
+        var truck = CreateTruck(branch);
+        truck.IsAvailable = false;
+        var driver1 = CreateDriver1(branch);
+        var driver2 = CreateDriver2(branch);
         
         // Act
-        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
-            (StartPointLatitude, StartPointLongitude),
-            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
-            HazardClassFlag, false, user, truck, driver1, driver2,
-            _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService, tank: false));
     }
     
     [Fact]
-    public void Order_New_Driver1BranchIsInvalid_ThrowArgumentException()
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckBranchAndDriver1BranchIsInvalid_ThrowArgumentException()
     {
-        // Arrange1
-        var user = User.New("AnyName", "AnyContact", 364);
-        var branch = Branch.New("AnyAddress", (34, 75));
-        var truck = Truck.New("AnyNumber", true, 78, 1.2m, 17000, 0.15m, 1,
-            HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23, branch);
-        var driver1 = Driver.New("AnyDriver1Name", AdrDriverQualificationsFlags.Base, true, branch);
-        var driver2 = Driver.New("AnyDriver2Name", AdrDriverQualificationsFlags.Base, true, branch);
+        // Arrange
+        var user = CreateUser();
+        var branch1 = CreateBranch();
+        var branch2 = CreateBranch();
+        var truck = CreateTruck(branch);
+        var driver1 = CreateDriver1(branch1);
+        var driver2 = CreateDriver2(branch);
         
         // Act
-        Assert.Throws<ArgumentException>(() => Order.New(StartAddress, EndAddress, Description,
-            (StartPointLatitude, StartPointLongitude),
-            (EndPointLatitude, EndPointLongitude), CargoVolume, CargoWeight,
-            HazardClassFlag, Tank, user, truck, driver1, driver2,
-            _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+    }
+
+    [Fact]
+    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckBranchAndDriver2BranchIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var user = CreateUser();
+        var branch1 = CreateBranch();
+        var branch2 = CreateBranch();
+        var truck = CreateTruck(branch);
+        var driver1 = CreateDriver1(branch);
+        var driver2 = CreateDriver2(branch1);
+        
+        // Act
+        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
     }
 
     private static Order CreateOrderWithTwoDriversAndHazardClassFlag(User user, Truck truck, Driver driver1,
