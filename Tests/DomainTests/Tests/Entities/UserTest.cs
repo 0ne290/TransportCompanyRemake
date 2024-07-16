@@ -80,7 +80,7 @@ public partial class UserTest
     }
 
     [Fact]
-    public void User_New_ArgumentsIsValid_ReturnThe100UsersWithUniqueGuidsAndDynamicPartsOfSalt_Test()
+    public void User_NewTheVkUser_ArgumentsIsValid_ReturnThe100UsersWithUniqueGuidsAndDynamicPartsOfSalt_Test()
     {
         // Arrange
         var guids = new HashSet<string>(100);
@@ -90,6 +90,27 @@ public partial class UserTest
         {
             // Act
             var user = User.New("AnyName", "AnyContact", 35);
+
+            // Assert
+            Assert.DoesNotContain(user.Guid, guids);
+            Assert.DoesNotContain(user.DynamicPartOfSalt, dynamicPartsOfSalt);
+
+            guids.Add(user.Guid);
+            dynamicPartsOfSalt.Add(user.DynamicPartOfSalt);
+        }
+    }
+    
+    [Fact]
+    public void User_NewTheDefaultUser_ArgumentsIsValid_ReturnThe100UsersWithUniqueGuidsAndDynamicPartsOfSalt_Test()
+    {
+        // Arrange
+        var guids = new HashSet<string>(100);
+        var dynamicPartsOfSalt = new HashSet<string>(100);
+
+        for (var i = 0; i < 100; i++)
+        {
+            // Act
+            var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _stubOfCryptographicService);
 
             // Assert
             Assert.DoesNotContain(user.Guid, guids);

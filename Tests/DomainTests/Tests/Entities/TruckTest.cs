@@ -9,8 +9,7 @@ public partial class TruckTest
     [Theory]
     [InlineData(HazardClassesFlags.Class3)]
     [InlineData(HazardClassesFlags.Class61 | HazardClassesFlags.Class62)]
-    [InlineData(null)]
-    public void Truck_New_ArgumentsIsValid_ReturnTheTruck_Test(int? expectedPermittedHazardClassesFlags)
+    public void Truck_NewTruckWithPermittedHazardClassesFlags_ArgumentsIsValid_ReturnTheTruck_Test(int expectedPermittedHazardClassesFlags)
     {
         // Arrange
         var guidRegex = GuidRegex();
@@ -46,7 +45,7 @@ public partial class TruckTest
     }
     
     [Fact]
-    public void Truck_New_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
+    public void Truck_NewTruckWithPermittedHazardClassesFlags_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
         const int permittedHazardClassesFlags = 1_048_576;
@@ -56,7 +55,7 @@ public partial class TruckTest
     }
     
     [Fact]
-    public void Truck_New_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
+    public void Truck_NewTruckWithPermittedHazardClassesFlags_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
     {
         // Arrange
         var branch = Branch.New("AnyAddress", (37.314, -2.425));
@@ -65,7 +64,61 @@ public partial class TruckTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null, branch);
+            var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, HazardClassesFlags.Class21, branch);
+            
+            // Assert
+            Assert.DoesNotContain(truck.Guid, guids);
+
+            guids.Add(truck.Guid);
+        }
+    }
+    
+    [Fact]
+    public void Truck_NewTruckWithoutPermittedHazardClassesFlags_ArgumentsIsValid_ReturnTheTruck_Test()
+    {
+        // Arrange
+        var guidRegex = GuidRegex();
+        var expectedBranch = Branch.New("AnyAddress", (37.314, -2.425));
+        const bool expectedTank = true;
+        const decimal expectedVolumeMax = 80;
+        const decimal expectedVolumePrice = 1.5m;
+        const decimal expectedWeightMax = 10008.4m;
+        const decimal expectedWeightPrice = 0.7m;
+        const decimal expectedPricePerKm = 1.1m;
+        const string expectedNumber = "С150ТО";
+        var expectedWriteOnDateError = TimeSpan.FromSeconds(10);
+        var expectedWriteOnDate = DateTime.Now;
+
+        // Act
+        var truck = Truck.New(expectedNumber, expectedTank, expectedVolumeMax, expectedVolumePrice, expectedWeightMax,
+            expectedWeightPrice, expectedPricePerKm, expectedBranch);
+            
+        // Assert
+        Assert.Equal(expectedWriteOnDate, truck.WriteOnDate, expectedWriteOnDateError);
+        Assert.Null(truck.WriteOffDate);
+        Assert.Equal(expectedVolumeMax, truck.VolumeMax);
+        Assert.Equal(expectedVolumePrice, truck.VolumePrice);
+        Assert.Equal(expectedWeightMax, truck.WeightMax);
+        Assert.Equal(expectedWeightPrice, truck.WeightPrice);
+        Assert.Equal(expectedPricePerKm, truck.PricePerKm);
+        Assert.True(truck.IsAvailable);
+        Assert.Equal(expectedNumber, truck.Number);
+        Assert.Equal(expectedBranch, truck.Branch);
+        Assert.Equal(expectedBranch.Guid, truck.BranchGuid);
+        Assert.Matches(guidRegex, truck.Guid);
+    }
+    
+    [Fact]
+    public void Truck_NewTruckWithoutPermittedHazardClassesFlags_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
+    {
+        // Arrange
+        var branch = Branch.New("AnyAddress", (37.314, -2.425));
+        var guids = new HashSet<string>(100);
+
+        for (var i = 0; i < 100; i++)
+        {
+            // Act
+            var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, branch);
             
             // Assert
             Assert.DoesNotContain(truck.Guid, guids);
@@ -80,7 +133,7 @@ public partial class TruckTest
         // Arrange
         var expectedWriteOffDateError = TimeSpan.FromSeconds(10);
         var expectedWriteOffDate = DateTime.Now;
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
             Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act
@@ -96,7 +149,7 @@ public partial class TruckTest
     public void Truck_Reinstate_ContextIsValid_SetTheWriteOffDateToNullAndIsAvailableToTrue_Test()
     {
         // Arrange
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
             Branch.New("AnyAddress", (37.314, -2.425)));
         truck.WriteOff();
 
@@ -115,7 +168,7 @@ public partial class TruckTest
     public void Truck_SetPermittedHazardClassesFlags_ContextAndArgumentIsValid_SetThePermittedHazardClassesFlags_Test(int? expectedPermittedHazardClassesFlags)
     {
         // Arrange
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
             Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act
@@ -130,7 +183,7 @@ public partial class TruckTest
     {
         // Arrange
         const int permittedHazardClassesFlags = 1_048_576;
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m,0.7m, 1.1m, null, Branch.New("AnyAddress", (37.314, -2.425)));
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m,0.7m, 1.1m, Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags));
@@ -141,7 +194,7 @@ public partial class TruckTest
     {
         // Arrange
         var expectedBranch = Branch.New("ExpectedAddress", (13.8, -4));
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, null,
+        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
             Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act

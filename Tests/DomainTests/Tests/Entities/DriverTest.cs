@@ -77,7 +77,26 @@ public partial class DriverTest
     }
     
     [Fact]
-    public void Driver_New_ArgumentsIsValid_ReturnThe100DriversWithUniqueGuids_Test()
+    public void Driver_NewDriverWithAdrQualificationFlagDriver_ArgumentsIsValid_ReturnThe10DriversWithUniqueGuids_Test()
+    {
+        // Arrange
+        var branch = Branch.New("AnyAddress", (37.314, -2.425));
+        var guids = new HashSet<string>(100);
+
+        for (var i = 0; i < 100; i++)
+        {
+            // Act
+            var driver = Driver.New("AnyName", AdrDriverQualificationsFlags.Base, false, branch);
+            
+            // Assert
+            Assert.DoesNotContain(driver.Guid, guids);
+
+            guids.Add(driver.Guid);
+        }
+    }
+    
+    [Fact]
+    public void Driver_New_ArgumentsIsValid_ReturnThe10DriversWithUniqueGuids_Test()
     {
         // Arrange
         var branch = Branch.New("AnyAddress", (37.314, -2.425));

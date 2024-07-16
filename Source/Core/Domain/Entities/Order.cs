@@ -20,6 +20,10 @@ public class Order
         order.AssignPrice();
         order.AssignExpectedHoursWorkedByDriversForTwoDrivers();
 
+        truck.IsAvailable = false;
+        driver1.IsAvailable = false;
+        driver2.IsAvailable = false;
+
         return order;
     }
 
@@ -95,6 +99,10 @@ public class Order
         order.AssignDistanceInKm(geolocationService);
         order.AssignPrice();
         order.AssignExpectedHoursWorkedByDriversForTwoDrivers();
+        
+        truck.IsAvailable = false;
+        driver1.IsAvailable = false;
+        driver2.IsAvailable = false;
 
         return order;
     }
@@ -146,6 +154,9 @@ public class Order
         order.AssignDistanceInKm(geolocationService);
         order.AssignPrice();
         order.AssignExpectedHoursWorkedByDriversForOneDriver();
+        
+        truck.IsAvailable = false;
+        driver1.IsAvailable = false;
 
         return order;
     }
@@ -208,6 +219,9 @@ public class Order
         order.AssignDistanceInKm(geolocationService);
         order.AssignPrice();
         order.AssignExpectedHoursWorkedByDriversForOneDriver();
+        
+        truck.IsAvailable = false;
+        driver1.IsAvailable = false;
 
         return order;
     }
