@@ -2,7 +2,7 @@ using Domain.Constants;
 
 namespace DomainTests.Tests.Entities;
 
-public partial class OrderTest
+public class OrderTest
 {
     // OrderWithTwoDriversAndHazardClassFlag
     [Fact]

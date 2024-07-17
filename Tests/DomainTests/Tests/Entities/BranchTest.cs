@@ -10,18 +10,13 @@ public class BranchTest
     [Fact]
     public void Branch_New_ArgumentsIsValid_ReturnTheBranch_Test()
     {
-        // Arrange
-        const string expectedAddress = "AnyAddress";
-        const double expectedLatitude = 37.314;
-        const double expectedLongitude = -2.425;
-
         // Act
-        var branch = Branch.New(expectedAddress, (expectedLatitude, expectedLongitude));
+        var branch = BranchFixture.Create();
 
         // Assert
-        Assert.Equal(expectedAddress, branch.Address);
-        Assert.Equal(expectedLatitude, branch.Latitude);
-        Assert.Equal(expectedLongitude, branch.Longitude);
+        Assert.Equal(BranchFixture.DefaultAddress, branch.Address);
+        Assert.Equal(BranchFixture.DefaultLatitude, branch.Latitude);
+        Assert.Equal(BranchFixture.DefaultLongitude, branch.Longitude);
         Assert.Matches(_guidRegex, branch.Guid);
     }
 
@@ -34,7 +29,7 @@ public class BranchTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var branch = Branch.New("AnyAddress", (37.314, -2.425));
+            var branch = BranchFixture.Create();
 
             // Assert
             Assert.DoesNotContain(branch.Guid, guids);
@@ -50,11 +45,11 @@ public class BranchTest
         // Arrange
         var geolocationServiceStub = GeolocationServiceStub.Create();
         
-        var branchPoint = (34.85, -73.64);
+        var branchPoint = (BranchFixture.DefaultLatitude, BranchFixture.DefaultLongitude);
         var givenPoint = (22.6, 4);
         var expectedDistance = geolocationServiceStub.CalculateDistanceInKmByDegrees(branchPoint, givenPoint);
 
-        var branch = Branch.New("Anything", branchPoint);
+        var branch = BranchFixture.Create();
 
         //Act
         var actualDistance =

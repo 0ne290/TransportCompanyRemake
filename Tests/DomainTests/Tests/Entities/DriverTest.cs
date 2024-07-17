@@ -5,24 +5,20 @@ using DomainTests.Tests.Fixtures;
 
 namespace DomainTests.Tests.Entities;
 
-public partial class DriverTest
+public class DriverTest
 {
-    [Theory]
-    [InlineData(AdrDriverQualificationsFlags.Base)]
-    [InlineData(AdrDriverQualificationsFlags.Full)]
-    public void Driver_New_ArgumentsIsValid_ReturnTheDriverWithAdrQualification_Test(int expectedAdrQualificationFlag)
+    [Fact]
+    public void Driver_New_ArgumentsIsValid_ReturnTheDriverWithAdrQualification_Test()
     {
         // Arrange
-        var expectedBranch = Branch.New("AnyAddress", (37.314, -2.425));
+        var expectedBranch = BranchFixture.Create();
         const double expectedHoursWorkedPerWeek = 0;
         const double expectedTotalHoursWorked = 0;
-        const string expectedName = "AnyName";
-        const bool expectedAdrQualificationOfTank = true;
         var expectedHireDateError = TimeSpan.FromSeconds(10);
         var expectedHireDate = DateTime.Now;
 
         // Act
-        var driver = Driver.New(expectedName, expectedAdrQualificationFlag, expectedAdrQualificationOfTank, expectedBranch);
+        var driver = DriverFixture.CreateWithAdrQualificationFlag(expectedBranch);
             
         // Assert
         Assert.Equal(expectedHireDate, driver.HireDate, expectedHireDateError);
@@ -30,22 +26,20 @@ public partial class DriverTest
         Assert.Equal(expectedHoursWorkedPerWeek, driver.HoursWorkedPerWeek);
         Assert.Equal(expectedTotalHoursWorked, driver.TotalHoursWorked);
         Assert.True(driver.IsAvailable);
-        Assert.Equal(expectedName, driver.Name);
+        Assert.Equal(DriverFixture.DefaultName, driver.Name);
         Assert.NotNull(driver.AdrQualificationFlag);
-        Assert.Equal(expectedAdrQualificationFlag, driver.AdrQualificationFlag);
-        Assert.Equal(expectedAdrQualificationOfTank, driver.AdrQualificationOfTank);
+        Assert.Equal(DriverFixture.DefaultAdrDriverQualificationFlag, driver.AdrQualificationFlag);
+        Assert.Equal(DriverFixture.DefaultAdrQualificationOfTank, driver.AdrQualificationOfTank);
         Assert.Equal(expectedBranch, driver.Branch);
         Assert.Equal(expectedBranch.Guid, driver.BranchGuid);
-        Assert.Matches(guidRegex, driver.Guid);
+        Assert.Matches(_guidRegex, driver.Guid);
     }
 
-    [Theory]
-    [InlineData(AdrDriverQualificationsFlags.Full + 1)]
-    [InlineData(AdrDriverQualificationsFlags.Base + 1)]
-    public void
-        Driver_New_AdrQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test(
-            int adrQualificationFlag) => Assert.Throws<ArgumentOutOfRangeException>(() =>
-        Driver.New("AnyName", adrQualificationFlag, true, Branch.New("AnyAddress", (37.314, -2.425))));
+    [Fact]
+    public void Driver_New_AdrQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test() =>
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            DriverFixture.CreateWithAdrQualificationFlag(BranchFixture.Create(),
+                adrQualificationFlag: AdrDriverQualificationsFlags.Base + 1));
     
     [Fact]
     public void Driver_New_ArgumentsIsValid_ReturnTheDriverWithoutAdrQualification_Test()

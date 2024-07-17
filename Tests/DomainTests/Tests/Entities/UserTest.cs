@@ -162,10 +162,9 @@ public class UserTest
     
     private static string ExpectedSalt(string value, User user)
     {
-        const string staticPartOfSalt = "6d9ace9d25bca79be42c971f85a543b22dcee800101d9b39b9213741a5cdcf147b853dc142fa761f66b6cffb50e1a3c5183ae78013124fa58ff41a6edfc6e969";
+        const string s;
         
-        return value + user.RegistrationDate.ToString(CultureInfo.InvariantCulture) + staticPartOfSalt + user.Login + value + user.DynamicPartOfSalt +
-            user.Login;
+        return ;
     }
 
     private readonly ICryptographicService _cryptographicServiceStub = CryptographicServiceStub.Create();
