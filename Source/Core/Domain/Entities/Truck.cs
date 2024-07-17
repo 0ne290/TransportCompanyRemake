@@ -56,16 +56,17 @@ public class Truck
     // моделирует наличие/отсутствие у совокупности Фура-Полуприцеп сертификата по всем 20 подклассам. Например, если
     // 16-ый и 17-ый биты равны 1, то Фура-Полуприцеп имеет сертификат по 16-му 17-му подклассам (в терминах ГОСТ Р
     // 57479 это будут подклассы 6.1 "Токсичные вещества" и 6.2 "Инфекционные вещества")
-    public void SetPermittedHazardClassesFlags(int? permittedHazardClassesFlags)
+    public void SetPermittedHazardClassesFlags(int permittedHazardClassesFlags)
     {
-        if (permittedHazardClassesFlags != null)
-            if (!HazardClassesFlags.IsFlagCombination(permittedHazardClassesFlags.Value))
-                throw new ArgumentOutOfRangeException(nameof(permittedHazardClassesFlags), permittedHazardClassesFlags,
-                    "The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
-                    "value of their combination must be in the range [1; 2^20 (1048576)).");
+        if (!HazardClassesFlags.IsFlagCombination(permittedHazardClassesFlags))
+            throw new ArgumentOutOfRangeException(nameof(permittedHazardClassesFlags), permittedHazardClassesFlags,
+                "The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
+                "value of their combination must be in the range [1; 2^20 (1048576)).");
             
         PermittedHazardClassesFlags = permittedHazardClassesFlags;
     }
+
+    public void ResetPermittedHazardClassesFlags() => PermittedHazardClassesFlags = null;
 
     public void SetBranch(Branch branch)
     {

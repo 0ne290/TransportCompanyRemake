@@ -2,27 +2,17 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Domain.Entities;
 using Domain.Interfaces;
-using Moq;
+using DomainTests.Tests.Fixtures;
+using DomainTests.Tests.Stubs;
 
 namespace DomainTests.Tests.Entities;
 
-public partial class UserTest
+public class UserTest
 {
-    public UserTest()
-    {
-        var mock = new Mock<ICryptographicService>();
-        mock.Setup(cs => cs.EncryptAndHash(It.IsAny<string>())).Returns(StubOfEncryptAndHash);
-
-        _stubOfCryptographicService = mock.Object;
-    }
-    
     [Fact]
     public void User_New_ArgumentsIsValid_ReturnTheDefaultUser_Test()
     {
         // Arrange1
-        var guidRegex = GuidRegex();
-        var dynamicPartOfSaltRegex = DynamicPartOfSaltRegex();
-        
         const string expectedName = "AnyName";
         const string expectedContact = "AnyContact";
         const string expectedLogin = "AnyLogin";
@@ -32,14 +22,14 @@ public partial class UserTest
         var expextedRegistrationDateError = TimeSpan.FromSeconds(10);
         
         // Act
-        var user = User.New(expectedName, expectedContact, expectedLogin, password, _stubOfCryptographicService);
+        var user = User.New(expectedName, expectedContact, expectedLogin, password, _cryptographicServiceStub);
         
         // Arrange2
-        var expectedPassword = StubOfEncryptAndHash(ExpectedSalt(password, user));
+        var expectedPassword = _cryptographicServiceStub.EncryptAndHash(ExpectedSalt(password, user));
 
         // Assert
-        Assert.Matches(guidRegex, user.Guid);
-        Assert.Matches(dynamicPartOfSaltRegex, user.DynamicPartOfSalt);
+        Assert.Matches(_guidRegex, user.Guid);
+        Assert.Matches(_dynamicPartOfSaltRegex, user.DynamicPartOfSalt);
         Assert.Equal(expextedRegistrationDate, user.RegistrationDate, expextedRegistrationDateError);
         Assert.Null(user.VkUserId);
         Assert.NotNull(user.Login);
@@ -54,9 +44,6 @@ public partial class UserTest
     public void User_New_ArgumentsIsValid_ReturnTheVkUser_Test()
     {
         // Arrange1
-        var guidRegex = GuidRegex();
-        var dynamicPartOfSaltRegex = DynamicPartOfSaltRegex();
-        
         const string expectedName = "AnyName";
         const string expectedContact = "AnyContact";
         const long expectedVkUserId = 26535;
@@ -68,8 +55,8 @@ public partial class UserTest
         var user = User.New(expectedName, expectedContact, expectedVkUserId);
 
         // Assert
-        Assert.Matches(guidRegex, user.Guid);
-        Assert.Matches(dynamicPartOfSaltRegex, user.DynamicPartOfSalt);
+        Assert.Matches(_guidRegex, user.Guid);
+        Assert.Matches(_dynamicPartOfSaltRegex, user.DynamicPartOfSalt);
         Assert.Equal(expextedRegistrationDate, user.RegistrationDate, expextedRegistrationDateError);
         Assert.Null(user.Login);
         Assert.Null(user.Password);
@@ -110,7 +97,7 @@ public partial class UserTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _stubOfCryptographicService);
+            var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _cryptographicServiceStub);
 
             // Assert
             Assert.DoesNotContain(user.Guid, guids);
@@ -127,7 +114,7 @@ public partial class UserTest
         // Arrange
         const string expectedLogin = "NewLogin";
         
-        var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _stubOfCryptographicService);
+        var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _cryptographicServiceStub);
         
         // Act
         user.SetLogin(expectedLogin);
@@ -152,12 +139,12 @@ public partial class UserTest
         // Arrange
         const string newPassword = "NewPassword";
         
-        var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _stubOfCryptographicService);
+        var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _cryptographicServiceStub);
         
-        var expectedPassword = StubOfEncryptAndHash(ExpectedSalt(newPassword, user));
+        var expectedPassword = _cryptographicServiceStub.EncryptAndHash(ExpectedSalt(newPassword, user));
         
         // Act
-        user.SetPassword(_stubOfCryptographicService, newPassword);
+        user.SetPassword(_cryptographicServiceStub, newPassword);
         
         // Assert
         Assert.Equal(expectedPassword, user.Password);
@@ -170,16 +157,8 @@ public partial class UserTest
         var user = User.New("AnyName", "AnyContact", 365);
         
         // Act & Assery
-        Assert.Throws<InvalidOperationException>(() => user.SetPassword(_stubOfCryptographicService, "NewPassword"));
+        Assert.Throws<InvalidOperationException>(() => user.SetPassword(_cryptographicServiceStub, "NewPassword"));
     }
-
-    [GeneratedRegex(@"^(?i)[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$", RegexOptions.None, "ru-RU")]
-    private static partial Regex GuidRegex();
-    
-    [GeneratedRegex(@"^(?i)[a-z\d]{128}$", RegexOptions.None, "ru-RU")]
-    private static partial Regex DynamicPartOfSaltRegex();
-    
-    private static string StubOfEncryptAndHash(string value) => $"EncryptAndHashOf{value}";
     
     private static string ExpectedSalt(string value, User user)
     {
@@ -189,5 +168,9 @@ public partial class UserTest
             user.Login;
     }
 
-    private readonly ICryptographicService _stubOfCryptographicService;
+    private readonly ICryptographicService _cryptographicServiceStub = CryptographicServiceStub.Create();
+    
+    private readonly Regex _guidRegex = RegexFixture.GuidRegex();
+
+    private readonly Regex _dynamicPartOfSaltRegex = RegexFixture.DynamicPartOfSaltRegex();
 }

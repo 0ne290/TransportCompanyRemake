@@ -11,11 +11,11 @@ public static class AdrDriverQualificationsFlags
                             HazardClassesFlags.Class43 | HazardClassesFlags.Class51 | HazardClassesFlags.Class52 |
                             HazardClassesFlags.Class61 | HazardClassesFlags.Class62 | HazardClassesFlags.Class9;
 
-    public const int Class7 = Base | HazardClassesFlags.Class7;
+    public const int BaseAndClass7 = Base | HazardClassesFlags.Class7;
 
-    public const int Class8 = Base | HazardClassesFlags.Class8;
+    public const int BaseAndClass8 = Base | HazardClassesFlags.Class8;
 
-    public const int Full = Class7 | Class8;
+    public const int Full = BaseAndClass7 | BaseAndClass8;
 
-    private static readonly HashSet<int> Flags = new(new[] { Base, Class7, Class8, Full });
+    private static readonly HashSet<int> Flags = new(new[] { Base, BaseAndClass7, BaseAndClass8, Full });
 }

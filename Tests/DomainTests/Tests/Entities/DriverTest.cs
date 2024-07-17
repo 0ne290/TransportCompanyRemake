@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Domain.Constants;
 using Domain.Entities;
+using DomainTests.Tests.Fixtures;
 
 namespace DomainTests.Tests.Entities;
 
@@ -12,7 +13,6 @@ public partial class DriverTest
     public void Driver_New_ArgumentsIsValid_ReturnTheDriverWithAdrQualification_Test(int expectedAdrQualificationFlag)
     {
         // Arrange
-        var guidRegex = GuidRegex();
         var expectedBranch = Branch.New("AnyAddress", (37.314, -2.425));
         const double expectedHoursWorkedPerWeek = 0;
         const double expectedTotalHoursWorked = 0;
@@ -180,7 +180,7 @@ public partial class DriverTest
     public void Driver_DequalifyAdr_ContextIsValid_SetTheAdrQualificationOfTankToFalseAndAdrQualificationFlagToNull_Test()
     {
         // Arrange
-        var driver = Driver.New("AnyName", AdrDriverQualificationsFlags.Class7, true, Branch.New("AnyAddress", (37.314, -2.425)));
+        var driver = Driver.New("AnyName", AdrDriverQualificationsFlags.BaseAndClass7, true, Branch.New("AnyAddress", (37.314, -2.425)));
 
         // Act
         driver.DequalifyAdr();
@@ -268,6 +268,5 @@ public partial class DriverTest
         Assert.Equal(expectedBranch.Guid, driver.BranchGuid);
     }
     
-    [GeneratedRegex(@"^(?i)[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$", RegexOptions.None, "ru-RU")]
-    private static partial Regex GuidRegex();
+    private readonly Regex _guidRegex = RegexFixture.GuidRegex();
 }
