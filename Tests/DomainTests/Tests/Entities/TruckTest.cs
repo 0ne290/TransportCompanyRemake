@@ -1,70 +1,61 @@
 using System.Text.RegularExpressions;
 using Domain.Constants;
 using Domain.Entities;
+using DomainTests.Tests.Fixtures;
 
 namespace DomainTests.Tests.Entities;
 
-public partial class TruckTest
+public class TruckTest
 {
-    [Theory]
-    [InlineData(HazardClassesFlags.Class3)]
-    [InlineData(HazardClassesFlags.Class61 | HazardClassesFlags.Class62)]
-    public void Truck_NewTruckWithPermittedHazardClassesFlags_ArgumentsIsValid_ReturnTheTruck_Test(int expectedPermittedHazardClassesFlags)
+    [Fact]
+    public void Truck_NewWithPermittedHazardClassesFlags_ArgumentsIsValid_ReturnTheTruck_Test()
     {
         // Arrange
-        var guidRegex = GuidRegex();
-        var expectedBranch = Branch.New("AnyAddress", (37.314, -2.425));
-        const bool expectedTank = true;
-        const decimal expectedVolumeMax = 80;
-        const decimal expectedVolumePrice = 1.5m;
-        const decimal expectedWeightMax = 10008.4m;
-        const decimal expectedWeightPrice = 0.7m;
-        const decimal expectedPricePerKm = 1.1m;
-        const string expectedNumber = "С150ТО";
+        var expectedBranch = BranchFixture.Create();
         var expectedWriteOnDateError = TimeSpan.FromSeconds(10);
         var expectedWriteOnDate = DateTime.Now;
 
         // Act
-        var truck = Truck.New(expectedNumber, expectedTank, expectedVolumeMax, expectedVolumePrice, expectedWeightMax,
-            expectedWeightPrice, expectedPricePerKm, expectedPermittedHazardClassesFlags, expectedBranch);
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(expectedBranch);
             
         // Assert
         Assert.Equal(expectedWriteOnDate, truck.WriteOnDate, expectedWriteOnDateError);
         Assert.Null(truck.WriteOffDate);
-        Assert.Equal(expectedVolumeMax, truck.VolumeMax);
-        Assert.Equal(expectedVolumePrice, truck.VolumePrice);
-        Assert.Equal(expectedWeightMax, truck.WeightMax);
-        Assert.Equal(expectedWeightPrice, truck.WeightPrice);
-        Assert.Equal(expectedPricePerKm, truck.PricePerKm);
+        Assert.Equal(TruckFixture.DefaultVolumeMax, truck.VolumeMax);
+        Assert.Equal(TruckFixture.DefaultVolumePrice, truck.VolumePrice);
+        Assert.Equal(TruckFixture.DefaultWeightMax, truck.WeightMax);
+        Assert.Equal(TruckFixture.DefaultWeightPrice, truck.WeightPrice);
+        Assert.Equal(TruckFixture.DefaultPricePerKm, truck.PricePerKm);
         Assert.True(truck.IsAvailable);
-        Assert.Equal(expectedNumber, truck.Number);
-        Assert.Equal(expectedPermittedHazardClassesFlags, truck.PermittedHazardClassesFlags);
+        Assert.Equal(TruckFixture.DefaultTank, truck.Tank);
+        Assert.Equal(TruckFixture.DefaultNumber, truck.Number);
+        Assert.Equal(TruckFixture.DefaultPermittedHazardClassessFlags, truck.PermittedHazardClassesFlags);
         Assert.Equal(expectedBranch, truck.Branch);
         Assert.Equal(expectedBranch.Guid, truck.BranchGuid);
-        Assert.Matches(guidRegex, truck.Guid);
+        Assert.Matches(_guidRegex, truck.Guid);
     }
     
     [Fact]
-    public void Truck_NewTruckWithPermittedHazardClassesFlags_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
+    public void Truck_NewWithPermittedHazardClassesFlags_PermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
         const int permittedHazardClassesFlags = 1_048_576;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => Truck.New("С150ТО", true, 80, 1.5m, 1000.8m,0.7m, 1.1m, permittedHazardClassesFlags, Branch.New("AnyAddress", (37.314, -2.425))));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TruckFixture.CreateWithPermittedHazardClassesFlags(BranchFixture.Create(), permittedHazardClassessFlags: permittedHazardClassesFlags));
     }
     
     [Fact]
-    public void Truck_NewTruckWithPermittedHazardClassesFlags_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
+    public void Truck_NewWithPermittedHazardClassesFlags_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
     {
         // Arrange
-        var branch = Branch.New("AnyAddress", (37.314, -2.425));
+        var branch = BranchFixture.Create();
         var guids = new HashSet<string>(100);
 
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, HazardClassesFlags.Class21, branch);
+            var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
             
             // Assert
             Assert.DoesNotContain(truck.Guid, guids);
@@ -74,51 +65,44 @@ public partial class TruckTest
     }
     
     [Fact]
-    public void Truck_NewTruckWithoutPermittedHazardClassesFlags_ArgumentsIsValid_ReturnTheTruck_Test()
+    public void Truck_NewWithoutPermittedHazardClassesFlags_ArgumentsIsValid_ReturnTheTruck_Test()
     {
         // Arrange
-        var guidRegex = GuidRegex();
-        var expectedBranch = Branch.New("AnyAddress", (37.314, -2.425));
-        const bool expectedTank = true;
-        const decimal expectedVolumeMax = 80;
-        const decimal expectedVolumePrice = 1.5m;
-        const decimal expectedWeightMax = 10008.4m;
-        const decimal expectedWeightPrice = 0.7m;
-        const decimal expectedPricePerKm = 1.1m;
-        const string expectedNumber = "С150ТО";
+        var expectedBranch = BranchFixture.Create();
         var expectedWriteOnDateError = TimeSpan.FromSeconds(10);
         var expectedWriteOnDate = DateTime.Now;
 
         // Act
-        var truck = Truck.New(expectedNumber, expectedTank, expectedVolumeMax, expectedVolumePrice, expectedWeightMax,
-            expectedWeightPrice, expectedPricePerKm, expectedBranch);
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(expectedBranch);
             
         // Assert
         Assert.Equal(expectedWriteOnDate, truck.WriteOnDate, expectedWriteOnDateError);
         Assert.Null(truck.WriteOffDate);
-        Assert.Equal(expectedVolumeMax, truck.VolumeMax);
-        Assert.Equal(expectedVolumePrice, truck.VolumePrice);
-        Assert.Equal(expectedWeightMax, truck.WeightMax);
-        Assert.Equal(expectedWeightPrice, truck.WeightPrice);
-        Assert.Equal(expectedPricePerKm, truck.PricePerKm);
+        Assert.Equal(TruckFixture.DefaultVolumeMax, truck.VolumeMax);
+        Assert.Equal(TruckFixture.DefaultVolumePrice, truck.VolumePrice);
+        Assert.Equal(TruckFixture.DefaultWeightMax, truck.WeightMax);
+        Assert.Equal(TruckFixture.DefaultWeightPrice, truck.WeightPrice);
+        Assert.Equal(TruckFixture.DefaultPricePerKm, truck.PricePerKm);
         Assert.True(truck.IsAvailable);
-        Assert.Equal(expectedNumber, truck.Number);
+        Assert.Equal(TruckFixture.DefaultTank, truck.Tank);
+        Assert.Equal(TruckFixture.DefaultNumber, truck.Number);
+        Assert.Null(truck.PermittedHazardClassesFlags);
         Assert.Equal(expectedBranch, truck.Branch);
         Assert.Equal(expectedBranch.Guid, truck.BranchGuid);
-        Assert.Matches(guidRegex, truck.Guid);
+        Assert.Matches(_guidRegex, truck.Guid);
     }
     
     [Fact]
-    public void Truck_NewTruckWithoutPermittedHazardClassesFlags_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
+    public void Truck_NewWithoutPermittedHazardClassesFlags_ArgumentsIsValid_ReturnThe100TrucksWithUniqueGuids_Test()
     {
         // Arrange
-        var branch = Branch.New("AnyAddress", (37.314, -2.425));
+        var branch = BranchFixture.Create();
         var guids = new HashSet<string>(100);
 
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m, branch);
+            var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch);
             
             // Assert
             Assert.DoesNotContain(truck.Guid, guids);
@@ -133,8 +117,7 @@ public partial class TruckTest
         // Arrange
         var expectedWriteOffDateError = TimeSpan.FromSeconds(10);
         var expectedWriteOffDate = DateTime.Now;
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
-            Branch.New("AnyAddress", (37.314, -2.425)));
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(BranchFixture.Create());
 
         // Act
         truck.WriteOff();
@@ -149,8 +132,7 @@ public partial class TruckTest
     public void Truck_Reinstate_ContextIsValid_SetTheWriteOffDateToNullAndIsAvailableToTrue_Test()
     {
         // Arrange
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
-            Branch.New("AnyAddress", (37.314, -2.425)));
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(BranchFixture.Create());
         truck.WriteOff();
 
         // Act
@@ -161,15 +143,12 @@ public partial class TruckTest
         Assert.True(truck.IsAvailable);
     }
     
-    [Theory]
-    [InlineData(HazardClassesFlags.Class7)]
-    [InlineData(HazardClassesFlags.Class11 | HazardClassesFlags.Class7 | HazardClassesFlags.Class9)]
-    [InlineData(null)]
-    public void Truck_SetPermittedHazardClassesFlags_ContextAndArgumentIsValid_SetThePermittedHazardClassesFlags_Test(int? expectedPermittedHazardClassesFlags)
+    [Fact]
+    public void Truck_SetPermittedHazardClassesFlags_ContextAndArgumentIsValid_SetThePermittedHazardClassesFlags_Test()
     {
         // Arrange
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
-            Branch.New("AnyAddress", (37.314, -2.425)));
+        const int expectedPermittedHazardClassesFlags = HazardClassesFlags.Class21 | HazardClassesFlags.Class22 | HazardClassesFlags.Class23;
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(BranchFixture.Create());
 
         // Act
         truck.SetPermittedHazardClassesFlags(expectedPermittedHazardClassesFlags);
@@ -183,10 +162,23 @@ public partial class TruckTest
     {
         // Arrange
         const int permittedHazardClassesFlags = 1_048_576;
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m,0.7m, 1.1m, Branch.New("AnyAddress", (37.314, -2.425)));
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(BranchFixture.Create());
 
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags));
+    }
+    
+    [Fact]
+    public void Truck_ResetPermittedHazardClassesFlags_ContextAndArgumentIsValid_SetThePermittedHazardClassesFlagsToNull_Test()
+    {
+        // Arrange
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(BranchFixture.Create());
+
+        // Act
+        truck.ResetPermittedHazardClassesFlags();
+        
+        // Assert
+        Assert.Null(truck.PermittedHazardClassesFlags);
     }
     
     [Fact]
@@ -194,8 +186,7 @@ public partial class TruckTest
     {
         // Arrange
         var expectedBranch = Branch.New("ExpectedAddress", (13.8, -4));
-        var truck = Truck.New("С150ТО", true, 80, 1.5m, 1000.8m, 0.7m, 1.1m,
-            Branch.New("AnyAddress", (37.314, -2.425)));
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(BranchFixture.Create());
 
         // Act
         truck.SetBranch(expectedBranch);
@@ -213,6 +204,5 @@ public partial class TruckTest
         Assert.True(false);
     }
     
-    [GeneratedRegex(@"^(?i)[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$", RegexOptions.None, "ru-RU")]
-    private static partial Regex GuidRegex();
+    private readonly Regex _guidRegex = RegexFixture.GuidRegex();
 }

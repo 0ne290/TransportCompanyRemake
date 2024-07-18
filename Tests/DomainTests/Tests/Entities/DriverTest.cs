@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Domain.Constants;
-using Domain.Entities;
 using DomainTests.Tests.Fixtures;
 
 namespace DomainTests.Tests.Entities;
@@ -8,7 +7,7 @@ namespace DomainTests.Tests.Entities;
 public class DriverTest
 {
     [Fact]
-    public void Driver_NewDriverWithAdrQualification_ArgumentsIsValid_ReturnTheDriver_Test()
+    public void Driver_NewWithAdrQualification_ArgumentsIsValid_ReturnTheDriver_Test()
     {
         // Arrange
         var expectedBranch = BranchFixture.Create();
@@ -36,13 +35,13 @@ public class DriverTest
     }
 
     [Fact]
-    public void Driver_NewDriverWithAdrQualification_AdrQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test() =>
+    public void Driver_NewWithAdrQualification_AdrQualificationsFlagsIsInvalid_ThrowArgumentOutOfRangeException_Test() =>
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             DriverFixture.CreateWithAdrQualificationFlag(BranchFixture.Create(),
                 adrQualificationFlag: AdrDriverQualificationsFlags.Base + 1));
     
     [Fact]
-    public void Driver_NewDriverWithAdrQualificationFlagDriver_ArgumentsIsValid_ReturnThe100DriversWithUniqueGuids_Test()
+    public void Driver_NewWithAdrQualificationFlagDriver_ArgumentsIsValid_ReturnThe100DriversWithUniqueGuids_Test()
     {
         // Arrange
         var branch = BranchFixture.Create();
@@ -61,7 +60,7 @@ public class DriverTest
     }
 
     [Fact]
-    public void Driver_NewDriverWithoutAdrQualification_ArgumentsIsValid_ReturnTheDriver_Test()
+    public void Driver_NewWithoutAdrQualification_ArgumentsIsValid_ReturnTheDriver_Test()
     {
         // Arrange
         var expectedBranch = BranchFixture.Create();
@@ -88,7 +87,7 @@ public class DriverTest
     }
     
     [Fact]
-    public void Driver_NewDriverWithoutAdrQualification_ArgumentsIsValid_ReturnThe100DriversWithUniqueGuids_Test()
+    public void Driver_NewWithoutAdrQualification_ArgumentsIsValid_ReturnThe100DriversWithUniqueGuids_Test()
     {
         // Arrange
         var branch = BranchFixture.Create();
@@ -186,8 +185,8 @@ public class DriverTest
     public void Driver_QualifyAdr_ContextAndArgumentIsValid_SetTheAdrQualificationFlag_Test()
     {
         // Arrange
-        var expectedAdrQualificationFlag = AdrDriverQualificationsFlags.Full;
-        var driver = DriverFixture.CreateWithoutAdrQualificationFlag();
+        const int expectedAdrQualificationFlag = AdrDriverQualificationsFlags.Full;
+        var driver = DriverFixture.CreateWithoutAdrQualificationFlag(BranchFixture.Create());
 
         // Act
         driver.QualifyAdr(expectedAdrQualificationFlag);
@@ -200,7 +199,7 @@ public class DriverTest
     public void Driver_QualifyAdr_AdrQualificationFlagIsInvalid_ThrowArgumentOutOfRangeException_Test()
     {
         // Arrange
-        var adrQualificationFlag = AdrDriverQualificationsFlags.Base + 1;
+        const int adrQualificationFlag = AdrDriverQualificationsFlags.Base + 1;
         var driver = DriverFixture.CreateWithoutAdrQualificationFlag(BranchFixture.Create());
 
         // Act & Assert

@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.RegularExpressions;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -10,22 +9,17 @@ namespace DomainTests.Tests.Entities;
 public class UserTest
 {
     [Fact]
-    public void User_New_ArgumentsIsValid_ReturnTheDefaultUser_Test()
+    public void User_NewStandart_ArgumentsIsValid_ReturnTheUser_Test()
     {
         // Arrange1
-        const string expectedName = "AnyName";
-        const string expectedContact = "AnyContact";
-        const string expectedLogin = "AnyLogin";
-        const string password = "AnyPassword";
-
         var expextedRegistrationDate = DateTime.Now;
         var expextedRegistrationDateError = TimeSpan.FromSeconds(10);
         
         // Act
-        var user = User.New(expectedName, expectedContact, expectedLogin, password, _cryptographicServiceStub);
+        var user = UserFixture.CreateStandart(_cryptographicServiceStub);
         
         // Arrange2
-        var expectedPassword = _cryptographicServiceStub.EncryptAndHash(ExpectedSalt(password, user));
+        var expectedPassword = _cryptographicServiceStub.EncryptAndHash(UserFixture.Salt(user, UserFixture.DefaultPassword));
 
         // Assert
         Assert.Matches(_guidRegex, user.Guid);
@@ -33,41 +27,15 @@ public class UserTest
         Assert.Equal(expextedRegistrationDate, user.RegistrationDate, expextedRegistrationDateError);
         Assert.Null(user.VkUserId);
         Assert.NotNull(user.Login);
-        Assert.Equal(expectedLogin, user.Login);
+        Assert.Equal(UserFixture.DefaultLogin, user.Login);
         Assert.NotNull(user.Password);
         Assert.Equal(expectedPassword, user.Password);
-        Assert.Equal(expectedName, user.Name);
-        Assert.Equal(expectedContact, user.Contact);
+        Assert.Equal(UserFixture.DefaultName, user.Name);
+        Assert.Equal(UserFixture.DefaultContact, user.Contact);
     }
     
     [Fact]
-    public void User_New_ArgumentsIsValid_ReturnTheVkUser_Test()
-    {
-        // Arrange1
-        const string expectedName = "AnyName";
-        const string expectedContact = "AnyContact";
-        const long expectedVkUserId = 26535;
-        
-        var expextedRegistrationDate = DateTime.Now;
-        var expextedRegistrationDateError = TimeSpan.FromSeconds(10);
-        
-        // Act
-        var user = User.New(expectedName, expectedContact, expectedVkUserId);
-
-        // Assert
-        Assert.Matches(_guidRegex, user.Guid);
-        Assert.Matches(_dynamicPartOfSaltRegex, user.DynamicPartOfSalt);
-        Assert.Equal(expextedRegistrationDate, user.RegistrationDate, expextedRegistrationDateError);
-        Assert.Null(user.Login);
-        Assert.Null(user.Password);
-        Assert.NotNull(user.VkUserId);
-        Assert.Equal(expectedVkUserId, user.VkUserId);
-        Assert.Equal(expectedName, user.Name);
-        Assert.Equal(expectedContact, user.Contact);
-    }
-
-    [Fact]
-    public void User_NewTheVkUser_ArgumentsIsValid_ReturnThe100UsersWithUniqueGuidsAndDynamicPartsOfSalt_Test()
+    public void User_NewStandart_ArgumentsIsValid_ReturnThe100UsersWithUniqueGuidsAndDynamicPartsOfSalt_Test()
     {
         // Arrange
         var guids = new HashSet<string>(100);
@@ -76,7 +44,7 @@ public class UserTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var user = User.New("AnyName", "AnyContact", 35);
+            var user = UserFixture.CreateStandart(_cryptographicServiceStub);
 
             // Assert
             Assert.DoesNotContain(user.Guid, guids);
@@ -88,7 +56,29 @@ public class UserTest
     }
     
     [Fact]
-    public void User_NewTheDefaultUser_ArgumentsIsValid_ReturnThe100UsersWithUniqueGuidsAndDynamicPartsOfSalt_Test()
+    public void User_NewVk_ArgumentsIsValid_ReturnTheUser_Test()
+    {
+        // Arrange
+        var expextedRegistrationDate = DateTime.Now;
+        var expextedRegistrationDateError = TimeSpan.FromSeconds(10);
+        
+        // Act
+        var user = UserFixture.CreateVk();
+
+        // Assert
+        Assert.Matches(_guidRegex, user.Guid);
+        Assert.Matches(_dynamicPartOfSaltRegex, user.DynamicPartOfSalt);
+        Assert.Equal(expextedRegistrationDate, user.RegistrationDate, expextedRegistrationDateError);
+        Assert.Null(user.Login);
+        Assert.Null(user.Password);
+        Assert.NotNull(user.VkUserId);
+        Assert.Equal(UserFixture.DefaultVkUserId, user.VkUserId);
+        Assert.Equal(UserFixture.DefaultName, user.Name);
+        Assert.Equal(UserFixture.DefaultContact, user.Contact);
+    }
+
+    [Fact]
+    public void User_NewVk_ArgumentsIsValid_ReturnThe100UsersWithUniqueGuidsAndDynamicPartsOfSalt_Test()
     {
         // Arrange
         var guids = new HashSet<string>(100);
@@ -97,7 +87,7 @@ public class UserTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _cryptographicServiceStub);
+            var user = UserFixture.CreateVk();
 
             // Assert
             Assert.DoesNotContain(user.Guid, guids);
@@ -113,8 +103,7 @@ public class UserTest
     {
         // Arrange
         const string expectedLogin = "NewLogin";
-        
-        var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _cryptographicServiceStub);
+        var user = UserFixture.CreateStandart(_cryptographicServiceStub, login: "OldLogin");
         
         // Act
         user.SetLogin(expectedLogin);
@@ -127,7 +116,7 @@ public class UserTest
     public void User_SetLogin_VkUserIdIsInvalid_ThrowTheInvalidOperationException()
     {
         // Arrange
-        var user = User.New("AnyName", "AnyContact", 365);
+        var user = UserFixture.CreateVk();
         
         // Act & Assery
         Assert.Throws<InvalidOperationException>(() => user.SetLogin("NewLogin"));
@@ -138,10 +127,8 @@ public class UserTest
     {
         // Arrange
         const string newPassword = "NewPassword";
-        
-        var user = User.New("AnyName", "AnyContact", "AnyLogin", "AnyPassword", _cryptographicServiceStub);
-        
-        var expectedPassword = _cryptographicServiceStub.EncryptAndHash(ExpectedSalt(newPassword, user));
+        var user = UserFixture.CreateStandart(_cryptographicServiceStub, password: "OldPassword");
+        var expectedPassword = _cryptographicServiceStub.EncryptAndHash(UserFixture.Salt(user, newPassword));
         
         // Act
         user.SetPassword(_cryptographicServiceStub, newPassword);
@@ -154,17 +141,10 @@ public class UserTest
     public void User_SetPassword_VkUserIdIsInvalid_ThrowTheInvalidOperationException()
     {
         // Arrange
-        var user = User.New("AnyName", "AnyContact", 365);
+        var user = UserFixture.CreateVk();
         
         // Act & Assery
         Assert.Throws<InvalidOperationException>(() => user.SetPassword(_cryptographicServiceStub, "NewPassword"));
-    }
-    
-    private static string ExpectedSalt(string value, User user)
-    {
-        const string s;
-        
-        return ;
     }
 
     private readonly ICryptographicService _cryptographicServiceStub = CryptographicServiceStub.Create();
