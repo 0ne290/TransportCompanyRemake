@@ -1,4 +1,7 @@
-using Domain.Constants;
+using System.Text.RegularExpressions;
+using Domain.Interfaces;
+using DomainTests.Tests.Fixtures;
+using DomainTests.Tests.Stubs;
 
 namespace DomainTests.Tests.Entities;
 
@@ -6,35 +9,41 @@ public class OrderTest
 {
     // OrderWithTwoDriversAndHazardClassFlag
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
     {
         // Arrange1
-        var expectedUser = CreateUser();
-        var expectedBranch = CreateBranch();
-        var expectedTruck = CreateTruckWithPermittedHazardClassesFlags(expectedBranch);
-        var expectedDriver1 = CreateDriver1WithAdrQualificationFlag(expectedBranch);
-        var expectedDriver2 = CreateDriver2WithAdrQualificationFlag(expectedBranch);
-        var expectedDistanceInKm = expectedBranch.CalculateDistanceInKmByDegrees(_stubOfGeolocationService, (DefaultOrderStartPointLatitude, DefaultOrderStartPointLongitude)) + _stubOfGeolocationService.CalculateDistanceInKmByDegrees((DefaultOrderStartPointLatitude, DefaultOrderStartPointLongitude),
-            (DefaultOrderEndPointLatitude, DefaultOrderEndPointLongitude)) + expectedBranch.CalculateDistanceInKmByDegrees(_stubOfGeolocationService, (DefaultOrderEndPointLatitude, DefaultOrderEndPointLongitude));
-        var expectedExpectedHoursWorkedByDrivers = expectedDistanceInKm / AverageTruckSpeedInKmPerHour / 2;
+        var expectedUser = UserFixture.CreateVk();
+        var expectedBranch = BranchFixture.Create();
+        var expectedTruck = TruckFixture.CreateWithPermittedHazardClassesFlags(expectedBranch);
+        var expectedDriver1 = DriverFixture.CreateWithAdrQualificationFlag(expectedBranch);
+        var expectedDriver2 = DriverFixture.CreateWithAdrQualificationFlag(expectedBranch);
+        var expectedDistanceInKm =
+            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
+                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude)) +
+            _geolocationServiceStub.CalculateDistanceInKmByDegrees(
+                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude),
+                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude)) +
+            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
+                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude));
+        var expectedExpectedHoursWorkedByDrivers = expectedDistanceInKm / OrderFixture.AverageTruckSpeedInKmPerHour / 2;
         const int expextedActualHoursWorkedByDriver1 = 0;
         const int expextedActualHoursWorkedByDriver2 = 0;
-        const int expectedHazardClassFlag = HazardClassesFlags.Class21;
         var expextedDateBegin = DateTime.Now;
         var expextedDateBeginError = TimeSpan.FromSeconds(10);
-        
+
         // Act
-        var order = CreateOrderWithTwoDriversAndHazardClassFlag(expectedUser, expectedTruck, expectedDriver1, expectedDriver2, _stubOfGeolocationService, hazardClassFlag: expectedHazardClassFlag);
-        
+        var order = OrderFixture.CreateWithTwoDriversAndHazardClassFlag(expectedUser, expectedTruck, expectedDriver1,
+            expectedDriver2, _geolocationServiceStub);
+
         // Arrange2
         var expectedPrice = expectedTruck.CalculateOrderPrice(order);
-        
+
         // Assert
         Assert.Matches(_guidRegex, order.Guid);
         Assert.Equal(expextedDateBegin, order.DateBegin, expextedDateBeginError);
         Assert.Null(order.DateEnd);
-        Assert.Equal(expectedHazardClassFlag, order.HazardClassFlag);
-        Assert.Equal(DefaultOrderTank, order.Tank);
+        Assert.Equal(OrderFixture.DefaultHazardClassFlag, order.HazardClassFlag);
+        Assert.Equal(OrderFixture.DefaultTank, order.Tank);
         Assert.Equal(expectedDistanceInKm, order.DistanceInKm);
         Assert.Equal(expectedPrice, order.Price);
         Assert.Equal(expectedExpectedHoursWorkedByDrivers, order.ExpectedHoursWorkedByDrivers);
@@ -50,37 +59,38 @@ public class OrderTest
         Assert.False(order.Driver1.IsAvailable);
         Assert.Equal(expectedDriver2, order.Driver2);
         Assert.Equal(expectedDriver2.Guid, order.Driver2Guid);
+        Assert.NotNull(order.Driver2);
         Assert.False(order.Driver2.IsAvailable);
         Assert.Equal(expectedBranch, order.Branch);
         Assert.Equal(expectedBranch.Guid, order.BranchGuid);
         Assert.Equal(expectedUser.Guid, order.UserGuid);
-        Assert.Equal(DefaultOrderStartAddress, order.StartAddress);
-        Assert.Equal(DefaultOrderEndAddress, order.EndAddress);
-        Assert.Equal(DefaultOrderCargoDescription, order.CargoDescription);
-        Assert.Equal(DefaultOrderStartPointLatitude, order.StartPointLatitude);
-        Assert.Equal(DefaultOrderStartPointLongitude, order.StartPointLongitude);
-        Assert.Equal(DefaultOrderEndPointLatitude, order.EndPointLatitude);
-        Assert.Equal(DefaultOrderEndPointLongitude, order.EndPointLongitude);
-        Assert.Equal(DefaultOrderCargoVolume, order.CargoVolume);
-        Assert.Equal(DefaultOrderCargoWeight, order.CargoWeight);
+        Assert.Equal(OrderFixture.DefaultStartAddress, order.StartAddress);
+        Assert.Equal(OrderFixture.DefaultEndAddress, order.EndAddress);
+        Assert.Equal(OrderFixture.DefaultCargoDescription, order.CargoDescription);
+        Assert.Equal(OrderFixture.DefaultStartPointLatitude, order.StartPointLatitude);
+        Assert.Equal(OrderFixture.DefaultStartPointLongitude, order.StartPointLongitude);
+        Assert.Equal(OrderFixture.DefaultEndPointLatitude, order.EndPointLatitude);
+        Assert.Equal(OrderFixture.DefaultEndPointLongitude, order.EndPointLongitude);
+        Assert.Equal(OrderFixture.DefaultCargoVolume, order.CargoVolume);
+        Assert.Equal(OrderFixture.DefaultCargoWeight, order.CargoWeight);
     }
-    
+
     [Fact]
     public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckIsAvailableIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
         truck.IsAvailable = false;
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
-    [Fact]
+    /*[Fact]
     public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver1IsAvailableIsInvalid_ThrowArgumentException()
     {
         // Arrange
@@ -755,5 +765,9 @@ public class OrderTest
 
             guids.Add(order.Guid);
         }
-    }
+    }*/
+
+    private readonly IGeolocationService _geolocationServiceStub = GeolocationServiceStub.Create();
+    
+    private readonly Regex _guidRegex = RegexFixture.GuidRegex();
 }

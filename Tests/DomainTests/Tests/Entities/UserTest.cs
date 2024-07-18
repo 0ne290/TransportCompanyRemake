@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Domain.Entities;
 using Domain.Interfaces;
 using DomainTests.Tests.Fixtures;
 using DomainTests.Tests.Stubs;
