@@ -163,7 +163,7 @@ public class TruckTest
         // Arrange
         const int permittedHazardClassesFlags = 1_048_576;
         var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(BranchFixture.Create());
-
+        
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags));
     }

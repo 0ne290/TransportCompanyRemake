@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Domain.Constants;
 using Domain.Interfaces;
 using DomainTests.Tests.Fixtures;
 using DomainTests.Tests.Stubs;
@@ -76,7 +77,7 @@ public class OrderTest
     }
 
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckIsAvailableIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TruckIsAvailableIsInvalid_ThrowArgumentException()
     {
         // Arrange
         var user = UserFixture.CreateVk();
@@ -90,235 +91,238 @@ public class OrderTest
         Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
-    /*[Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver1IsAvailableIsInvalid_ThrowArgumentException()
+    [Fact]
+    public void Order_NewWithTwoDriversAndHazardClassFlag_Driver1IsAvailableIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         driver1.IsAvailable = false;
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver2IsAvailableIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_Driver2IsAvailableIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         driver2.IsAvailable = false;
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankAndDriver1AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TankAndDriver1AdrQualificationOfTankIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch, adrQualificationOfTank: false);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationOfTank: false);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: true));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankAndDriver2AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TankAndDriver2AdrQualificationOfTankIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch, adrQualificationOfTank: false);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationOfTank: false);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: true));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankIsTrueAndTruckTankIsFalse_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TankIsTrueAndTruckTankIsFalse_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch, tank: false);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch, tank: false);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: true));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TankIsFalseAndTruckTankIsTrue_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TankIsFalseAndTruckTankIsTrue_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch, tank: true);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService, tank: false));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: false));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckBranchAndDriver1BranchIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TruckBranchAndDriver1BranchIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch1 = CreateBranch();
-        var branch2 = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch1);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch2);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch1);
+        var user = UserFixture.CreateVk();
+        var branch1 = BranchFixture.Create();
+        var branch2 = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch1);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch2);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch1);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
 
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckBranchAndDriver2BranchIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TruckBranchAndDriver2BranchIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch1 = CreateBranch();
-        var branch2 = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch1);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch1);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch2);
+        var user = UserFixture.CreateVk();
+        var branch1 = BranchFixture.Create();
+        var branch2 = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch1);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch1);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch2);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_HazardClassFlagIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_HazardClassFlagIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService, hazardClassFlag: HazardClassesFlags.Class7 + 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7 + 1));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckPermittedHazardClassesFlagsIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TruckPermittedHazardClassesFlagsIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch, permittedHazardClassessFlags: HazardClassesFlags.Class22 | HazardClassesFlags.Class7);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch, permittedHazardClassessFlags: HazardClassesFlags.Class8);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_TruckWithoutPermittedHazardClassesFlags_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_TruckWithoutPermittedHazardClassesFlags_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithoutPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver1AdrQualificationFlagIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_Driver1AdrQualificationFlagIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch, permittedHazardClassessFlags: HazardClassesFlags.Class7);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.Base);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver1WithoutAdrQualificationFlag_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_Driver1WithoutAdrQualificationFlag_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithoutAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver2AdrQualificationFlagIsInvalid_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_Driver2AdrQualificationFlagIsInvalid_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch, permittedHazardClassessFlags: HazardClassesFlags.Class7);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.Base);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_Driver2WithoutAdrQualificationFlag_ThrowArgumentException()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_Driver2WithoutAdrQualificationFlag_ThrowArgumentException()
     {
         // Arrange
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithoutAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
     }
     
     [Fact]
-    public void Order_NewOrderWithTwoDriversAndHazardClassFlag_ArgumentsIsValid_ReturnThe100OrdersWithUniqueGuids_Test()
+    public void Order_NewWithTwoDriversAndHazardClassFlag_ArgumentsIsValid_ReturnThe100OrdersWithUniqueGuids_Test()
     {
         // Arrange
         var guids = new HashSet<string>(100);
-        var user = CreateUser();
-        var branch = CreateBranch();
-        var truck = CreateTruckWithPermittedHazardClassesFlags(branch);
-        var driver1 = CreateDriver1WithAdrQualificationFlag(branch);
-        var driver2 = CreateDriver2WithAdrQualificationFlag(branch);
+        var user = UserFixture.CreateVk();
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
 
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var order = CreateOrderWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _stubOfGeolocationService);
+            var order = OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub);
+            truck.IsAvailable = true;
+            driver1.IsAvailable = true;
+            driver2.IsAvailable = true;
 
             // Assert
             Assert.DoesNotContain(order.Guid, guids);
@@ -328,7 +332,7 @@ public class OrderTest
     }
     
     // OrderWithTwoDriversAndWithoutHazardClassFlag
-    [Fact]
+    /*[Fact]
     public void Order_NewOrderWithTwoDriverAndWithoutHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
     {
         // Arrange1
