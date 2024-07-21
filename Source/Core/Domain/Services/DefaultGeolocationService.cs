@@ -29,7 +29,15 @@ public class DefaultGeolocationService : IGeolocationService
         return angularDifference * EarthRadiusInKm;
     }
 
+    public double CalculateApproximateDrivingHoursOfTruckAlongClosedRoute(
+        params (double Latitude, double Longitude)[] closedRoute)
+    {
+        
+    }
+
     private const double NumberOfRadiansInOneDegree = Math.PI / 180;
 
     private const double EarthRadiusInKm = 6_371.0088;
+    
+    private const double AverageTruckSpeedInKmPerHour = 70;
 }
