@@ -29,10 +29,14 @@ public class DefaultGeolocationService : IGeolocationService
         return angularDifference * EarthRadiusInKm;
     }
 
-    public double CalculateApproximateDrivingHoursOfTruckAlongClosedRoute(
-        params (double Latitude, double Longitude)[] closedRoute)
+    public (double LengthInKm, double DrivingHours) CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(params (double Latitude, double Longitude)[] closedRoute)
     {
-        
+        var lengthInKm = 0;
+        for (var i = 1; i < closedRoute.Length; i++)
+            lengthInKm += CalculateDistanceInKmByDegrees(closedRoute[i - 1], closedRoute[i]);
+        lengthInKm += CalculateDistanceInKmByDegrees(closedRoute[^1], closedRoute[0]);
+
+        return (lengthInKm, lengthInKm / AverageTruckSpeedInKmPerHour);
     }
 
     private const double NumberOfRadiansInOneDegree = Math.PI / 180;
