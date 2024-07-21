@@ -2,7 +2,7 @@ using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 
-namespace DomainTests.Tests.Fixtures;
+namespace DomainTests.Fixtures;
 
 public static class OrderFixture
 {
@@ -58,13 +58,13 @@ public static class OrderFixture
     
     public const double DefaultStartPointLongitude = 4.8;
     
-    public const int DefaultEndPointLatitude = -9;
+    public const double DefaultEndPointLatitude = -9;
     
-    public const int DefaultEndPointLongitude = 8;
+    public const double DefaultEndPointLongitude = 8;
     
-    public const int DefaultCargoVolume = 60;
+    public const decimal DefaultCargoVolume = 60;
     
-    public const int DefaultCargoWeight = 6000;
+    public const decimal DefaultCargoWeight = 6000;
     
     public const int DefaultHazardClassFlag = HazardClassesFlags.Class11;
     

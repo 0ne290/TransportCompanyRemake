@@ -1,7 +1,7 @@
 using Domain.Constants;
 using Domain.Entities;
 
-namespace DomainTests.Tests.Fixtures;
+namespace DomainTests.Fixtures;
 
 public static class TruckFixture
 {

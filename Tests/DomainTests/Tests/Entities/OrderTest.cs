@@ -1,8 +1,9 @@
 using System.Text.RegularExpressions;
 using Domain.Constants;
 using Domain.Interfaces;
-using DomainTests.Tests.Fixtures;
-using DomainTests.Tests.Stubs;
+using DomainTests.Fixtures;
+using DomainTests.Stubs;
+using RegexFixture = DomainTests.Fixtures.RegexFixture;
 
 namespace DomainTests.Tests.Entities;
 

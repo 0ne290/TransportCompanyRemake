@@ -1,7 +1,9 @@
 using System.Text.RegularExpressions;
 using Domain.Constants;
 using Domain.Entities;
-using DomainTests.Tests.Fixtures;
+using DomainTests.Fixtures;
+using DomainTests.Stubs;
+using RegexFixture = DomainTests.Fixtures.RegexFixture;
 
 namespace DomainTests.Tests.Entities;
 
@@ -201,7 +203,19 @@ public class TruckTest
     [Fact]
     public void Truck_CalculateOrderPrice_ContextAndArgumentIsValid_ReturnThePriceForFulfillingAnOrderByTruck_Test()
     {
-        Assert.True(false);
+        // Arrange
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch);
+        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), truck, DriverFixture.CreateWithoutAdrQualificationFlag(branch), GeolocationServiceStub.Create());
+        var expectedPrice =
+            (TruckFixture.DefaultWeightPrice * OrderFixture.DefaultCargoWeight +
+             TruckFixture.DefaultVolumePrice * OrderFixture.DefaultCargoVolume) * TruckFixture.DefaultPricePerKm *
+            (decimal)order.DistanceInKm;
+        // Act
+        var actualPrice = truck.CalculateOrderPrice(order);
+
+        // Assert
+        Assert.Equal(expectedPrice, actualPrice);
     }
     
     private readonly Regex _guidRegex = RegexFixture.GuidRegex();

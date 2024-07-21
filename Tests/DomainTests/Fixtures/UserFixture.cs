@@ -2,7 +2,7 @@ using System.Globalization;
 using Domain.Entities;
 using Domain.Interfaces;
 
-namespace DomainTests.Tests.Fixtures;
+namespace DomainTests.Fixtures;
 
 public static class UserFixture
 {

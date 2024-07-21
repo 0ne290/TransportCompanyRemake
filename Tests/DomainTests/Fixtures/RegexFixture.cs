@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace DomainTests.Tests.Fixtures;
+namespace DomainTests.Fixtures;
 
 public static partial class RegexFixture
 {

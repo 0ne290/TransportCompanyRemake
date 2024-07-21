@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Domain.Constants;
-using DomainTests.Tests.Fixtures;
+using DomainTests.Fixtures;
+using RegexFixture = DomainTests.Fixtures.RegexFixture;
 
 namespace DomainTests.Tests.Entities;
 

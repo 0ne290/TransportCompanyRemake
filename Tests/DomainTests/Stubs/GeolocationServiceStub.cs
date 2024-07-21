@@ -1,7 +1,7 @@
 using Domain.Interfaces;
 using Moq;
 
-namespace DomainTests.Tests.Stubs;
+namespace DomainTests.Stubs;
 
 public static class GeolocationServiceStub
 {

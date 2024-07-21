@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace DomainTests.Tests.Fixtures;
+namespace DomainTests.Fixtures;
 
 public static class BranchFixture
 {
