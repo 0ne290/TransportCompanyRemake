@@ -15,7 +15,7 @@ public static class DriverFixture
     
     public const string DefaultName = "AnyDriver1Name";
     
-    public const int DefaultAdrDriverQualificationFlag = AdrDriverQualificationsFlags.BaseAndClass8;
+    public const int DefaultAdrDriverQualificationFlag = AdrDriverQualificationsFlags.BaseAndClass1;
     
     public const bool DefaultAdrQualificationOfTank = true;
 }

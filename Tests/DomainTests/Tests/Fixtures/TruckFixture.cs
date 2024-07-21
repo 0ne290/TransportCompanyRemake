@@ -35,5 +35,8 @@ public static class TruckFixture
     public const decimal DefaultPricePerKm = 1;
 
     public const int DefaultPermittedHazardClassessFlags = HazardClassesFlags.Class21 | HazardClassesFlags.Class22 |
-                                                           HazardClassesFlags.Class23 | HazardClassesFlags.Class8;
+                                                           HazardClassesFlags.Class23 | HazardClassesFlags.Class11 |
+                                                           HazardClassesFlags.Class12 | HazardClassesFlags.Class13 |
+                                                           HazardClassesFlags.Class14 | HazardClassesFlags.Class15 |
+                                                           HazardClassesFlags.Class16;
 }

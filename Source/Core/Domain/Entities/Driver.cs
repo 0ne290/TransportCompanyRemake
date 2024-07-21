@@ -82,7 +82,7 @@ public class Driver
     {
         if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag))
             throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
-                "AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (655359), BaseAndClass7 (786431), BaseAndClass8 (917503), Full (1048575).");
+                "AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
         
         AdrQualificationFlag = adrQualificationFlag;
     }

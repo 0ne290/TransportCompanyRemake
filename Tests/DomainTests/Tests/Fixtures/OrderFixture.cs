@@ -36,6 +36,16 @@ public static class OrderFixture
         cargoDescription, (startPointLatitude, startPointLongitude), (endPointLatitude, endPointLongitude), cargoVolume,
         cargoWeight, hazardClassFlag, tank, user, truck, driver1, geolocationService);
     
+    public static Order CreateWithOneDriverAndWithoutHazardClassFlag(User user, Truck truck, Driver driver1,
+        IGeolocationService geolocationService, string startAddress = DefaultStartAddress,
+        string endAddress = DefaultEndAddress, string cargoDescription = DefaultCargoDescription,
+        double startPointLatitude = DefaultStartPointLatitude, double startPointLongitude = DefaultStartPointLongitude,
+        double endPointLatitude = DefaultEndPointLatitude, double endPointLongitude = DefaultEndPointLongitude,
+        decimal cargoVolume = DefaultCargoVolume, decimal cargoWeight = DefaultCargoWeight,
+        bool tank = DefaultTank) => Order.New(startAddress, endAddress,
+        cargoDescription, (startPointLatitude, startPointLongitude), (endPointLatitude, endPointLongitude), cargoVolume,
+        cargoWeight, tank, user, truck, driver1, geolocationService);
+    
     public const double AverageTruckSpeedInKmPerHour = 70;
     
     public const string DefaultStartAddress = "AnyStartAddress";
@@ -56,7 +66,7 @@ public static class OrderFixture
     
     public const int DefaultCargoWeight = 6000;
     
-    public const int DefaultHazardClassFlag = HazardClassesFlags.Class8;
+    public const int DefaultHazardClassFlag = HazardClassesFlags.Class11;
     
     public const bool DefaultTank = true;
 }

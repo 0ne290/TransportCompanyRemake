@@ -306,10 +306,12 @@ public class Order
         if (DateEnd != null)
             throw new InvalidOperationException("The order has already been finished.");
 
-        DateEnd = DateTime.Now;
         Truck.IsAvailable = true;
         Driver1.IsAvailable = true;
-        Driver2!.IsAvailable = true;
+        Driver1.AddHoursWorked(actualHoursWorkedByDriver1);
+
+        ActualHoursWorkedByDriver1 = actualHoursWorkedByDriver1;
+        DateEnd = DateTime.Now;
     }
 
     public void Finish(double actualHoursWorkedByDriver1, double actualHoursWorkedByDriver2)
