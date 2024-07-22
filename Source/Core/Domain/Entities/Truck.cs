@@ -79,7 +79,7 @@ public class Truck
         var weightPricePerKilometer = WeightPrice * order.CargoWeight;
         var volumePricePerKilometer = VolumePrice * order.CargoVolume;
         var totalPricePerKilometer = (weightPricePerKilometer + volumePricePerKilometer) * PricePerKm;
-        var orderPrice = totalPricePerKilometer * (decimal)order.DistanceInKm;
+        var orderPrice = totalPricePerKilometer * (decimal)order.LengthInKm;
 
         return orderPrice;
     }

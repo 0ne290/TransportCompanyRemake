@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Domain.Dtos;
 using DomainTests.Fixtures;
 using DomainTests.Stubs;
 using RegexFixture = DomainTests.Fixtures.RegexFixture;
@@ -40,24 +41,30 @@ public class BranchTest
 
     [Fact]
     public void
-        Branch_CalculateDistanceInKmByDegrees_ContextAndArgumentsIsValid_ReturnTheDistanceFromBranchPointToGivenPoint_Test()
+        Branch_CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt_ContextAndArgumentsIsValid_ReturnTheLengthInKmAndDrivingHours_Test()
     {
         // Arrange
         var geolocationServiceStub = GeolocationServiceStub.Create();
-        
+
         var branchPoint = (BranchFixture.DefaultLatitude, BranchFixture.DefaultLongitude);
-        var givenPoint = (22.6, 4);
-        var expectedDistance = geolocationServiceStub.CalculateDistanceInKmByDegrees(branchPoint, givenPoint);
+        var startPoint = (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude);
+        var endPoint = (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude);
+        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
+        var expectedLengthInKmAndDrivingHours =
+            geolocationServiceStub.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(branchPoint,
+                startPoint, endPoint);
 
         var branch = BranchFixture.Create();
 
         //Act
-        var actualDistance =
-            branch.CalculateDistanceInKmByDegrees(geolocationServiceStub, givenPoint);
+        var actualLengthInKmAndDrivingHours =
+            branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderCreationRequestDto,
+                geolocationServiceStub);
 
         // Assert
-        Assert.Equal(expectedDistance, actualDistance);
+        Assert.Equal(expectedLengthInKmAndDrivingHours.LengthInKm, actualLengthInKmAndDrivingHours.LengthInKm);
+        Assert.Equal(expectedLengthInKmAndDrivingHours.DrivingHours, actualLengthInKmAndDrivingHours.DrivingHours);
     }
-    
+
     private readonly Regex _guidRegex = RegexFixture.GuidRegex();
 }

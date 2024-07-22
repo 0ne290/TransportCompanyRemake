@@ -1,3 +1,4 @@
+using Domain.Dtos;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
@@ -11,10 +12,12 @@ public class Branch
         Guid = System.Guid.NewGuid().ToString(), Address = address, Latitude = point.Latitude,
         Longitude = point.Longitude
     };
-    
-    public double CalculateDistanceInKmByDegrees(IGeolocationService geolocationService,
-        (double Latitude, double Longitude) point) =>
-        geolocationService.CalculateDistanceInKmByDegrees((Latitude, Longitude), (point.Latitude, point.Longitude));
+
+    public (double LengthInKm, double DrivingHours)
+        CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+            OrderCreationRequestDto orderCreationRequestDto, IGeolocationService geolocationService) =>
+        geolocationService.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+            (Latitude, Longitude), orderCreationRequestDto.StartPoint, orderCreationRequestDto.EndPoint);
     
     public override string ToString() => $"Address = {Address}";
     

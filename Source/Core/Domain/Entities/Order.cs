@@ -1,4 +1,5 @@
 using Domain.Constants;
+using Domain.Dtos;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
@@ -7,18 +8,14 @@ public class Order
 {
     private Order() { }
 
-    public static Order New(string startAddress, string endAddress, string cargoDescription,
-        (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, int hazardClassFlag, bool tank, User user, Truck truck,
+    public static Order New(OrderCreationRequestDto orderCreationRequestDto, int hazardClassFlag, User user, Truck truck,
         Driver driver1, Driver driver2, IGeolocationService geolocationService)
     {
-        var order = Base(startAddress, endAddress, cargoDescription, startPoint, endPoint, cargoVolume, cargoWeight,
-            tank);
+        var order = Base(orderCreationRequestDto);
         order.AssignTwoDriversAndTruckAndBranchAndHazardClassFlag(driver1, driver2, truck, hazardClassFlag);
         order.AssignUser(user);
-        order.AssignDistanceInKm(geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderCreationRequestDto, geolocationService);
         order.AssignPrice();
-        order.AssignExpectedHoursWorkedByDriversForTwoDrivers();
 
         truck.IsAvailable = false;
         driver1.IsAvailable = false;
@@ -87,18 +84,14 @@ public class Order
         HazardClassFlag = hazardClassFlag;
     }
 
-    public static Order New(string startAddress, string endAddress, string cargoDescription,
-        (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, bool tank, User user, Truck truck, Driver driver1, Driver driver2,
-        IGeolocationService geolocationService)
+    public static Order New(OrderCreationRequestDto orderCreationRequestDto, User user, Truck truck, Driver driver1,
+        Driver driver2, IGeolocationService geolocationService)
     {
-        var order = Base(startAddress, endAddress, cargoDescription, startPoint, endPoint, cargoVolume, cargoWeight,
-            tank);
+        var order = Base(orderCreationRequestDto);
         order.AssignTwoDriversAndTruckAndBranch(driver1, driver2, truck);
         order.AssignUser(user);
-        order.AssignDistanceInKm(geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderCreationRequestDto, geolocationService);
         order.AssignPrice();
-        order.AssignExpectedHoursWorkedByDriversForTwoDrivers();
         
         truck.IsAvailable = false;
         driver1.IsAvailable = false;
@@ -142,18 +135,14 @@ public class Order
         BranchGuid = truck.BranchGuid;
     }
 
-    public static Order New(string startAddress, string endAddress, string cargoDescription,
-        (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, int hazardClassFlag, bool tank, User user, Truck truck,
+    public static Order New(OrderCreationRequestDto orderCreationRequestDto, int hazardClassFlag, User user, Truck truck,
         Driver driver1, IGeolocationService geolocationService)
     {
-        var order = Base(startAddress, endAddress, cargoDescription, startPoint, endPoint, cargoVolume, cargoWeight,
-            tank);
+        var order = Base(orderCreationRequestDto);
         order.AssignOneDriverAndTruckAndBranchAndHazardClassFlag(driver1, truck, hazardClassFlag);
         order.AssignUser(user);
-        order.AssignDistanceInKm(geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderCreationRequestDto, geolocationService);
         order.AssignPrice();
-        order.AssignExpectedHoursWorkedByDriversForOneDriver();
         
         truck.IsAvailable = false;
         driver1.IsAvailable = false;
@@ -207,18 +196,14 @@ public class Order
         HazardClassFlag = hazardClassFlag;
     }
 
-    public static Order New(string startAddress, string endAddress, string cargoDescription,
-        (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, bool tank, User user, Truck truck, Driver driver1,
+    public static Order New(OrderCreationRequestDto orderCreationRequestDto, User user, Truck truck, Driver driver1,
         IGeolocationService geolocationService)
     {
-        var order = Base(startAddress, endAddress, cargoDescription, startPoint, endPoint, cargoVolume, cargoWeight,
-            tank);
+        var order = Base(orderCreationRequestDto);
         order.AssignOneDriverAndTruckAndBranch(driver1, truck);
         order.AssignUser(user);
-        order.AssignDistanceInKm(geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderCreationRequestDto, geolocationService);
         order.AssignPrice();
-        order.AssignExpectedHoursWorkedByDriversForOneDriver();
         
         truck.IsAvailable = false;
         driver1.IsAvailable = false;
@@ -255,16 +240,18 @@ public class Order
         BranchGuid = truck.BranchGuid;
     }
 
-    private static Order
-        Base(string startAddress, string endAddress, string cargoDescription,
-            (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-            decimal cargoVolume, decimal cargoWeight, bool tank) => new()
+    private static Order Base(OrderCreationRequestDto orderCreationRequestDto) => new()
     {
         Guid = System.Guid.NewGuid().ToString(), DateBegin = DateTime.Now, DateEnd = null, HazardClassFlag = null,
-        ActualHoursWorkedByDriver2 = null, Driver2Guid = null, Driver2 = null, Tank = tank, StartAddress = startAddress,
-        EndAddress = endAddress, CargoDescription = cargoDescription, StartPointLatitude = startPoint.Latitude,
-        StartPointLongitude = startPoint.Longitude, EndPointLatitude = endPoint.Latitude,
-        EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight
+        ActualHoursWorkedByDriver2 = null, Driver2Guid = null, Driver2 = null,
+        StartAddress = orderCreationRequestDto.StartAddress, EndAddress = orderCreationRequestDto.EndAddress,
+        CargoDescription = orderCreationRequestDto.CargoDescription,
+        StartPointLatitude = orderCreationRequestDto.StartPoint.Latitude,
+        StartPointLongitude = orderCreationRequestDto.StartPoint.Longitude,
+        EndPointLatitude = orderCreationRequestDto.EndPoint.Latitude,
+        EndPointLongitude = orderCreationRequestDto.EndPoint.Longitude,
+        CargoVolume = orderCreationRequestDto.CargoVolume, CargoWeight = orderCreationRequestDto.CargoWeight,
+        Tank = orderCreationRequestDto.Tank
     };
 
     private void AssignUser(User user)
@@ -273,30 +260,27 @@ public class Order
         User = user;
     }
 
-    private void AssignDistanceInKm(IGeolocationService geolocationService)
+    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(OrderCreationRequestDto orderCreationRequestDto, IGeolocationService geolocationService)
     {
-        var distanceFromBranchToStart =
-            Branch.CalculateDistanceInKmByDegrees(geolocationService, (StartPointLatitude, StartPointLongitude));
-        var distanceFromStartToEnd =
-            geolocationService.CalculateDistanceInKmByDegrees((StartPointLatitude, StartPointLongitude),
-                (EndPointLatitude, EndPointLongitude));
-        var distanceFromEndToBranch =
-            Branch.CalculateDistanceInKmByDegrees(geolocationService, (EndPointLatitude, EndPointLongitude));
+        var lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt =
+            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderCreationRequestDto,
+                geolocationService);
 
-        DistanceInKm = distanceFromBranchToStart + distanceFromStartToEnd + distanceFromEndToBranch;
+        LengthInKm = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.LengthInKm;
+        ExpectedHoursWorkedByDrivers = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.DrivingHours / 2;
+    }
+    
+    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(OrderCreationRequestDto orderCreationRequestDto, IGeolocationService geolocationService)
+    {
+        var lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt =
+            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderCreationRequestDto,
+                geolocationService);
+
+        LengthInKm = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.LengthInKm;
+        ExpectedHoursWorkedByDrivers = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.DrivingHours;
     }
 
     private void AssignPrice() => Price = Truck.CalculateOrderPrice(this);
-
-    private void AssignExpectedHoursWorkedByDriversForTwoDrivers()
-    {
-        var drivingHours = DistanceInKm / AverageTruckSpeedInKmPerHour;
-
-        ExpectedHoursWorkedByDrivers = drivingHours / 2;
-    }
-
-    private void AssignExpectedHoursWorkedByDriversForOneDriver() =>
-        ExpectedHoursWorkedByDrivers = DistanceInKm / AverageTruckSpeedInKmPerHour;
 
     public void Finish(double actualHoursWorkedByDriver1)
     {
@@ -343,7 +327,7 @@ public class Order
 
     public bool Tank { get; private set; }
 
-    public double DistanceInKm { get; private set; }
+    public double LengthInKm { get; private set; }
 
     public decimal Price { get; private set; }
 
@@ -390,6 +374,4 @@ public class Order
     public decimal CargoVolume { get; private set; }
 
     public decimal CargoWeight { get; private set; }
-
-    private const double AverageTruckSpeedInKmPerHour = 70;
 }

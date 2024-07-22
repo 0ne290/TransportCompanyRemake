@@ -199,18 +199,19 @@ public class TruckTest
     }
 
     // Price calculation formula:
-    // (Truck.WeightPrice * Order.CargoWeight + Truck.VolumePrice * Order.CargoVolume) * Truck.PricePerKm * Order.DistanceInKm
+    // (Truck.WeightPrice * Order.CargoWeight + Truck.VolumePrice * Order.CargoVolume) * Truck.PricePerKm * Order.LengthInKm
     [Fact]
     public void Truck_CalculateOrderPrice_ContextAndArgumentIsValid_ReturnThePriceForFulfillingAnOrderByTruck_Test()
     {
         // Arrange
         var branch = BranchFixture.Create();
         var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch);
-        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), truck, DriverFixture.CreateWithoutAdrQualificationFlag(branch), GeolocationServiceStub.Create());
+        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), truck, DriverFixture.CreateWithoutAdrQualificationFlag(branch), GeolocationServiceStub.Create(), OrderFixture.CreateOrderCreationRequestDto());
         var expectedPrice =
             (TruckFixture.DefaultWeightPrice * OrderFixture.DefaultCargoWeight +
              TruckFixture.DefaultVolumePrice * OrderFixture.DefaultCargoVolume) * TruckFixture.DefaultPricePerKm *
-            (decimal)order.DistanceInKm;
+            (decimal)order.LengthInKm;
+        
         // Act
         var actualPrice = truck.CalculateOrderPrice(order);
 

@@ -8,13 +8,21 @@ public static class GeolocationServiceStub
     public static IGeolocationService Create()
     {
         var mock = new Mock<IGeolocationService>();
-        mock.Setup(gs => gs.CalculateDistanceInKmByDegrees(It.IsAny<ValueTuple<double, double>>(),
-            It.IsAny<ValueTuple<double, double>>())).Returns(StubOfCalculateDistanceInKmByDegrees);
-        
+        mock.Setup(gs =>
+                gs.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+                    It.IsAny<ValueTuple<double, double>[]>()))
+            .Returns(StubOfCalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt);
+
         return mock.Object;
     }
-    
-    private static double StubOfCalculateDistanceInKmByDegrees((double Latitude, double Longitude) point1,
-        (double Latitude, double Longitude) point2) =>
-        point1.Latitude + point1.Longitude + point2.Latitude + point2.Longitude;
+
+    private static (double LengthInKm, double DrivingHours)
+        StubOfCalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+            params (double Latitude, double Longitude)[] closedRoute)
+    {
+        var lengthInKm = closedRoute.Sum(point => point.Latitude + point.Longitude);
+
+        return (lengthInKm, lengthInKm + 37);
+    }
+
 }

@@ -4,7 +4,19 @@ namespace Domain.Services;
 
 public class DefaultGeolocationService : IGeolocationService
 {
-    public double CalculateDistanceInKmByDegrees((double Latitude, double Longitude) point1,
+    public (double LengthInKm, double DrivingHours)
+        CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+            params (double Latitude, double Longitude)[] closedRoute)
+    {
+        var lengthInKm = 0d;
+        for (var i = 1; i < closedRoute.Length; i++)
+            lengthInKm += CalculateLengthInKmBetweenTwoPoints(closedRoute[i - 1], closedRoute[i]);
+        lengthInKm += CalculateLengthInKmBetweenTwoPoints(closedRoute[^1], closedRoute[0]);
+
+        return (lengthInKm, lengthInKm / AverageTruckSpeedInKmPerHour);
+    }
+
+    private static double CalculateLengthInKmBetweenTwoPoints((double Latitude, double Longitude) point1,
         (double Latitude, double Longitude) point2)
     {
         point1.Latitude *= NumberOfRadiansInOneDegree;
@@ -29,19 +41,9 @@ public class DefaultGeolocationService : IGeolocationService
         return angularDifference * EarthRadiusInKm;
     }
 
-    public (double LengthInKm, double DrivingHours) CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(params (double Latitude, double Longitude)[] closedRoute)
-    {
-        var lengthInKm = 0;
-        for (var i = 1; i < closedRoute.Length; i++)
-            lengthInKm += CalculateDistanceInKmByDegrees(closedRoute[i - 1], closedRoute[i]);
-        lengthInKm += CalculateDistanceInKmByDegrees(closedRoute[^1], closedRoute[0]);
-
-        return (lengthInKm, lengthInKm / AverageTruckSpeedInKmPerHour);
-    }
-
     private const double NumberOfRadiansInOneDegree = Math.PI / 180;
 
     private const double EarthRadiusInKm = 6_371.0088;
-    
+
     private const double AverageTruckSpeedInKmPerHour = 70;
 }

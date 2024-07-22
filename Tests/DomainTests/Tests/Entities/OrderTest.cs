@@ -14,20 +14,16 @@ public class OrderTest
     public void Order_NewWithTwoDriversAndHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
     {
         // Arrange1
+        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
         var expectedUser = UserFixture.CreateVk();
         var expectedBranch = BranchFixture.Create();
         var expectedTruck = TruckFixture.CreateWithPermittedHazardClassesFlags(expectedBranch);
         var expectedDriver1 = DriverFixture.CreateWithAdrQualificationFlag(expectedBranch);
         var expectedDriver2 = DriverFixture.CreateWithAdrQualificationFlag(expectedBranch);
-        var expectedDistanceInKm =
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude)) +
-            _geolocationServiceStub.CalculateDistanceInKmByDegrees(
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude),
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude)) +
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude));
-        var expectedExpectedHoursWorkedByDrivers = expectedDistanceInKm / OrderFixture.AverageTruckSpeedInKmPerHour / 2;
+        var expectedLengthInKmAndHoursWorkedByDrivers =
+            expectedBranch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+                orderCreationRequestDto, _geolocationServiceStub);
+        expectedLengthInKmAndHoursWorkedByDrivers.DrivingHours /= 2;
         const int expextedActualHoursWorkedByDriver1 = 0;
         const int expextedActualHoursWorkedByDriver2 = 0;
         var expextedDateBegin = DateTime.Now;
@@ -35,7 +31,7 @@ public class OrderTest
 
         // Act
         var order = OrderFixture.CreateWithTwoDriversAndHazardClassFlag(expectedUser, expectedTruck, expectedDriver1,
-            expectedDriver2, _geolocationServiceStub);
+            expectedDriver2, _geolocationServiceStub, orderCreationRequestDto);
 
         // Arrange2
         var expectedPrice = expectedTruck.CalculateOrderPrice(order);
@@ -46,9 +42,9 @@ public class OrderTest
         Assert.Null(order.DateEnd);
         Assert.Equal(OrderFixture.DefaultHazardClassFlag, order.HazardClassFlag);
         Assert.Equal(OrderFixture.DefaultTank, order.Tank);
-        Assert.Equal(expectedDistanceInKm, order.DistanceInKm);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.LengthInKm, order.LengthInKm);
         Assert.Equal(expectedPrice, order.Price);
-        Assert.Equal(expectedExpectedHoursWorkedByDrivers, order.ExpectedHoursWorkedByDrivers);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.DrivingHours, order.ExpectedHoursWorkedByDrivers);
         Assert.Equal(expextedActualHoursWorkedByDriver1, order.ActualHoursWorkedByDriver1);
         Assert.Equal(expextedActualHoursWorkedByDriver2, order.ActualHoursWorkedByDriver2);
         Assert.Equal(expectedUser, order.User);
@@ -89,7 +85,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -104,7 +100,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -119,7 +115,7 @@ public class OrderTest
         driver2.IsAvailable = false;
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -133,7 +129,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: true));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: true)));
     }
     
     [Fact]
@@ -147,7 +143,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationOfTank: false);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: true));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: true)));
     }
     
     [Fact]
@@ -161,7 +157,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: true));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: true)));
     }
     
     [Fact]
@@ -175,7 +171,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: false));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: false)));
     }
     
     [Fact]
@@ -190,7 +186,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch1);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
 
     [Fact]
@@ -205,7 +201,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch2);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -219,7 +215,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7 + 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(), hazardClassFlag: HazardClassesFlags.Class7 + 1));
     }
     
     [Fact]
@@ -233,7 +229,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(), hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
@@ -247,7 +243,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -261,7 +257,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(), hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
@@ -275,7 +271,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -289,7 +285,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.Base);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(), hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
@@ -303,13 +299,14 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
     public void Order_NewWithTwoDriversAndHazardClassFlag_ArgumentsIsValid_ReturnThe100OrdersWithUniqueGuids_Test()
     {
         // Arrange
+        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
         var guids = new HashSet<string>(100);
         var user = UserFixture.CreateVk();
         var branch = BranchFixture.Create();
@@ -320,7 +317,7 @@ public class OrderTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var order = OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub);
+            var order = OrderFixture.CreateWithTwoDriversAndHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, orderCreationRequestDto);
             truck.IsAvailable = true;
             driver1.IsAvailable = true;
             driver2.IsAvailable = true;
@@ -337,20 +334,16 @@ public class OrderTest
     public void Order_NewWithTwoDriversAndWithoutHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
     {
         // Arrange1
+        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
         var expectedUser = UserFixture.CreateVk();
         var expectedBranch = BranchFixture.Create();
         var expectedTruck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(expectedBranch);
         var expectedDriver1 = DriverFixture.CreateWithoutAdrQualificationFlag(expectedBranch);
         var expectedDriver2 = DriverFixture.CreateWithoutAdrQualificationFlag(expectedBranch);
-        var expectedDistanceInKm =
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude)) +
-            _geolocationServiceStub.CalculateDistanceInKmByDegrees(
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude),
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude)) +
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude));
-        var expectedExpectedHoursWorkedByDrivers = expectedDistanceInKm / OrderFixture.AverageTruckSpeedInKmPerHour / 2;
+        var expectedLengthInKmAndHoursWorkedByDrivers =
+            expectedBranch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+                orderCreationRequestDto, _geolocationServiceStub);
+        expectedLengthInKmAndHoursWorkedByDrivers.DrivingHours /= 2;
         const int expextedActualHoursWorkedByDriver1 = 0;
         const int expextedActualHoursWorkedByDriver2 = 0;
         var expextedDateBegin = DateTime.Now;
@@ -358,7 +351,7 @@ public class OrderTest
 
         // Act
         var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(expectedUser, expectedTruck, expectedDriver1,
-            expectedDriver2, _geolocationServiceStub);
+            expectedDriver2, _geolocationServiceStub, orderCreationRequestDto);
 
         // Arrange2
         var expectedPrice = expectedTruck.CalculateOrderPrice(order);
@@ -369,9 +362,9 @@ public class OrderTest
         Assert.Null(order.DateEnd);
         Assert.Null(order.HazardClassFlag);
         Assert.Equal(OrderFixture.DefaultTank, order.Tank);
-        Assert.Equal(expectedDistanceInKm, order.DistanceInKm);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.LengthInKm, order.LengthInKm);
         Assert.Equal(expectedPrice, order.Price);
-        Assert.Equal(expectedExpectedHoursWorkedByDrivers, order.ExpectedHoursWorkedByDrivers);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.DrivingHours, order.ExpectedHoursWorkedByDrivers);
         Assert.Equal(expextedActualHoursWorkedByDriver1, order.ActualHoursWorkedByDriver1);
         Assert.Equal(expextedActualHoursWorkedByDriver2, order.ActualHoursWorkedByDriver2);
         Assert.Equal(expectedUser, order.User);
@@ -412,7 +405,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -427,7 +420,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -442,7 +435,7 @@ public class OrderTest
         driver2.IsAvailable = false;
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -456,7 +449,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: true));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: true)));
     }
     
     [Fact]
@@ -470,7 +463,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, tank: false));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: false)));
     }
     
     [Fact]
@@ -485,7 +478,7 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch1);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
 
     [Fact]
@@ -500,13 +493,14 @@ public class OrderTest
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch2);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
     public void Order_NewWithTwoDriversAndWithoutHazardClassFlag_ArgumentsIsValid_ReturnThe100OrdersWithUniqueGuids_Test()
     {
         // Arrange
+        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
         var guids = new HashSet<string>(100);
         var user = UserFixture.CreateVk();
         var branch = BranchFixture.Create();
@@ -517,7 +511,7 @@ public class OrderTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub);
+            var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2, _geolocationServiceStub, orderCreationRequestDto);
             truck.IsAvailable = true;
             driver1.IsAvailable = true;
             driver2.IsAvailable = true;
@@ -534,25 +528,20 @@ public class OrderTest
     public void Order_NewWithOneDriverAndHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
     {
         // Arrange1
+        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
         var expectedUser = UserFixture.CreateVk();
         var expectedBranch = BranchFixture.Create();
         var expectedTruck = TruckFixture.CreateWithPermittedHazardClassesFlags(expectedBranch);
         var expectedDriver1 = DriverFixture.CreateWithAdrQualificationFlag(expectedBranch);
-        var expectedDistanceInKm =
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude)) +
-            _geolocationServiceStub.CalculateDistanceInKmByDegrees(
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude),
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude)) +
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude));
-        var expectedExpectedHoursWorkedByDrivers = expectedDistanceInKm / OrderFixture.AverageTruckSpeedInKmPerHour;
+        var expectedLengthInKmAndHoursWorkedByDrivers =
+            expectedBranch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+                orderCreationRequestDto, _geolocationServiceStub);
         const int expextedActualHoursWorkedByDriver1 = 0;
         var expextedDateBegin = DateTime.Now;
         var expextedDateBeginError = TimeSpan.FromSeconds(10);
 
         // Act
-        var order = OrderFixture.CreateWithOneDriverAndHazardClassFlag(expectedUser, expectedTruck, expectedDriver1, _geolocationServiceStub);
+        var order = OrderFixture.CreateWithOneDriverAndHazardClassFlag(expectedUser, expectedTruck, expectedDriver1, _geolocationServiceStub, orderCreationRequestDto);
 
         // Arrange2
         var expectedPrice = expectedTruck.CalculateOrderPrice(order);
@@ -563,9 +552,9 @@ public class OrderTest
         Assert.Null(order.DateEnd);
         Assert.Equal(OrderFixture.DefaultHazardClassFlag, order.HazardClassFlag);
         Assert.Equal(OrderFixture.DefaultTank, order.Tank);
-        Assert.Equal(expectedDistanceInKm, order.DistanceInKm);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.LengthInKm, order.LengthInKm);
         Assert.Equal(expectedPrice, order.Price);
-        Assert.Equal(expectedExpectedHoursWorkedByDrivers, order.ExpectedHoursWorkedByDrivers);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.DrivingHours, order.ExpectedHoursWorkedByDrivers);
         Assert.Equal(expextedActualHoursWorkedByDriver1, order.ActualHoursWorkedByDriver1);
         Assert.Null(order.ActualHoursWorkedByDriver2);
         Assert.Equal(expectedUser, order.User);
@@ -603,7 +592,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -617,7 +606,7 @@ public class OrderTest
         driver1.IsAvailable = false;
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -630,7 +619,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationOfTank: false);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, tank: true));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: true)));
     }
     
     [Fact]
@@ -643,7 +632,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, tank: true));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: true)));
     }
     
     [Fact]
@@ -656,7 +645,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, tank: false));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: false)));
     }
     
     [Fact]
@@ -670,7 +659,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch2);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -683,7 +672,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7 + 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(), hazardClassFlag: HazardClassesFlags.Class7 + 1));
     }
     
     [Fact]
@@ -696,7 +685,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(), hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
@@ -709,7 +698,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -722,7 +711,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.Base);
         
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, hazardClassFlag: HazardClassesFlags.Class7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(), hazardClassFlag: HazardClassesFlags.Class7));
     }
     
     [Fact]
@@ -735,7 +724,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -751,7 +740,7 @@ public class OrderTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var order = OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub);
+            var order = OrderFixture.CreateWithOneDriverAndHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
             truck.IsAvailable = true;
             driver1.IsAvailable = true;
 
@@ -767,25 +756,20 @@ public class OrderTest
     public void Order_NewWithOneDriverAndWithoutHazardClassFlag_ArgumentsIsValid_ReturnTheOrder()
     {
         // Arrange1
+        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
         var expectedUser = UserFixture.CreateVk();
         var expectedBranch = BranchFixture.Create();
         var expectedTruck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(expectedBranch);
         var expectedDriver1 = DriverFixture.CreateWithoutAdrQualificationFlag(expectedBranch);
-        var expectedDistanceInKm =
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude)) +
-            _geolocationServiceStub.CalculateDistanceInKmByDegrees(
-                (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude),
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude)) +
-            expectedBranch.CalculateDistanceInKmByDegrees(_geolocationServiceStub,
-                (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude));
-        var expectedExpectedHoursWorkedByDrivers = expectedDistanceInKm / OrderFixture.AverageTruckSpeedInKmPerHour;
+        var expectedLengthInKmAndHoursWorkedByDrivers =
+            expectedBranch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+                orderCreationRequestDto, _geolocationServiceStub);
         const int expextedActualHoursWorkedByDriver1 = 0;
         var expextedDateBegin = DateTime.Now;
         var expextedDateBeginError = TimeSpan.FromSeconds(10);
 
         // Act
-        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(expectedUser, expectedTruck, expectedDriver1, _geolocationServiceStub);
+        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(expectedUser, expectedTruck, expectedDriver1, _geolocationServiceStub, orderCreationRequestDto);
 
         // Arrange2
         var expectedPrice = expectedTruck.CalculateOrderPrice(order);
@@ -796,9 +780,9 @@ public class OrderTest
         Assert.Null(order.DateEnd);
         Assert.Null(order.HazardClassFlag);
         Assert.Equal(OrderFixture.DefaultTank, order.Tank);
-        Assert.Equal(expectedDistanceInKm, order.DistanceInKm);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.LengthInKm, order.LengthInKm);
         Assert.Equal(expectedPrice, order.Price);
-        Assert.Equal(expectedExpectedHoursWorkedByDrivers, order.ExpectedHoursWorkedByDrivers);
+        Assert.Equal(expectedLengthInKmAndHoursWorkedByDrivers.DrivingHours, order.ExpectedHoursWorkedByDrivers);
         Assert.Equal(expextedActualHoursWorkedByDriver1, order.ActualHoursWorkedByDriver1);
         Assert.Null(order.ActualHoursWorkedByDriver2);
         Assert.Equal(expectedUser, order.User);
@@ -836,7 +820,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -850,7 +834,7 @@ public class OrderTest
         driver1.IsAvailable = false;
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -863,7 +847,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, tank: true));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: true)));
     }
     
     [Fact]
@@ -876,7 +860,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, tank: false));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto(tank: false)));
     }
     
     [Fact]
@@ -890,7 +874,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch2);
         
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub));
+        Assert.Throws<ArgumentException>(() => OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto()));
     }
     
     [Fact]
@@ -906,7 +890,7 @@ public class OrderTest
         for (var i = 0; i < 100; i++)
         {
             // Act
-            var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub);
+            var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
             truck.IsAvailable = true;
             driver1.IsAvailable = true;
 
@@ -930,7 +914,7 @@ public class OrderTest
         var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         var driver2 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
         var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(user, truck, driver1, driver2,
-            _geolocationServiceStub);
+            _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
         var expextedDateEnd = DateTime.Now;
         var expextedDateEndError = TimeSpan.FromSeconds(10);
         
@@ -956,7 +940,7 @@ public class OrderTest
     {
         // Arrange
         var branch = BranchFixture.Create();
-        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub);
+        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
         
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => order.Finish(5, 2));
@@ -967,7 +951,7 @@ public class OrderTest
     {
         // Arrange
         var branch = BranchFixture.Create();
-        var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub);
+        var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
         order.Finish(5, 2);
         
         // Act & Assert
@@ -984,7 +968,7 @@ public class OrderTest
         var branch = BranchFixture.Create();
         var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch);
         var driver1 = DriverFixture.CreateWithoutAdrQualificationFlag(branch);
-        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub);
+        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(user, truck, driver1, _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
         var expextedDateEnd = DateTime.Now;
         var expextedDateEndError = TimeSpan.FromSeconds(10);
         
@@ -1006,7 +990,7 @@ public class OrderTest
     {
         // Arrange
         var branch = BranchFixture.Create();
-        var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub);
+        var order = OrderFixture.CreateWithTwoDriversAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
         
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => order.Finish(5));
@@ -1017,7 +1001,7 @@ public class OrderTest
     {
         // Arrange
         var branch = BranchFixture.Create();
-        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub);
+        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch), DriverFixture.CreateWithoutAdrQualificationFlag(branch), _geolocationServiceStub, OrderFixture.CreateOrderCreationRequestDto());
         order.Finish(5);
         
         // Act & Assert
