@@ -1,5 +1,5 @@
+using Domain.Configs;
 using Domain.Constants;
-using Domain.Dtos;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
@@ -8,13 +8,13 @@ public class Order
 {
     private Order() { }
 
-    public static Order New(OrderCreationRequestDto orderCreationRequestDto, int hazardClassFlag, User user, Truck truck,
+    public static Order New(OrderConfig orderConfig, int hazardClassFlag, User user, Truck truck,
         Driver driver1, Driver driver2, IGeolocationService geolocationService)
     {
-        var order = Base(orderCreationRequestDto);
+        var order = Base(orderConfig);
         order.AssignTwoDriversAndTruckAndBranchAndHazardClassFlag(driver1, driver2, truck, hazardClassFlag);
         order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderCreationRequestDto, geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderConfig, geolocationService);
         order.AssignPrice();
 
         truck.IsAvailable = false;
@@ -84,13 +84,13 @@ public class Order
         HazardClassFlag = hazardClassFlag;
     }
 
-    public static Order New(OrderCreationRequestDto orderCreationRequestDto, User user, Truck truck, Driver driver1,
+    public static Order New(OrderConfig orderConfig, User user, Truck truck, Driver driver1,
         Driver driver2, IGeolocationService geolocationService)
     {
-        var order = Base(orderCreationRequestDto);
+        var order = Base(orderConfig);
         order.AssignTwoDriversAndTruckAndBranch(driver1, driver2, truck);
         order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderCreationRequestDto, geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderConfig, geolocationService);
         order.AssignPrice();
         
         truck.IsAvailable = false;
@@ -135,13 +135,13 @@ public class Order
         BranchGuid = truck.BranchGuid;
     }
 
-    public static Order New(OrderCreationRequestDto orderCreationRequestDto, int hazardClassFlag, User user, Truck truck,
+    public static Order New(OrderConfig orderConfig, int hazardClassFlag, User user, Truck truck,
         Driver driver1, IGeolocationService geolocationService)
     {
-        var order = Base(orderCreationRequestDto);
+        var order = Base(orderConfig);
         order.AssignOneDriverAndTruckAndBranchAndHazardClassFlag(driver1, truck, hazardClassFlag);
         order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderCreationRequestDto, geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderConfig, geolocationService);
         order.AssignPrice();
         
         truck.IsAvailable = false;
@@ -196,13 +196,13 @@ public class Order
         HazardClassFlag = hazardClassFlag;
     }
 
-    public static Order New(OrderCreationRequestDto orderCreationRequestDto, User user, Truck truck, Driver driver1,
+    public static Order New(OrderConfig orderConfig, User user, Truck truck, Driver driver1,
         IGeolocationService geolocationService)
     {
-        var order = Base(orderCreationRequestDto);
+        var order = Base(orderConfig);
         order.AssignOneDriverAndTruckAndBranch(driver1, truck);
         order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderCreationRequestDto, geolocationService);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderConfig, geolocationService);
         order.AssignPrice();
         
         truck.IsAvailable = false;
@@ -240,18 +240,18 @@ public class Order
         BranchGuid = truck.BranchGuid;
     }
 
-    private static Order Base(OrderCreationRequestDto orderCreationRequestDto) => new()
+    private static Order Base(OrderConfig orderConfig) => new()
     {
         Guid = System.Guid.NewGuid().ToString(), DateBegin = DateTime.Now, DateEnd = null, HazardClassFlag = null,
         ActualHoursWorkedByDriver2 = null, Driver2Guid = null, Driver2 = null,
-        StartAddress = orderCreationRequestDto.StartAddress, EndAddress = orderCreationRequestDto.EndAddress,
-        CargoDescription = orderCreationRequestDto.CargoDescription,
-        StartPointLatitude = orderCreationRequestDto.StartPoint.Latitude,
-        StartPointLongitude = orderCreationRequestDto.StartPoint.Longitude,
-        EndPointLatitude = orderCreationRequestDto.EndPoint.Latitude,
-        EndPointLongitude = orderCreationRequestDto.EndPoint.Longitude,
-        CargoVolume = orderCreationRequestDto.CargoVolume, CargoWeight = orderCreationRequestDto.CargoWeight,
-        Tank = orderCreationRequestDto.Tank
+        StartAddress = orderConfig.StartAddress, EndAddress = orderConfig.EndAddress,
+        CargoDescription = orderConfig.CargoDescription,
+        StartPointLatitude = orderConfig.StartPoint.Latitude,
+        StartPointLongitude = orderConfig.StartPoint.Longitude,
+        EndPointLatitude = orderConfig.EndPoint.Latitude,
+        EndPointLongitude = orderConfig.EndPoint.Longitude,
+        CargoVolume = orderConfig.CargoVolume, CargoWeight = orderConfig.CargoWeight,
+        Tank = orderConfig.Tank
     };
 
     private void AssignUser(User user)
@@ -260,20 +260,20 @@ public class Order
         User = user;
     }
 
-    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(OrderCreationRequestDto orderCreationRequestDto, IGeolocationService geolocationService)
+    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(OrderConfig orderConfig, IGeolocationService geolocationService)
     {
         var lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt =
-            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderCreationRequestDto,
+            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderConfig,
                 geolocationService);
 
         LengthInKm = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.LengthInKm;
         ExpectedHoursWorkedByDrivers = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.DrivingHours / 2;
     }
     
-    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(OrderCreationRequestDto orderCreationRequestDto, IGeolocationService geolocationService)
+    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(OrderConfig orderConfig, IGeolocationService geolocationService)
     {
         var lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt =
-            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderCreationRequestDto,
+            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderConfig,
                 geolocationService);
 
         LengthInKm = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.LengthInKm;

@@ -1,5 +1,5 @@
+using Domain.Configs;
 using Domain.Constants;
-using Domain.Dtos;
 using Domain.Entities;
 using Domain.Interfaces;
 
@@ -8,24 +8,24 @@ namespace DomainTests.Fixtures;
 public static class OrderFixture
 {
     public static Order CreateWithTwoDriversAndHazardClassFlag(User user, Truck truck, Driver driver1, Driver driver2,
-        IGeolocationService geolocationService, OrderCreationRequestDto orderCreationRequestDto,
-        int hazardClassFlag = DefaultHazardClassFlag) => Order.New(orderCreationRequestDto, hazardClassFlag, user,
+        IGeolocationService geolocationService, OrderConfig orderConfig,
+        int hazardClassFlag = DefaultHazardClassFlag) => Order.New(orderConfig, hazardClassFlag, user,
         truck, driver1, driver2, geolocationService);
 
     public static Order CreateWithTwoDriversAndWithoutHazardClassFlag(User user, Truck truck, Driver driver1,
-        Driver driver2, IGeolocationService geolocationService, OrderCreationRequestDto orderCreationRequestDto) =>
-        Order.New(orderCreationRequestDto, user, truck, driver1, driver2, geolocationService);
+        Driver driver2, IGeolocationService geolocationService, OrderConfig orderConfig) =>
+        Order.New(orderConfig, user, truck, driver1, driver2, geolocationService);
 
     public static Order CreateWithOneDriverAndHazardClassFlag(User user, Truck truck, Driver driver1,
-        IGeolocationService geolocationService, OrderCreationRequestDto orderCreationRequestDto,
-        int hazardClassFlag = DefaultHazardClassFlag) => Order.New(orderCreationRequestDto, hazardClassFlag, user,
+        IGeolocationService geolocationService, OrderConfig orderConfig,
+        int hazardClassFlag = DefaultHazardClassFlag) => Order.New(orderConfig, hazardClassFlag, user,
         truck, driver1, geolocationService);
 
     public static Order CreateWithOneDriverAndWithoutHazardClassFlag(User user, Truck truck, Driver driver1,
-        IGeolocationService geolocationService, OrderCreationRequestDto orderCreationRequestDto) =>
-        Order.New(orderCreationRequestDto, user, truck, driver1, geolocationService);
+        IGeolocationService geolocationService, OrderConfig orderConfig) =>
+        Order.New(orderConfig, user, truck, driver1, geolocationService);
 
-    public static OrderCreationRequestDto CreateOrderCreationRequestDto(string startAddress = DefaultStartAddress,
+    public static OrderConfig CreateOrderCreationRequestDto(string startAddress = DefaultStartAddress,
         string endAddress = DefaultEndAddress, string cargoDescription = DefaultCargoDescription,
         double startPointLatitude = DefaultStartPointLatitude, double startPointLongitude = DefaultStartPointLongitude,
         double endPointLatitude = DefaultEndPointLatitude, double endPointLongitude = DefaultEndPointLongitude,

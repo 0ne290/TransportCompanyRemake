@@ -1,4 +1,4 @@
-using Domain.Dtos;
+using Domain.Configs;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
@@ -15,9 +15,9 @@ public class Branch
 
     public (double LengthInKm, double DrivingHours)
         CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
-            OrderCreationRequestDto orderCreationRequestDto, IGeolocationService geolocationService) =>
+            OrderConfig orderConfig, IGeolocationService geolocationService) =>
         geolocationService.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
-            (Latitude, Longitude), orderCreationRequestDto.StartPoint, orderCreationRequestDto.EndPoint);
+            (Latitude, Longitude), orderConfig.StartPoint, orderConfig.EndPoint);
     
     public override string ToString() => $"Address = {Address}";
     
