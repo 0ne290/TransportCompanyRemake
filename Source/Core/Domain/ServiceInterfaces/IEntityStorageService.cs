@@ -1,6 +1,6 @@
-namespace Domain.Interfaces;
+namespace Domain.ServiceInterfaces;
 
-public interface IEntityRepository<TEntity> : IDisposable, IAsyncDisposable
+public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 {
     TEntity? Find(Predicate<TEntity> predicate);
     

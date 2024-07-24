@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Security.Cryptography;
-using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 
 namespace Domain.Entities;
 

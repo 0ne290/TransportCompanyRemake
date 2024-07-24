@@ -1,5 +1,5 @@
 using Domain.Configs;
-using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 
 namespace Domain.Entities;
 

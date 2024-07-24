@@ -1,4 +1,4 @@
-using Domain.Services;
+using Domain.ServiceDefaultImplementations;
 
 namespace DomainTests.Tests.Services;
 

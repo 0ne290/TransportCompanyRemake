@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using Domain.Constants;
-using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 using DomainTests.Fixtures;
 using DomainTests.Stubs;
 using RegexFixture = DomainTests.Fixtures.RegexFixture;

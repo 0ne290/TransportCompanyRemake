@@ -1,4 +1,4 @@
-using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 using Moq;
 
 namespace DomainTests.Stubs;

@@ -1,6 +1,6 @@
-using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 
-namespace Domain.Services;
+namespace Domain.ServiceDefaultImplementations;
 
 public class DefaultGeolocationService : IGeolocationService
 {

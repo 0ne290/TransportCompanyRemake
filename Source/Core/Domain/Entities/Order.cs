@@ -1,6 +1,6 @@
 using Domain.Configs;
 using Domain.Constants;
-using Domain.Interfaces;
+using Domain.ServiceInterfaces;
 
 namespace Domain.Entities;
 
