@@ -1,5 +1,14 @@
-﻿namespace OrderPayments;
+﻿using Domain.ServiceInterfaces;
+using YooKassa.Entities;
 
-public class Class1
+namespace OrderPayments;
+
+public class YooKassaOrderPaymentService : IOrderPaymentService
 {
+    public YooKassaOrderPaymentService(PaymentService paymentService)
+    {
+        _paymentService = paymentService;
+    }
+
+    private readonly PaymentService _paymentService;
 }

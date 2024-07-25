@@ -27,8 +27,10 @@ public static class ServiceCollection
     {
         serviceCollection.AddHttpClient("YooKassaPaymentApi", httpClient =>
         {
+            httpClient.DefaultRequestHeaders.Clear();
             httpClient.BaseAddress = new Uri(paymentApiUrl);
             httpClient.SetBasicAuthentication(shopId, secretKey);
+            httpClient.AddAcceptHeaderValue("application/json");
         });
     }
 }

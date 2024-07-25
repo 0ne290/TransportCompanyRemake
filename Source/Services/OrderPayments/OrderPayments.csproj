@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Libraries\YooKassa\YooKassa.csproj" />
+      <ProjectReference Include="..\..\Core\Domain\Domain.csproj" />
+    </ItemGroup>
+
 </Project>

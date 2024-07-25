@@ -9,9 +9,14 @@ public class PaymentService
         _httpClient = httpClientFactory.CreateClient("YooKassaPaymentApi");
     }
 
-    public IssuedPayment CreatePayment(UnissuedPayment unissuedPayment)
+    public async Task<IssuedPayment> IssuePayment(UnissuedPayment unissuedPayment)
     {
-        
+        var unissuedPaymentJson = unissuedPayment.ToJson();
+        var issuedPaymentJson = await (await Extensions.HttpClient.PostJson(_httpClient, unissuedPaymentJson)).Content
+            .ReadAsStringAsync();
+        var issuedPayment = IssuedPayment.FromJson(issuedPaymentJson);
+
+        return issuedPayment;
     }
     
     private readonly HttpClient _httpClient;
