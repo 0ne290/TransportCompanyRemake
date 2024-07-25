@@ -4,5 +4,5 @@ namespace Domain.ServiceInterfaces;
 
 public interface IOrderPaymentService
 {
-    public string IssuePayment(Order order);
+    public Task<string> IssuePayment(Order order);
 }
