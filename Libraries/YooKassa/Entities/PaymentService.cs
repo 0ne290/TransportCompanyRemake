@@ -2,7 +2,6 @@
 
 namespace YooKassa.Entities;
 
-// Все-таки лучше сделать Confirmation одним фиксированным классом, если это возможно
 public class PaymentService
 {
     public PaymentService(IHttpClientFactory httpClientFactory)
