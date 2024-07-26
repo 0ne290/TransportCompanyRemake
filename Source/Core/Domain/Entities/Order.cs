@@ -1,4 +1,3 @@
-using Domain.Configs;
 using Domain.Constants;
 using Domain.ServiceInterfaces;
 
@@ -7,6 +6,45 @@ namespace Domain.Entities;
 public class Order
 {
     private Order() { }
+    
+    public static Order New(User user, string startAddress, string endAddress, string cargoDescription,
+        (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
+        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag) => new()
+    {
+        Guid = System.Guid.NewGuid().ToString(), Status = OrderStatuses.AwaitingAssignmentOfPerformers, DateCreated = DateTime.Now,
+        DateAssignmentOfPerformers = null, DatePaymentAndBegin = null, DateEnd = null, HazardClassFlag = hazardClassFlag, Tank = tank,
+        LengthInKm = null, Price = null, ExpectedHoursWorkedByDrivers = null, ActualHoursWorkedByDriver1 = null,
+        ActualHoursWorkedByDriver2 = null, UserGuid = user.Guid, TruckGuid = null, Driver1Guid = null,
+        Driver2Guid = null, BranchGuid = null, User = user, Truck = null, Driver1 = null, Driver2 = null, Branch = null,
+        StartAddress = startAddress, EndAddress = endAddress, CargoDescription = cargoDescription,
+        StartPointLatitude = startPoint.Latitude, StartPointLongitude = startPoint.Longitude,
+        EndPointLatitude = endPoint.Latitude, EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume,
+        CargoWeight = cargoWeight
+    };
+    
+    public void AssignPerformers(IGeolocationService geolocationService, Truck truck, Driver driver1, Driver? driver2 = null)
+    {
+        Status = OrderStatuses.PerformersAssigned;
+        DateAssignmentOfPerformers = DateTime.Now;
+        
+        var order = Base(orderConfig);
+        order.AssignTwoDriversAndTruckAndBranchAndHazardClassFlag(driver1, driver2, truck, hazardClassFlag);
+        order.AssignUser(user);
+        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderConfig, geolocationService);
+        order.AssignPrice();
+
+        truck.IsAvailable = false;
+        driver1.IsAvailable = false;
+        driver2.IsAvailable = false;
+
+        return order;
+    }
+    
+    public void ConfirmPaymentAndBegin()
+    {
+        Status = OrderStatuses.InProgress;
+        DatePaymentAndBegin = DateTime.Now;
+    }
 
     public static Order New(OrderConfig orderConfig, int hazardClassFlag, User user, Truck truck,
         Driver driver1, Driver driver2, IGeolocationService geolocationService)
@@ -240,20 +278,6 @@ public class Order
         BranchGuid = truck.BranchGuid;
     }
 
-    private static Order Base(OrderConfig orderConfig) => new()
-    {
-        Guid = System.Guid.NewGuid().ToString(), DateBegin = DateTime.Now, DateEnd = null, HazardClassFlag = null,
-        ActualHoursWorkedByDriver2 = null, Driver2Guid = null, Driver2 = null,
-        StartAddress = orderConfig.StartAddress, EndAddress = orderConfig.EndAddress,
-        CargoDescription = orderConfig.CargoDescription,
-        StartPointLatitude = orderConfig.StartPoint.Latitude,
-        StartPointLongitude = orderConfig.StartPoint.Longitude,
-        EndPointLatitude = orderConfig.EndPoint.Latitude,
-        EndPointLongitude = orderConfig.EndPoint.Longitude,
-        CargoVolume = orderConfig.CargoVolume, CargoWeight = orderConfig.CargoWeight,
-        Tank = orderConfig.Tank
-    };
-
     private void AssignUser(User user)
     {
         UserGuid = user.Guid;
@@ -318,8 +342,14 @@ public class Order
     }
 
     public string Guid { get; private set; } = null!;
-
-    public DateTime DateBegin { get; private set; }
+    
+    public string Status { get; private set; } = null!;
+    
+    public DateTime DateCreated { get; private set; }
+    
+    public DateTime? DateAssignmentOfPerformers { get; private set; }
+    
+    public DateTime? DatePaymentAndBegin { get; private set; }
 
     public DateTime? DateEnd { get; private set; }
 
@@ -327,35 +357,35 @@ public class Order
 
     public bool Tank { get; private set; }
 
-    public double LengthInKm { get; private set; }
+    public double? LengthInKm { get; private set; }
 
-    public decimal Price { get; private set; }
+    public decimal? Price { get; private set; }
 
-    public double ExpectedHoursWorkedByDrivers { get; private set; }
+    public double? ExpectedHoursWorkedByDrivers { get; private set; }
 
-    public double ActualHoursWorkedByDriver1 { get; private set; }
+    public double? ActualHoursWorkedByDriver1 { get; private set; }
 
     public double? ActualHoursWorkedByDriver2 { get; private set; }
 
     public string UserGuid { get; private set; } = null!;
 
-    public string TruckGuid { get; private set; } = null!;
+    public string? TruckGuid { get; private set; }
 
-    public string Driver1Guid { get; private set; } = null!;
+    public string? Driver1Guid { get; private set; }
 
     public string? Driver2Guid { get; private set; }
 
-    public string BranchGuid { get; private set; } = null!;
+    public string? BranchGuid { get; private set; }
 
     public virtual User User { get; private set; } = null!;
 
-    public virtual Truck Truck { get; private set; } = null!;
+    public virtual Truck? Truck { get; private set; }
 
-    public virtual Driver Driver1 { get; private set; } = null!;
+    public virtual Driver? Driver1 { get; private set; }
 
     public virtual Driver? Driver2 { get; private set; }
 
-    public virtual Branch Branch { get; private set; } = null!;
+    public virtual Branch? Branch { get; private set; }
 
     public string StartAddress { get; private set; } = null!;
 

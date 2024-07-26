@@ -4,7 +4,7 @@ public static class HazardClassesFlags
 {
     public static bool IsFlagCombination(int value) => value is >= 0b0000_0000_0000_0000_0001 and <= 0b1111_1111_1111_1111_1111;
 
-    public static bool IsFlag(int value) => Flags.Contains(value);
+    public static bool IsFlag(int value) => ValidFlags.Contains(value);
     
     public const int Class11 = 0b0000_0000_0000_0000_0001;
 
@@ -46,7 +46,7 @@ public static class HazardClassesFlags
     
     public const int Class9 = 0b1000_0000_0000_0000_0000;
 
-    private static readonly HashSet<int> Flags = new(new[]
+    private static readonly HashSet<int> ValidFlags = new(new[]
     {
         Class11, Class12, Class13, Class14, Class15, Class16, Class21, Class22, Class23, Class3, Class41, Class42,
         Class43, Class51, Class52, Class61, Class62, Class7, Class8, Class9
