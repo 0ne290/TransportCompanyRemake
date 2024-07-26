@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
-using Domain.ServiceInterfaces;
+using Domain.InfrastructureInterfaces;
 
-namespace Domain.ServiceDefaultImplementations;
+namespace Domain.InfrastructureDefaultImplementations;
 
 public class DefaultCryptographicService : ICryptographicService
 {

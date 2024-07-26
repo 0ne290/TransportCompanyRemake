@@ -1,5 +1,5 @@
 using Domain.Constants;
-using Domain.ServiceInterfaces;
+using Domain.InfrastructureInterfaces;
 
 namespace Domain.Entities;
 
@@ -119,35 +119,24 @@ public class Order
         DatePaymentAndBegin = DateTime.Now;
     }
 
-    public void Finish(double actualHoursWorkedByDriver1)
+    public void Finish(double actualHoursWorkedByDriver1, double? actualHoursWorkedByDriver2 = null)
     {
-        if (Driver2Guid != null)
-            throw new InvalidOperationException(
-                "The finish method for an order with one driver cannot be called for an order with two drivers.");
-        if (DateEnd != null)
-            throw new InvalidOperationException("The order has already been finished.");
+        if (Status != OrderStatuses.InProgress)
+            throw new InvalidOperationException("Status is invalid");
+        
+        if ((actualHoursWorkedByDriver2 != null && Driver2Guid == null) || (actualHoursWorkedByDriver2 == null && Driver2Guid != null))
+            throw new InvalidOperationException("Driver2 is invalid");
 
-        Truck.IsAvailable = true;
-        Driver1.IsAvailable = true;
+        Truck!.IsAvailable = true;
+        
+        Driver1!.IsAvailable = true;
         Driver1.AddHoursWorked(actualHoursWorkedByDriver1);
-
-        ActualHoursWorkedByDriver1 = actualHoursWorkedByDriver1;
-        DateEnd = DateTime.Now;
-    }
-
-    public void Finish(double actualHoursWorkedByDriver1, double actualHoursWorkedByDriver2)
-    {
-        if (Driver2Guid == null)
-            throw new InvalidOperationException(
-                "The finish method for an order with two drivers cannot be called for an order with one driver.");
-        if (DateEnd != null)
-            throw new InvalidOperationException("The order has already been finished.");
-
-        Truck.IsAvailable = true;
-        Driver1.IsAvailable = true;
-        Driver1.AddHoursWorked(actualHoursWorkedByDriver1);
-        Driver2!.IsAvailable = true;
-        Driver2.AddHoursWorked(actualHoursWorkedByDriver2);
+        
+        if (Driver2 != null)
+        {
+            Driver2.IsAvailable = true;
+            Driver2.AddHoursWorked(actualHoursWorkedByDriver2!.Value);
+        }
 
         ActualHoursWorkedByDriver1 = actualHoursWorkedByDriver1;
         ActualHoursWorkedByDriver2 = actualHoursWorkedByDriver2;

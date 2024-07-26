@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Domain.ServiceInterfaces;
+namespace Domain.InfrastructureInterfaces;
 
 public interface IOrderPaymentService
 {

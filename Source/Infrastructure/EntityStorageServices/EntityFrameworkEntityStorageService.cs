@@ -1,4 +1,4 @@
-﻿namespace EntityStorages;
+﻿namespace EntityStorageServices;
 
 public class EntityFrameworkEntityStorageService
 {

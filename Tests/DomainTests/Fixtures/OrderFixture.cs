@@ -1,7 +1,7 @@
 using Domain.Configs;
 using Domain.Constants;
 using Domain.Entities;
-using Domain.ServiceInterfaces;
+using Domain.InfrastructureInterfaces;
 
 namespace DomainTests.Fixtures;
 

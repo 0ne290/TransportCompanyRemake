@@ -1,6 +1,6 @@
 using Application.Dtos;
 using Domain.Entities;
-using Domain.ServiceInterfaces;
+using Domain.InfrastructureInterfaces;
 
 namespace Application.Actors;
 

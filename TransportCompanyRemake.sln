@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{B1D0ABAC-4B75-4A52-AFB4-EE6C1C121FB0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{FA91A022-75F4-4DA0-83D1-A0B2E13E1ACB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FA91A022-75F4-4DA0-83D1-A0B2E13E1ACB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D2CD10AD-1C73-49CC-B967-B1AECD12CE5C}"
 EndProject
@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{FB4383
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Source\Web\Web.csproj", "{239C2081-71B3-41CA-8A1B-DB5451957C1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityStorages", "Source\Services\EntityStorages\EntityStorages.csproj", "{F859EFE1-5166-437F-B566-EF47E3F99C46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityStorageServices", "Source\Infrastructure\EntityStorageServices\EntityStorageServices.csproj", "{F859EFE1-5166-437F-B566-EF47E3F99C46}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Source\Core\Domain\Domain.csproj", "{91BAC05D-2CBB-49B9-8BE2-B5AA638EF05D}"
 EndProject
@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YooKassa", "Libraries\YooKassa\YooKassa.csproj", "{D3399385-E86A-4361-817F-379257E5E40F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderPayments", "Source\Services\OrderPayments\OrderPayments.csproj", "{F4347BAC-9379-4CB0-9BDE-50B5AD9946A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderPaymentServices", "Source\Infrastructure\OrderPaymentServices\OrderPaymentServices.csproj", "{F4347BAC-9379-4CB0-9BDE-50B5AD9946A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

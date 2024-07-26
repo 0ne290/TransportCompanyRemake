@@ -1,11 +1,12 @@
 ﻿using System.Globalization;
+using Domain.Constants;
 using Domain.Entities;
-using Domain.ServiceInterfaces;
+using Domain.InfrastructureInterfaces;
 using YooKassa.Constants;
 using YooKassa.Entities;
 using YooKassa.Entities.Payment;
 
-namespace OrderPayments;
+namespace OrderPaymentServices;
 
 public class YooKassaOrderPaymentService : IOrderPaymentService
 {
@@ -17,11 +18,14 @@ public class YooKassaOrderPaymentService : IOrderPaymentService
     
     public async Task<string> IssuePayment(Order order)
     {
+        if (order.Status != OrderStatuses.PerformersAssigned)
+            throw new ArgumentException("Order.Status is invalid", nameof(order));
+        
         var unissuedPayment = new UnissuedPayment
         {
             Amount = new Amount
             {
-                Value = order.Price.ToString(CultureInfo.InvariantCulture),
+                Value = order.Price!.Value.ToString(CultureInfo.InvariantCulture),
                 Currency = Currencies.Rub
             },
             Confirmation = new Confirmation
