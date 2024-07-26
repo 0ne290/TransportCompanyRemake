@@ -9,76 +9,50 @@ public class Order
     
     public static Order New(User user, string startAddress, string endAddress, string cargoDescription,
         (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag) => new()
+        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag)
     {
-        Guid = System.Guid.NewGuid().ToString(), Status = OrderStatuses.AwaitingAssignmentOfPerformers, DateCreated = DateTime.Now,
-        DateAssignmentOfPerformers = null, DatePaymentAndBegin = null, DateEnd = null, HazardClassFlag = hazardClassFlag, Tank = tank,
-        LengthInKm = null, Price = null, ExpectedHoursWorkedByDrivers = null, ActualHoursWorkedByDriver1 = null,
-        ActualHoursWorkedByDriver2 = null, UserGuid = user.Guid, TruckGuid = null, Driver1Guid = null,
-        Driver2Guid = null, BranchGuid = null, User = user, Truck = null, Driver1 = null, Driver2 = null, Branch = null,
-        StartAddress = startAddress, EndAddress = endAddress, CargoDescription = cargoDescription,
-        StartPointLatitude = startPoint.Latitude, StartPointLongitude = startPoint.Longitude,
-        EndPointLatitude = endPoint.Latitude, EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume,
-        CargoWeight = cargoWeight
-    };
+        if (hazardClassFlag != null && !HazardClassesFlags.IsFlag(hazardClassFlag.Value))
+            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
+                "The value is not a hazard class flag.");
+        
+        var order = new Order
+        {
+            Guid = System.Guid.NewGuid().ToString(), Status = OrderStatuses.AwaitingAssignmentOfPerformers,
+            DateCreated = DateTime.Now,
+            DateAssignmentOfPerformers = null, DatePaymentAndBegin = null, DateEnd = null,
+            HazardClassFlag = hazardClassFlag, Tank = tank,
+            LengthInKm = null, Price = null, ExpectedHoursWorkedByDrivers = null, ActualHoursWorkedByDriver1 = null,
+            ActualHoursWorkedByDriver2 = null, UserGuid = user.Guid, TruckGuid = null, Driver1Guid = null,
+            Driver2Guid = null, BranchGuid = null, User = user, Truck = null, Driver1 = null, Driver2 = null,
+            Branch = null,
+            StartAddress = startAddress, EndAddress = endAddress, CargoDescription = cargoDescription,
+            StartPointLatitude = startPoint.Latitude, StartPointLongitude = startPoint.Longitude,
+            EndPointLatitude = endPoint.Latitude, EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume,
+            CargoWeight = cargoWeight
+        };
+
+        return order;
+    }
     
     public void AssignPerformers(IGeolocationService geolocationService, Truck truck, Driver driver1, Driver? driver2 = null)
     {
-        Status = OrderStatuses.PerformersAssigned;
-        DateAssignmentOfPerformers = DateTime.Now;
+        if (Status != OrderStatuses.AwaitingAssignmentOfPerformers)
+            throw new InvalidOperationException("Status is invalid");
         
-        var order = Base(orderConfig);
-        order.AssignTwoDriversAndTruckAndBranchAndHazardClassFlag(driver1, driver2, truck, hazardClassFlag);
-        order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderConfig, geolocationService);
-        order.AssignPrice();
-
-        truck.IsAvailable = false;
-        driver1.IsAvailable = false;
-        driver2.IsAvailable = false;
-
-        return order;
-    }
-    
-    public void ConfirmPaymentAndBegin()
-    {
-        Status = OrderStatuses.InProgress;
-        DatePaymentAndBegin = DateTime.Now;
-    }
-
-    public static Order New(OrderConfig orderConfig, int hazardClassFlag, User user, Truck truck,
-        Driver driver1, Driver driver2, IGeolocationService geolocationService)
-    {
-        var order = Base(orderConfig);
-        order.AssignTwoDriversAndTruckAndBranchAndHazardClassFlag(driver1, driver2, truck, hazardClassFlag);
-        order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderConfig, geolocationService);
-        order.AssignPrice();
-
-        truck.IsAvailable = false;
-        driver1.IsAvailable = false;
-        driver2.IsAvailable = false;
-
-        return order;
-    }
-
-    private void AssignTwoDriversAndTruckAndBranchAndHazardClassFlag(Driver driver1, Driver driver2, Truck truck,
-        int hazardClassFlag)
-    {
         if (!driver1.IsAvailable)
-            throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver1));
-        if (!driver2.IsAvailable)
-            throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver2));
+            throw new ArgumentException("To assign a driver1 to an order, it must be available.", nameof(driver1));
+        if (driver2 is { IsAvailable: false })
+            throw new ArgumentException("To assign a driver2 to an order, it must be available.", nameof(driver2));
         if (!truck.IsAvailable)
             throw new ArgumentException("To assign a truck to an order, it must be available.", nameof(truck));
         
-        if (Tank && !driver1.AdrQualificationOfTank)
+        if (HazardClassFlag != null && Tank && !driver1.AdrQualificationOfTank)
             throw new ArgumentException(
-                "To assign a driver to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
+                "To assign a driver1 to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
                 nameof(driver1));
-        if (Tank && !driver2.AdrQualificationOfTank)
+        if (HazardClassFlag != null && driver2 != null && Tank && !driver2.AdrQualificationOfTank)
             throw new ArgumentException(
-                "To assign a driver to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
+                "To assign a driver2 to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
                 nameof(driver2));
         
         if (Tank && !truck.Tank)
@@ -90,221 +64,60 @@ public class Order
                 "To assign a truck to an order with cargo that does not require a tank, the truck must not have a tank.",
                 nameof(truck));
         
-        if (truck.BranchGuid != driver1.BranchGuid || truck.BranchGuid != driver2.BranchGuid)
+        if (truck.BranchGuid != driver1.BranchGuid || (driver2 != null && truck.BranchGuid != driver2.BranchGuid))
             throw new ArgumentException("To assign drivers and truck to an order, they must belong to the same branch");
         
-        if (!HazardClassesFlags.IsFlag(hazardClassFlag))
-            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
-                "The value is not a hazard class flag.");
-        if ((hazardClassFlag & truck.PermittedHazardClassesFlags ?? 0) < 1)
-            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
+        if ((HazardClassFlag & truck.PermittedHazardClassesFlags ?? 0) < 1)
+            throw new ArgumentOutOfRangeException(nameof(truck), truck,
                 "The truck cannot transport cargo with this hazard class.");
-        if ((hazardClassFlag & driver1.AdrQualificationFlag ?? 0) < 1)
-            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
+        if ((HazardClassFlag & driver1.AdrQualificationFlag ?? 0) < 1)
+            throw new ArgumentOutOfRangeException(nameof(driver1), driver1,
                 "The driver1 is not qualified enough to transport cargo with this hazard class.");
-        if ((hazardClassFlag & driver2.AdrQualificationFlag ?? 0) < 1)
-            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
+        if (driver2 != null && (HazardClassFlag & driver2.AdrQualificationFlag ?? 0) < 1)
+            throw new ArgumentOutOfRangeException(nameof(driver2), driver2,
                 "The driver2 is not qualified enough to transport cargo with this hazard class.");
 
         Driver1Guid = driver1.Guid;
         Driver1 = driver1;
-
-        Driver2Guid = driver2.Guid;
-        Driver2 = driver2;
-        ActualHoursWorkedByDriver2 = 0;
+        Driver1.IsAvailable = false;
+        
+        if (driver2 != null)
+        {
+            Driver2Guid = driver2.Guid;
+            Driver2 = driver2;
+            Driver2.IsAvailable = false;
+        }
 
         TruckGuid = truck.Guid;
         Truck = truck;
+        Truck.IsAvailable = false;
 
         Branch = truck.Branch;
         BranchGuid = truck.BranchGuid;
-
-        HazardClassFlag = hazardClassFlag;
-    }
-
-    public static Order New(OrderConfig orderConfig, User user, Truck truck, Driver driver1,
-        Driver driver2, IGeolocationService geolocationService)
-    {
-        var order = Base(orderConfig);
-        order.AssignTwoDriversAndTruckAndBranch(driver1, driver2, truck);
-        order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(orderConfig, geolocationService);
-        order.AssignPrice();
         
-        truck.IsAvailable = false;
-        driver1.IsAvailable = false;
-        driver2.IsAvailable = false;
-
-        return order;
-    }
-
-    private void AssignTwoDriversAndTruckAndBranch(Driver driver1, Driver driver2, Truck truck)
-    {
-        if (!driver1.IsAvailable)
-            throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver1));
-        if (!driver2.IsAvailable)
-            throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver2));
-        if (!truck.IsAvailable)
-            throw new ArgumentException("To assign a truck to an order, it must be available.", nameof(truck));
-        
-        if (Tank && !truck.Tank)
-            throw new ArgumentException(
-                "To assign a truck to an order with cargo that requires a tank, the truck must have a tank.",
-                nameof(truck));
-        if (!Tank && truck.Tank)
-            throw new ArgumentException(
-                "To assign a truck to an order with cargo that does not require a tank, the truck must not have a tank.",
-                nameof(truck));
-        
-        if (truck.BranchGuid != driver1.BranchGuid || truck.BranchGuid != driver2.BranchGuid)
-            throw new ArgumentException("To assign drivers and truck to an order, they must belong to the same branch");
-
-        Driver1Guid = driver1.Guid;
-        Driver1 = driver1;
-
-        Driver2Guid = driver2.Guid;
-        Driver2 = driver2;
-        ActualHoursWorkedByDriver2 = 0;
-
-        TruckGuid = truck.Guid;
-        Truck = truck;
-
-        Branch = truck.Branch;
-        BranchGuid = truck.BranchGuid;
-    }
-
-    public static Order New(OrderConfig orderConfig, int hazardClassFlag, User user, Truck truck,
-        Driver driver1, IGeolocationService geolocationService)
-    {
-        var order = Base(orderConfig);
-        order.AssignOneDriverAndTruckAndBranchAndHazardClassFlag(driver1, truck, hazardClassFlag);
-        order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderConfig, geolocationService);
-        order.AssignPrice();
-        
-        truck.IsAvailable = false;
-        driver1.IsAvailable = false;
-
-        return order;
-    }
-
-    private void AssignOneDriverAndTruckAndBranchAndHazardClassFlag(Driver driver1, Truck truck, int hazardClassFlag)
-    {
-        if (!driver1.IsAvailable)
-            throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver1));
-        if (!truck.IsAvailable)
-            throw new ArgumentException("To assign a truck to an order, it must be available.", nameof(truck));
-        
-        if (Tank && !driver1.AdrQualificationOfTank)
-            throw new ArgumentException(
-                "To assign a driver to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
-                nameof(driver1));
-        
-        if (Tank && !truck.Tank)
-            throw new ArgumentException(
-                "To assign a truck to an order with cargo that requires a tank, the truck must have a tank.",
-                nameof(truck));
-        if (!Tank && truck.Tank)
-            throw new ArgumentException(
-                "To assign a truck to an order with cargo that does not require a tank, the truck must not have a tank.",
-                nameof(truck));
-        
-        if (truck.BranchGuid != driver1.BranchGuid)
-            throw new ArgumentException("To assign drivers and truck to an order, they must belong to the same branch");
-        
-        if (!HazardClassesFlags.IsFlag(hazardClassFlag))
-            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
-                "The value is not a hazard class flag.");
-        if ((hazardClassFlag & truck.PermittedHazardClassesFlags ?? 0) < 1)
-            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
-                "The truck cannot transport cargo with this hazard class.");
-        if ((hazardClassFlag & driver1.AdrQualificationFlag ?? 0) < 1)
-            throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
-                "The driver1 is not qualified enough to transport cargo with this hazard class.");
-
-        Driver1Guid = driver1.Guid;
-        Driver1 = driver1;
-
-        TruckGuid = truck.Guid;
-        Truck = truck;
-
-        Branch = truck.Branch;
-        BranchGuid = truck.BranchGuid;
-
-        HazardClassFlag = hazardClassFlag;
-    }
-
-    public static Order New(OrderConfig orderConfig, User user, Truck truck, Driver driver1,
-        IGeolocationService geolocationService)
-    {
-        var order = Base(orderConfig);
-        order.AssignOneDriverAndTruckAndBranch(driver1, truck);
-        order.AssignUser(user);
-        order.AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(orderConfig, geolocationService);
-        order.AssignPrice();
-        
-        truck.IsAvailable = false;
-        driver1.IsAvailable = false;
-
-        return order;
-    }
-
-    private void AssignOneDriverAndTruckAndBranch(Driver driver1, Truck truck)
-    {
-        if (!driver1.IsAvailable)
-            throw new ArgumentException("To assign a driver to an order, it must be available.", nameof(driver1));
-        if (!truck.IsAvailable)
-            throw new ArgumentException("To assign a truck to an order, it must be available.", nameof(truck));
-        
-        if (Tank && !truck.Tank)
-            throw new ArgumentException(
-                "To assign a truck to an order with cargo that requires a tank, the truck must have a tank.",
-                nameof(truck));
-        if (!Tank && truck.Tank)
-            throw new ArgumentException(
-                "To assign a truck to an order with cargo that does not require a tank, the truck must not have a tank.",
-                nameof(truck));
-        
-        if (truck.BranchGuid != driver1.BranchGuid)
-            throw new ArgumentException("To assign drivers and truck to an order, they must belong to the same branch");
-
-        Driver1Guid = driver1.Guid;
-        Driver1 = driver1;
-
-        TruckGuid = truck.Guid;
-        Truck = truck;
-
-        Branch = truck.Branch;
-        BranchGuid = truck.BranchGuid;
-    }
-
-    private void AssignUser(User user)
-    {
-        UserGuid = user.Guid;
-        User = user;
-    }
-
-    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForTwoDrivers(OrderConfig orderConfig, IGeolocationService geolocationService)
-    {
         var lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt =
-            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderConfig,
-                geolocationService);
-
-        LengthInKm = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.LengthInKm;
-        ExpectedHoursWorkedByDrivers = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.DrivingHours / 2;
-    }
-    
-    private void AssignLengthInKmAndExpectedHoursWorkedByDriversForOneDriver(OrderConfig orderConfig, IGeolocationService geolocationService)
-    {
-        var lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt =
-            Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderConfig,
-                geolocationService);
+        Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(this,
+            geolocationService);
 
         LengthInKm = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.LengthInKm;
         ExpectedHoursWorkedByDrivers = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.DrivingHours;
+        if (Driver2 != null)
+            ExpectedHoursWorkedByDrivers /= 2;
+        
+        Price = Truck.CalculateOrderPrice(this);
+        
+        Status = OrderStatuses.PerformersAssigned;
+        DateAssignmentOfPerformers = DateTime.Now;
     }
-
-    private void AssignPrice() => Price = Truck.CalculateOrderPrice(this);
+    
+    public void ConfirmPaymentAndBegin()
+    {
+        if (Status != OrderStatuses.PerformersAssigned)
+            throw new InvalidOperationException("Status is invalid");
+        
+        Status = OrderStatuses.InProgress;
+        DatePaymentAndBegin = DateTime.Now;
+    }
 
     public void Finish(double actualHoursWorkedByDriver1)
     {
