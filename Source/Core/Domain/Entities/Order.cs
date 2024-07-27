@@ -126,7 +126,7 @@ public class Order
             throw new InvalidOperationException("Status is invalid");
         
         if ((actualHoursWorkedByDriver2 != null && Driver2Guid == null) || (actualHoursWorkedByDriver2 == null && Driver2Guid != null))
-            throw new InvalidOperationException("Driver2 is invalid");
+            throw new ArgumentException("ActualHoursWorkedByDriver2 is invalid", nameof(actualHoursWorkedByDriver2));
 
         Truck!.IsAvailable = true;
         
