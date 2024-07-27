@@ -89,7 +89,7 @@ public class OrderTest
 
     [Fact]
     public void
-        Order_AssignPerformersWithDriver2_ContextAndArgumentsIsValid_SetTheDriver1AndDriver2AndTruckAndBranchAndLengthInKmAndExpectedHoursWorkedByDriversAndPriceAndStatusAndDateAssignmentOfPerformers()
+        Order_AssignPerformersWithDriver2_ContextAndArgumentsIsValid_SetTheDriver1AndDriver2AndTruckAndBranchAndLengthInKmAndExpectedHoursWorkedByDriversAndPriceAndSetTheStatusToPerformersAssignedAndSetTheDateAssignmentOfPerformersToNow()
     {
         // Arrange
         var expectedBranch = BranchFixture.Create();
@@ -130,7 +130,7 @@ public class OrderTest
     
     [Fact]
     public void
-        Order_AssignPerformersWithoutDriver2_ContextAndArgumentsIsValid_SetTheDriver1AndTruckAndBranchAndLengthInKmAndExpectedHoursWorkedByDriversAndPriceAndStatusAndDateAssignmentOfPerformers()
+        Order_AssignPerformersWithoutDriver2_ContextAndArgumentsIsValid_SetTheDriver1AndTruckAndBranchAndLengthInKmAndExpectedHoursWorkedByDriversAndPriceAndSetTheStatusToPerformersAssignedAndSetTheDateAssignmentOfPerformersToNow()
     {
         // Arrange
         var expectedBranch = BranchFixture.Create();
@@ -188,10 +188,219 @@ public class OrderTest
         var driver = DriverFixture.CreateWithAdrQualificationFlag(branch);
         var order = OrderFixture.Create(UserFixture.CreateVk());
 
-        // Act
-
         // Act & Assert
         Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), driver, driver));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_Driver1IsAvailableIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        driver1.IsAvailable = false;
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), driver1));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_Driver2IsAvailableIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch);
+        driver2.IsAvailable = false;
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), DriverFixture.CreateWithAdrQualificationFlag(branch), driver2));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_TruckIsAvailableIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(branch);
+        truck.IsAvailable = false;
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, truck, DriverFixture.CreateWithAdrQualificationFlag(branch)));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_TankAndDriver1AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var driver1 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationOfTank: false);
+        var order = OrderFixture.Create(UserFixture.CreateVk(), tank: true);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), driver1));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_TankAndDriver2AdrQualificationOfTankIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var driver2 = DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationOfTank: false);
+        var order = OrderFixture.Create(UserFixture.CreateVk(), tank: true);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), DriverFixture.CreateWithAdrQualificationFlag(branch), driver2));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_TankIsTrueAndTruckTankIsFalse_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk(), tank: true);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch, tank: false), DriverFixture.CreateWithAdrQualificationFlag(branch)));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_TankIsFalseAndTruckTankIsTrue_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk(), tank: false);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch, tank: true), DriverFixture.CreateWithAdrQualificationFlag(branch)));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_Driver1BranchIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), DriverFixture.CreateWithAdrQualificationFlag(BranchFixture.Create())));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_Driver2BranchIsInvalid_ThrowArgumentException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), DriverFixture.CreateWithAdrQualificationFlag(branch), DriverFixture.CreateWithAdrQualificationFlag(BranchFixture.Create())));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_TruckPermittedHazardClassesFlagsIsInvalid_ThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk(), hazardClassFlag: HazardClassesFlags.Class7);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch, permittedHazardClassessFlags: HazardClassesFlags.Class8), DriverFixture.CreateWithAdrQualificationFlag(branch)));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_Driver1AdrQualificationFlagIsInvalid_ThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk(), hazardClassFlag: HazardClassesFlags.Class7);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch, permittedHazardClassessFlags: HazardClassesFlags.Class7), DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.Base)));
+    }
+    
+    [Fact]
+    public void
+        Order_AssignPerformers_Driver2AdrQualificationFlagIsInvalid_ThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk(), hazardClassFlag: HazardClassesFlags.Class7);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch, permittedHazardClassessFlags: HazardClassesFlags.Class7), DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.BaseAndClass7), DriverFixture.CreateWithAdrQualificationFlag(branch, adrQualificationFlag: AdrDriverQualificationsFlags.Base)));
+    }
+    
+    [Fact]
+    public void Order_ConfirmPaymentAndBegin_ContextIsValid_SetTheStatusToInProgressAndSetTheDatePaymentAndBeginToNow_Test()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+        order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), DriverFixture.CreateWithAdrQualificationFlag(branch));
+        const string expectedStatus = OrderStatuses.InProgress;
+        var expextedDatePaymentAndBegin = DateTime.Now;
+        var expextedDatePaymentAndBeginError = TimeSpan.FromSeconds(10);
+        
+        // Act
+        order.ConfirmPaymentAndBegin();
+
+        // Assert
+        Assert.Equal(expectedStatus, order.Status);
+        Assert.NotNull(order.DatePaymentAndBegin);
+        Assert.Equal(expextedDatePaymentAndBegin, order.DatePaymentAndBegin.Value, expextedDatePaymentAndBeginError);
+    }
+    
+    [Fact]
+    public void Order_ConfirmPaymentAndBegin_StatusIsInvalid_ThrowInvalidOperationException_Test()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => order.ConfirmPaymentAndBegin());
+    }
+
+    [Fact]
+    public void Order_FinishWithDriver2_SetTheTruckIsAvailableAndDriver1IsAvailableAndDriver2IsAvailableToTrueAndSetTheActualHoursWorkedByDriver1AndActualHoursWorkedByDriver2AndCallTheDriver1AddHoursWorkedAndDriver2AddHoursWorkedAndSetTheStatusToCompletedAndSetTheDateEndToNow_Test()
+    {
+        // Arrange
+        var branch = BranchFixture.Create();
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+        order.AssignPerformers(_geolocationServiceStub, TruckFixture.CreateWithPermittedHazardClassesFlags(branch), DriverFixture.CreateWithAdrQualificationFlag(branch));
+        order.ConfirmPaymentAndBegin();
+        const int expectedHoursWorked1 = 13;
+        const int expectedHoursWorked2 = 17;
+        var expextedDateEnd = DateTime.Now;
+        var expextedDateEndError = TimeSpan.FromSeconds(10);
+        
+        // Act
+        order.Finish(expectedHoursWorked1, expectedHoursWorked2);
+
+        // Assert
+        Assert.True(order.Truck!.IsAvailable);
+        Assert.True(order.Driver1!.IsAvailable);
+        Assert.Equal(expectedHoursWorked1, order.Driver1.HoursWorkedPerWeek);
+        Assert.Equal(expectedHoursWorked1, order.Driver1.TotalHoursWorked);
+        Assert.Equal(expectedHoursWorked1, order.ActualHoursWorkedByDriver1);
+        Assert.True(order.Driver2!.IsAvailable);
+        Assert.Equal(expectedHoursWorked2, order.Driver2.HoursWorkedPerWeek);
+        Assert.Equal(expectedHoursWorked2, order.Driver2.TotalHoursWorked);
+        Assert.Equal(expectedHoursWorked2, order.ActualHoursWorkedByDriver2);
     }
 
     private readonly IGeolocationService _geolocationServiceStub = GeolocationServiceStub.Create();

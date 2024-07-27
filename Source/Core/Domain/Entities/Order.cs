@@ -132,15 +132,16 @@ public class Order
         
         Driver1!.IsAvailable = true;
         Driver1.AddHoursWorked(actualHoursWorkedByDriver1);
+        ActualHoursWorkedByDriver1 = actualHoursWorkedByDriver1;
         
         if (Driver2 != null)
         {
             Driver2.IsAvailable = true;
             Driver2.AddHoursWorked(actualHoursWorkedByDriver2!.Value);
+            ActualHoursWorkedByDriver2 = actualHoursWorkedByDriver2;
         }
 
-        ActualHoursWorkedByDriver1 = actualHoursWorkedByDriver1;
-        ActualHoursWorkedByDriver2 = actualHoursWorkedByDriver2;
+        Status = OrderStatuses.Completed;
         DateEnd = DateTime.Now;
     }
 
