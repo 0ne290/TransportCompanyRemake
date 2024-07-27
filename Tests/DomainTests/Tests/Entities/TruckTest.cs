@@ -2,7 +2,6 @@ using System.Text.RegularExpressions;
 using Domain.Constants;
 using Domain.Entities;
 using DomainTests.Fixtures;
-using DomainTests.Stubs;
 using RegexFixture = DomainTests.Fixtures.RegexFixture;
 
 namespace DomainTests.Tests.Entities;
@@ -201,22 +200,21 @@ public class TruckTest
     // Price calculation formula:
     // (Truck.WeightPrice * Order.CargoWeight + Truck.VolumePrice * Order.CargoVolume) * Truck.PricePerKm * Order.LengthInKm
     [Fact]
-    public void Truck_CalculateOrderPrice_ContextAndArgumentIsValid_ReturnThePriceForFulfillingAnOrderByTruck_Test()
+    public void Truck_CalculateOrderPricePerKm_ContextAndArgumentIsValid_ReturnTheOrderPrice_Test()
     {
         // Arrange
         var branch = BranchFixture.Create();
         var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(branch);
-        var order = OrderFixture.CreateWithOneDriverAndWithoutHazardClassFlag(UserFixture.CreateVk(), truck, DriverFixture.CreateWithoutAdrQualificationFlag(branch), GeolocationServiceStub.Create(), OrderFixture.CreateOrderCreationRequestDto());
-        var expectedPrice =
+        var order = OrderFixture.Create(UserFixture.CreateVk());
+        const decimal expectedPricePerKm =
             (TruckFixture.DefaultWeightPrice * OrderFixture.DefaultCargoWeight +
-             TruckFixture.DefaultVolumePrice * OrderFixture.DefaultCargoVolume) * TruckFixture.DefaultPricePerKm *
-            (decimal)order.LengthInKm;
+             TruckFixture.DefaultVolumePrice * OrderFixture.DefaultCargoVolume) * TruckFixture.DefaultPricePerKm;
         
         // Act
-        var actualPrice = truck.CalculateOrderPrice(order);
+        var actualPricePerKm = truck.CalculateOrderPricePerKm(order);
 
         // Assert
-        Assert.Equal(expectedPrice, actualPrice);
+        Assert.Equal(expectedPricePerKm, actualPricePerKm);
     }
     
     private readonly Regex _guidRegex = RegexFixture.GuidRegex();

@@ -48,7 +48,7 @@ public class BranchTest
         var branchPoint = (BranchFixture.DefaultLatitude, BranchFixture.DefaultLongitude);
         var startPoint = (OrderFixture.DefaultStartPointLatitude, OrderFixture.DefaultStartPointLongitude);
         var endPoint = (OrderFixture.DefaultEndPointLatitude, OrderFixture.DefaultEndPointLongitude);
-        var orderCreationRequestDto = OrderFixture.CreateOrderCreationRequestDto();
+        var order = OrderFixture.Create(UserFixture.CreateVk());
         var expectedLengthInKmAndDrivingHours =
             geolocationServiceStub.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(branchPoint,
                 startPoint, endPoint);
@@ -57,7 +57,7 @@ public class BranchTest
 
         //Act
         var actualLengthInKmAndDrivingHours =
-            branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(orderCreationRequestDto,
+            branch.CalculateLengthInKmOfOrderRouteClosedAtBranchAndApproximateDrivingHoursOfTruckAlongIt(order,
                 geolocationServiceStub);
 
         // Assert

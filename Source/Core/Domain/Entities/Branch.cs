@@ -13,7 +13,7 @@ public class Branch
     };
 
     public (double LengthInKm, double DrivingHours)
-        CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
+        CalculateLengthInKmOfOrderRouteClosedAtBranchAndApproximateDrivingHoursOfTruckAlongIt(
             Order order, IGeolocationService geolocationService) =>
         geolocationService.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(
             (Latitude, Longitude), (order.StartPointLatitude, order.StartPointLongitude), (order.EndPointLatitude, order.EndPointLongitude));

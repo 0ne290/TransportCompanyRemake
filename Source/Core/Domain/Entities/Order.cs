@@ -9,7 +9,7 @@ public class Order
     
     public static Order New(User user, string startAddress, string endAddress, string cargoDescription,
         (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag)
+        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag = null)
     {
         if (hazardClassFlag != null && !HazardClassesFlags.IsFlag(hazardClassFlag.Value))
             throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
@@ -38,7 +38,9 @@ public class Order
     {
         if (Status != OrderStatuses.AwaitingAssignmentOfPerformers)
             throw new InvalidOperationException("Status is invalid");
-        
+
+        if (driver1 == driver2)
+            throw new ArgumentException("It is impossible to assign two identical drivers.", $"{nameof(driver1)}; {nameof(driver2)}");
         if (!driver1.IsAvailable)
             throw new ArgumentException("To assign a driver1 to an order, it must be available.", nameof(driver1));
         if (driver2 is { IsAvailable: false })
@@ -96,15 +98,14 @@ public class Order
         BranchGuid = truck.BranchGuid;
         
         var lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt =
-        Branch.CalculateLengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt(this,
+        Branch.CalculateLengthInKmOfOrderRouteClosedAtBranchAndApproximateDrivingHoursOfTruckAlongIt(this,
             geolocationService);
-
         LengthInKm = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.LengthInKm;
         ExpectedHoursWorkedByDrivers = lengthInKmOfClosedRouteAndApproximateDrivingHoursOfTruckAlongIt.DrivingHours;
         if (Driver2 != null)
             ExpectedHoursWorkedByDrivers /= 2;
         
-        Price = Truck.CalculateOrderPrice(this);
+        Price = Truck.CalculateOrderPricePerKm(this) * (decimal)LengthInKm;
         
         Status = OrderStatuses.PerformersAssigned;
         DateAssignmentOfPerformers = DateTime.Now;

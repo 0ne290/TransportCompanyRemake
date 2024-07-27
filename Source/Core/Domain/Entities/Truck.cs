@@ -74,14 +74,12 @@ public class Truck
         BranchGuid = branch.Guid;
     }
 
-    public decimal CalculateOrderPrice(Order order)
+    public decimal CalculateOrderPricePerKm(Order order)
     {
         var weightPricePerKilometer = WeightPrice * order.CargoWeight;
         var volumePricePerKilometer = VolumePrice * order.CargoVolume;
-        var totalPricePerKilometer = (weightPricePerKilometer + volumePricePerKilometer) * PricePerKm;
-        var orderPrice = totalPricePerKilometer * (decimal)order.LengthInKm;
-
-        return orderPrice;
+        
+        return (weightPricePerKilometer + volumePricePerKilometer) * PricePerKm;
     }
 
     public override string ToString() => $"Number = {Number}";
