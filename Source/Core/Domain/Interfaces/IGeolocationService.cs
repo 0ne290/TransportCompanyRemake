@@ -1,4 +1,4 @@
-namespace Domain.InfrastructureInterfaces;
+namespace Domain.Interfaces;
 
 public interface IGeolocationService
 {

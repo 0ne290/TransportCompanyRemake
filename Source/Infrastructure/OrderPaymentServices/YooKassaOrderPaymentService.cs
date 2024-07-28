@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
+using Application.Interfaces;
 using Domain.Constants;
 using Domain.Entities;
-using Domain.InfrastructureInterfaces;
+using Domain.Interfaces;
 using YooKassa.Constants;
 using YooKassa.Entities;
 using YooKassa.Entities.Payment;
@@ -16,7 +17,7 @@ public class YooKassaOrderPaymentService : IOrderPaymentService
         _returnUrl = returnUrl;
     }
     
-    public async Task<string> IssuePayment(Order order)
+    public async Task<string> GetPaymentUrl(Order order)
     {
         if (order.Status != OrderStatuses.PerformersAssigned)
             throw new ArgumentException("Order.Status is invalid", nameof(order));

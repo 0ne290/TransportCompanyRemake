@@ -1,6 +1,6 @@
 using System.Globalization;
 using Domain.Entities;
-using Domain.InfrastructureInterfaces;
+using Domain.Interfaces;
 
 namespace DomainTests.Fixtures;
 

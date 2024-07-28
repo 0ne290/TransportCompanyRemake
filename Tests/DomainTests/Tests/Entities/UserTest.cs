@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using Domain.InfrastructureInterfaces;
+using Domain.Interfaces;
 using DomainTests.Fixtures;
 using DomainTests.Stubs;
 using RegexFixture = DomainTests.Fixtures.RegexFixture;

@@ -1,5 +1,5 @@
 using Domain.Constants;
-using Domain.InfrastructureInterfaces;
+using Domain.Interfaces;
 
 namespace Domain.Entities;
 
@@ -32,6 +32,18 @@ public class Order
         };
 
         return order;
+    }
+    
+    public void AssignManager(Manager manager)
+    {
+        if (Status != OrderStatuses.AwaitingAssignmentOfManager)
+            throw new InvalidOperationException("Status is invalid");
+
+        ManagerGuid = manager.Guid;
+        Manager = manager;
+        
+        Status = OrderStatuses.ManagerAssigned;
+        DateAssignmentOfManager = DateTime.Now;
     }
     
     public void AssignPerformers(IGeolocationService geolocationService, Truck truck, Driver driver1, Driver? driver2 = null)
@@ -150,6 +162,8 @@ public class Order
     public string Status { get; private set; } = null!;
     
     public DateTime DateCreated { get; private set; }
+    
+    public DateTime? DateAssignmentOfManager { get; private set; }
     
     public DateTime? DateAssignmentOfPerformers { get; private set; }
     

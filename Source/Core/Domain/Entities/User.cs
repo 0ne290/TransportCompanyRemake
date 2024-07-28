@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
-using Domain.InfrastructureInterfaces;
+using Domain.Constants;
+using Domain.Interfaces;
 
 namespace Domain.Entities;
 
@@ -30,6 +31,22 @@ public class User
         };
         
         return user;
+    }
+
+    public Order CreateOrder(string startAddress, string endAddress, string cargoDescription,
+        (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
+        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag = null) => Order.New(this,
+        startAddress, endAddress, cargoDescription, startPoint, endPoint, cargoVolume, cargoWeight, tank,
+        hazardClassFlag);
+    
+    public async Task<string> GetOrderPaymentUrl(IOrderPaymentService orderPaymentService, Order order)
+    {
+        if (order.Status != OrderStatuses.PerformersAssigned)
+            throw new ArgumentException("Get order payment URL only possible for orders with the \"PerformersAssigned\" status.", nameof(order));
+        if (order.UserGuid != Guid)
+            throw new ArgumentException("Get order payment URL only possible for user own orders.", nameof(order));
+        
+        return await orderPaymentService.GetPaymentUrl(order, this);
     }
     
     public void SetLogin(string login)

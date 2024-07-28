@@ -1,4 +1,4 @@
-namespace Domain.InfrastructureInterfaces;
+namespace Application.Interfaces;
 
 public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 {
