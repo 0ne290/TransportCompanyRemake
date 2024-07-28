@@ -42,7 +42,7 @@ public class Order
         ManagerGuid = manager.Guid;
         Manager = manager;
         
-        Status = OrderStatuses.ManagerAssigned;
+        Status = OrderStatuses.AwaitingAssignmentOfPerformers;
         DateAssignmentOfManager = DateTime.Now;
     }
     
@@ -186,6 +186,8 @@ public class Order
     public double? ActualHoursWorkedByDriver2 { get; private set; }
 
     public string UserGuid { get; private set; } = null!;
+    
+    public string? ManagerGuid { get; private set; }
 
     public string? TruckGuid { get; private set; }
 
@@ -196,6 +198,8 @@ public class Order
     public string? BranchGuid { get; private set; }
 
     public virtual User User { get; private set; } = null!;
+    
+    public virtual Manager? Manager { get; private set; }
 
     public virtual Truck? Truck { get; private set; }
 

@@ -31,6 +31,14 @@ public class Manager
         order.AssignPerformers(geolocationService, truck, driver1, driver2);
     }
     
+    public void FinishOrder(Order order, double actualHoursWorkedByDriver1, double? actualHoursWorkedByDriver2 = null)
+    {
+        if (order.ManagerGuid != Guid)
+            throw new ArgumentException("The manager can assign performers only to his own orders.", nameof(order));
+        
+        order.Finish(actualHoursWorkedByDriver1, actualHoursWorkedByDriver2);
+    }
+    
     public void SetLogin(string login) => Login = login;
     
     public void SetPassword(ICryptographicService cryptographicService, string password) => Password = cryptographicService.EncryptAndHash(Salt(password));
