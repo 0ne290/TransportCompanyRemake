@@ -3,8 +3,6 @@ namespace Domain.Constants;
 public static class OrderStatuses
 {
     public static bool IsStatus(string status) => ValidStatuses.Contains(status);
-
-    public const string AwaitingAssignmentOfManager = "Awaiting assignment of manager";
     
     public const string AwaitingAssignmentOfPerformers = "Awaiting assignment of performers";
     

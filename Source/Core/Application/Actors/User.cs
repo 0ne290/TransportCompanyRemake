@@ -1,6 +1,6 @@
 namespace Application.Actors;
 
-public class UserActor
+public class User
 {
     
 }

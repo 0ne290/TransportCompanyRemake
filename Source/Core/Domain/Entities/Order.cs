@@ -34,18 +34,6 @@ public class Order
         return order;
     }
     
-    public void AssignManager(Manager manager)
-    {
-        if (Status != OrderStatuses.AwaitingAssignmentOfManager)
-            throw new InvalidOperationException("Status is invalid");
-
-        ManagerGuid = manager.Guid;
-        Manager = manager;
-        
-        Status = OrderStatuses.AwaitingAssignmentOfPerformers;
-        DateAssignmentOfManager = DateTime.Now;
-    }
-    
     public void AssignPerformers(IGeolocationService geolocationService, Truck truck, Driver driver1, Driver? driver2 = null)
     {
         if (Status != OrderStatuses.AwaitingAssignmentOfPerformers)
@@ -163,8 +151,6 @@ public class Order
     
     public DateTime DateCreated { get; private set; }
     
-    public DateTime? DateAssignmentOfManager { get; private set; }
-    
     public DateTime? DateAssignmentOfPerformers { get; private set; }
     
     public DateTime? DatePaymentAndBegin { get; private set; }
@@ -186,8 +172,6 @@ public class Order
     public double? ActualHoursWorkedByDriver2 { get; private set; }
 
     public string UserGuid { get; private set; } = null!;
-    
-    public string? ManagerGuid { get; private set; }
 
     public string? TruckGuid { get; private set; }
 
@@ -198,8 +182,6 @@ public class Order
     public string? BranchGuid { get; private set; }
 
     public virtual User User { get; private set; } = null!;
-    
-    public virtual Manager? Manager { get; private set; }
 
     public virtual Truck? Truck { get; private set; }
 

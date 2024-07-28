@@ -4,5 +4,5 @@ namespace Domain.Interfaces;
 
 public interface IOrderPaymentService
 {
-    public Task<string> GetPaymentUrl(Order order, User payer);
+    public Task<string> GetPaymentUrl(Order order);
 }

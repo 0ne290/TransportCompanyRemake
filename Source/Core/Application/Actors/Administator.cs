@@ -4,7 +4,7 @@ using Domain.Entities;
 
 namespace Application.Actors;
 
-public class AdministatorActor(IEntityStorageService<Driver> driverStorageService, IEntityStorageService<Branch> branchStorageService)
+public class Administator(IEntityStorageService<Driver> driverStorageService, IEntityStorageService<Branch> branchStorageService)
 {
     /*public void RegisterDriver(DriverRegistrationRequestDto requestDto)
     {
