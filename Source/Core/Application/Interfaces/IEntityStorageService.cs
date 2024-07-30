@@ -2,9 +2,13 @@ namespace Application.Interfaces;
 
 public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 {
-    TEntity? FindByPrimaryKey(object[] primaryKey);
+    IEntityStorageService<TEntity> AsNoTracking();
     
-    void Create(TEntity entity);
+    bool Create(IEnumerable<TEntity> entities);
+
+    IEnumerable<TEntity> AsEnumerable();
+    
+    TEntity? FindByPrimaryKey(object[] primaryKey);
     
     IEnumerable<TEntity> FindAll(Predicate<TEntity> predicate);
     

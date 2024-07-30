@@ -24,29 +24,27 @@ public class Driver
     // вычисляемых полей в отдельные методы-сеттеры.
     private Driver() { }
 
-    public static Driver New(string name, int adrQualificationFlag, bool adrQualificationOfTank, string branchGuid)
+    public static Driver New(string name, string branchGuid, int? adrQualificationFlag, bool adrQualificationOfTank)
     {
         var driver = new Driver
         {
-            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DismissalDate = null, Name = name, HoursWorkedPerWeek = 0,
-            TotalHoursWorked = 0, AdrQualificationOfTank = adrQualificationOfTank, BranchGuid = branchGuid, IsAvailable = true
+            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DismissalDate = null,
+            HoursWorkedPerWeek = 0, TotalHoursWorked = 0, AdrQualificationFlag = null,
+            AdrQualificationOfTank = false, BranchGuid = branchGuid, Name = name, IsAvailable = true
         };
-        driver.QualifyAdr(adrQualificationFlag);
+        
+        if (adrQualificationFlag != null)
+            driver.QualifyAdr(adrQualificationFlag.Value);
+        if (adrQualificationOfTank)
+            driver.QualifyAdrTank();
 
         return driver;
     }
 
-    public static Driver New(string name, Branch branch) => new()
-    {
-        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DismissalDate = null, Name = name,
-        HoursWorkedPerWeek = 0, TotalHoursWorked = 0, AdrQualificationOfTank = false, AdrQualificationFlag = null,
-        Branch = branch, BranchGuid = branch.Guid, IsAvailable = true
-    };
-
     public void Reinstate()
     {
         if (DismissalDate == null)
-            throw new InvalidOperationException("Only a dismissed driver can use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. Only a dismissed driver can use the reinstatement operation.");
         
         IsAvailable = true;
         DismissalDate = null;
@@ -55,7 +53,7 @@ public class Driver
     public void Dismiss()
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
         IsAvailable = false;
         DismissalDate = DateTime.Now;
@@ -64,7 +62,7 @@ public class Driver
     public void AddHoursWorked(double hoursWorked)
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
         HoursWorkedPerWeek += hoursWorked;
         TotalHoursWorked += hoursWorked;
@@ -73,7 +71,7 @@ public class Driver
     public void ResetHoursWorkedPerWeek()
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
         HoursWorkedPerWeek = 0;
     }
@@ -81,7 +79,7 @@ public class Driver
     public void DequalifyAdr()
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
         AdrQualificationOfTank = false;
         AdrQualificationFlag = null;
@@ -90,10 +88,10 @@ public class Driver
     public void QualifyAdr(int adrQualificationFlag)
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag))
             throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
-                "AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
+                $"Driver {Guid}. AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
         
         AdrQualificationFlag = adrQualificationFlag;
     }
@@ -101,10 +99,10 @@ public class Driver
     public void QualifyAdrTank()
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         if (AdrQualificationFlag == null)
             throw new InvalidOperationException(
-                "The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
+                $"Driver {Guid}. The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
 
         AdrQualificationOfTank = true;
     }
@@ -112,7 +110,7 @@ public class Driver
     public void DequalifyAdrTank()
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
         AdrQualificationOfTank = false;
     }
@@ -120,7 +118,7 @@ public class Driver
     public void SetBranch(string branchGuid)
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
         BranchGuid = branchGuid;
     }
@@ -128,7 +126,7 @@ public class Driver
     public void SetName(string name)
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
         Name = name;
     }
@@ -136,7 +134,7 @@ public class Driver
     public void Work()
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
 
         IsAvailable = true;
     }
@@ -144,7 +142,7 @@ public class Driver
     public void Rest()
     {
         if (DismissalDate != null)
-            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
 
         IsAvailable = false;
     }
