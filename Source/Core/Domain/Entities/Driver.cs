@@ -24,62 +24,73 @@ public class Driver
     // вычисляемых полей в отдельные методы-сеттеры.
     private Driver() { }
 
-    public static Driver New(string name, int adrQualificationFlag, bool adrQualificationOfTank, Branch branch)
+    public static Driver New(string name, int adrQualificationFlag, bool adrQualificationOfTank, string branchGuid)
     {
         var driver = new Driver
         {
-            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, HoursWorkedPerWeek = 0,
-            TotalHoursWorked = 0, AdrQualificationOfTank = adrQualificationOfTank
+            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DismissalDate = null, Name = name, HoursWorkedPerWeek = 0,
+            TotalHoursWorked = 0, AdrQualificationOfTank = adrQualificationOfTank, BranchGuid = branchGuid, IsAvailable = true
         };
-        driver.Reinstate();
         driver.QualifyAdr(adrQualificationFlag);
-        driver.SetBranch(branch);
 
         return driver;
     }
-    
-    public static Driver New(string name, Branch branch)
+
+    public static Driver New(string name, Branch branch) => new()
     {
-        var driver = new Driver
-        {
-            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, Name = name, HoursWorkedPerWeek = 0,
-            TotalHoursWorked = 0
-        };
-        driver.Reinstate();
-        driver.DequalifyAdr();
-        driver.SetBranch(branch);
-
-        return driver;
-    }
+        Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DismissalDate = null, Name = name,
+        HoursWorkedPerWeek = 0, TotalHoursWorked = 0, AdrQualificationOfTank = false, AdrQualificationFlag = null,
+        Branch = branch, BranchGuid = branch.Guid, IsAvailable = true
+    };
 
     public void Reinstate()
     {
+        if (DismissalDate == null)
+            throw new InvalidOperationException("Only a dismissed driver can use the reinstatement operation.");
+        
         IsAvailable = true;
         DismissalDate = null;
     }
     
     public void Dismiss()
     {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+        
         IsAvailable = false;
         DismissalDate = DateTime.Now;
     }
 
     public void AddHoursWorked(double hoursWorked)
     {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+        
         HoursWorkedPerWeek += hoursWorked;
         TotalHoursWorked += hoursWorked;
     }
 
-    public void ResetHoursWorkedPerWeek() => HoursWorkedPerWeek = 0;
+    public void ResetHoursWorkedPerWeek()
+    {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+        
+        HoursWorkedPerWeek = 0;
+    }
 
     public void DequalifyAdr()
     {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+        
         AdrQualificationOfTank = false;
         AdrQualificationFlag = null;
     }
     
     public void QualifyAdr(int adrQualificationFlag)
     {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
         if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag))
             throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
                 "AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
@@ -89,6 +100,8 @@ public class Driver
     
     public void QualifyAdrTank()
     {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
         if (AdrQualificationFlag == null)
             throw new InvalidOperationException(
                 "The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
@@ -96,12 +109,44 @@ public class Driver
         AdrQualificationOfTank = true;
     }
 
-    public void DequalifyAdrTank() => AdrQualificationOfTank = false;
-
-    public void SetBranch(Branch branch)
+    public void DequalifyAdrTank()
     {
-        Branch = branch;
-        BranchGuid = branch.Guid;
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+        
+        AdrQualificationOfTank = false;
+    }
+
+    public void SetBranch(string branchGuid)
+    {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+        
+        BranchGuid = branchGuid;
+    }
+    
+    public void SetName(string name)
+    {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+        
+        Name = name;
+    }
+
+    public void Work()
+    {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+
+        IsAvailable = true;
+    }
+    
+    public void Rest()
+    {
+        if (DismissalDate != null)
+            throw new InvalidOperationException("A dismissed driver can only use the reinstatement operation.");
+
+        IsAvailable = false;
     }
 
     public override string ToString() => $"Name = {Name}";
@@ -121,12 +166,12 @@ public class Driver
     public bool AdrQualificationOfTank { get; private set; }
     
     public string BranchGuid { get; private set; } = null!;
-
+    
+    public string Name { get; private set; } = null!;
+    
+    public bool IsAvailable { get; private set; }
+    
     public virtual Branch Branch { get; private set; } = null!;
     
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
-
-    public string Name { get; set; } = null!;
-    
-    public bool IsAvailable { get; set; }
 }
