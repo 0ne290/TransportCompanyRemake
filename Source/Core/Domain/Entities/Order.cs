@@ -7,7 +7,7 @@ public class Order
 {
     private Order() { }
     
-    public static Order New(User user, string startAddress, string endAddress, string cargoDescription,
+    public static Order New(string userGuid, string startAddress, string endAddress, string cargoDescription,
         (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
         decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag = null)
     {
@@ -22,8 +22,8 @@ public class Order
             DateAssignmentOfPerformers = null, DatePaymentAndBegin = null, DateEnd = null,
             HazardClassFlag = hazardClassFlag, Tank = tank,
             LengthInKm = null, Price = null, ExpectedHoursWorkedByDrivers = null, ActualHoursWorkedByDriver1 = null,
-            ActualHoursWorkedByDriver2 = null, UserGuid = user.Guid, TruckGuid = null, Driver1Guid = null,
-            Driver2Guid = null, BranchGuid = null, User = user, Truck = null, Driver1 = null, Driver2 = null,
+            ActualHoursWorkedByDriver2 = null, UserGuid = userGuid, TruckGuid = null, Driver1Guid = null,
+            Driver2Guid = null, BranchGuid = null, Truck = null, Driver1 = null, Driver2 = null,
             Branch = null,
             StartAddress = startAddress, EndAddress = endAddress, CargoDescription = cargoDescription,
             StartPointLatitude = startPoint.Latitude, StartPointLongitude = startPoint.Longitude,

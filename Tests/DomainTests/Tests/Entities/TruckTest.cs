@@ -20,8 +20,8 @@ public class TruckTest
         var truck = TruckFixture.CreateWithPermittedHazardClassesFlags(expectedBranch);
             
         // Assert
-        Assert.Equal(expectedWriteOnDate, truck.WriteOnDate, expectedWriteOnDateError);
-        Assert.Null(truck.WriteOffDate);
+        Assert.Equal(expectedWriteOnDate, truck.CommissionedDate, expectedWriteOnDateError);
+        Assert.Null(truck.DecommissionedDate);
         Assert.Equal(TruckFixture.DefaultVolumeMax, truck.VolumeMax);
         Assert.Equal(TruckFixture.DefaultVolumePrice, truck.VolumePrice);
         Assert.Equal(TruckFixture.DefaultWeightMax, truck.WeightMax);
@@ -77,8 +77,8 @@ public class TruckTest
         var truck = TruckFixture.CreateWithoutPermittedHazardClassesFlags(expectedBranch);
             
         // Assert
-        Assert.Equal(expectedWriteOnDate, truck.WriteOnDate, expectedWriteOnDateError);
-        Assert.Null(truck.WriteOffDate);
+        Assert.Equal(expectedWriteOnDate, truck.CommissionedDate, expectedWriteOnDateError);
+        Assert.Null(truck.DecommissionedDate);
         Assert.Equal(TruckFixture.DefaultVolumeMax, truck.VolumeMax);
         Assert.Equal(TruckFixture.DefaultVolumePrice, truck.VolumePrice);
         Assert.Equal(TruckFixture.DefaultWeightMax, truck.WeightMax);
@@ -124,8 +124,8 @@ public class TruckTest
         truck.WriteOff();
 
         // Assert
-        Assert.NotNull(truck.WriteOffDate);
-        Assert.Equal(expectedWriteOffDate, truck.WriteOffDate.Value, expectedWriteOffDateError);
+        Assert.NotNull(truck.DecommissionedDate);
+        Assert.Equal(expectedWriteOffDate, truck.DecommissionedDate.Value, expectedWriteOffDateError);
         Assert.False(truck.IsAvailable);
     }
 
@@ -137,10 +137,10 @@ public class TruckTest
         truck.WriteOff();
 
         // Act
-        truck.Reinstate();
+        truck.Recommission();
 
         // Assert
-        Assert.Null(truck.WriteOffDate);
+        Assert.Null(truck.DecommissionedDate);
         Assert.True(truck.IsAvailable);
     }
     

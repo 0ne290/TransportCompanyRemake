@@ -32,7 +32,8 @@ public class Driver
             HoursWorkedPerWeek = 0, TotalHoursWorked = 0, AdrQualificationFlag = null,
             AdrQualificationOfTank = false, BranchGuid = branchGuid, Name = name, IsAvailable = true
         };
-        driver.QualifyAdr(adrQualificationFlag, adrQualificationOfTank);
+        driver.SetAdrQualificationFlag(adrQualificationFlag);
+        driver.SetAdrQualificationOfTank(adrQualificationOfTank);
 
         return driver;
     }
@@ -79,7 +80,9 @@ public class Driver
         if (adrQualificationFlag != null && !AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag.Value))
             throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
                 $"Driver {Guid}. AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
-        
+        if (adrQualificationFlag == null && AdrQualificationOfTank)
+            throw new InvalidOperationException(
+                $"Driver {Guid}. The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
         
         AdrQualificationFlag = adrQualificationFlag;
     }
@@ -88,11 +91,11 @@ public class Driver
     {
         if (DismissalDate != null)
             throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
-        if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag))
-            throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
-                $"Driver {Guid}. AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
+        if (adrQualificationOfTank && AdrQualificationFlag == null)
+            throw new InvalidOperationException(
+                $"Driver {Guid}. The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
         
-        AdrQualificationFlag = adrQualificationFlag;
+        AdrQualificationOfTank = adrQualificationOfTank;
     }
 
     public void SetBranch(string branchGuid)

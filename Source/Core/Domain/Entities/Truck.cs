@@ -11,27 +11,32 @@ public class Truck
     {
         var truck = new Truck
         {
-            Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, WriteOffDate = null,
+            Guid = System.Guid.NewGuid().ToString(), CommissionedDate = DateTime.Now, DecommissionedDate = null,
             PermittedHazardClassesFlags = null, BranchGuid = branchGuid, Number = number, IsAvailable = true,
             TrailerIsTank = tank, VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax,
             WeightPrice = weightPrice, PricePerKm = pricePerKm
         };
-        if (permittedHazardClassesFlags != null)
-            truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags.Value);
+        truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags);
 
         return truck;
     }
 
-    public void Reinstate()
+    public void Recommission()
     {
+        if (DecommissionedDate == null)
+            throw new InvalidOperationException($"Truck {Guid}. Only a decommissioned truck can use the recommission operation.");
+        
         IsAvailable = true;
-        WriteOffDate = null;
+        DecommissionedDate = null;
     }
 
-    public void Dismiss()
+    public void Decommission()
     {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        
         IsAvailable = false;
-        WriteOffDate = DateTime.Now;
+        DecommissionedDate = DateTime.Now;
     }
     
     // В соответствии с действующим на момент 01.07.2024 ГОСТ Р 57479, существует 20 подклассов опасности грузов. Для
@@ -40,22 +45,88 @@ public class Truck
     // моделирует наличие/отсутствие у совокупности Фура-Полуприцеп сертификата по всем 20 подклассам. Например, если
     // 16-ый и 17-ый биты равны 1, то Фура-Полуприцеп имеет сертификат по 16-му 17-му подклассам (в терминах ГОСТ Р
     // 57479 это будут подклассы 6.1 "Токсичные вещества" и 6.2 "Инфекционные вещества")
-    public void SetPermittedHazardClassesFlags(int permittedHazardClassesFlags)
+    public void SetPermittedHazardClassesFlags(int? permittedHazardClassesFlags)
     {
-        if (!HazardClassesFlags.IsFlagCombination(permittedHazardClassesFlags))
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        if (permittedHazardClassesFlags != null && !HazardClassesFlags.IsFlagCombination(permittedHazardClassesFlags.Value))
             throw new ArgumentOutOfRangeException(nameof(permittedHazardClassesFlags), permittedHazardClassesFlags,
-                "The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
+                $"Truck {Guid}. The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
                 "value of their combination must be in the range [1; 2^20 (1048576)).");
             
         PermittedHazardClassesFlags = permittedHazardClassesFlags;
     }
 
-    public void ResetPermittedHazardClassesFlags() => PermittedHazardClassesFlags = null;
-
-    public void SetBranch(Branch branch)
+    public void SetBranch(string branchGuid)
     {
-        Branch = branch;
-        BranchGuid = branch.Guid;
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        
+        BranchGuid = branchGuid;
+    }
+    
+    public void SetNumber(string number)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        
+        Number = number;
+    }
+    
+    public void SetIsAvailable(bool isAvailable)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        
+        IsAvailable = isAvailable;
+    }
+    
+    public void SetTrailerIsTank(bool trailerIsTank)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        
+        TrailerIsTank = trailerIsTank;
+    }
+    
+    public void SetVolumeMax(decimal volumeMax)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+            
+        VolumeMax = volumeMax;
+    }
+
+    public void SetVolumePrice(decimal volumePrice)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+            
+        VolumePrice = volumePrice;
+    }
+    
+    public void SetWeightMax(decimal weightMax)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+            
+        WeightMax = weightMax;
+    }
+    
+    public void SetWeightPrice(decimal weightPrice)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+            
+        WeightPrice = weightPrice;
+    }
+    
+    public void SetPricePerKm(decimal pricePerKm)
+    {
+        if (DecommissionedDate != null)
+            throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        
+        PricePerKm = pricePerKm;
     }
 
     public decimal CalculateOrderPricePerKm(Order order)
@@ -70,9 +141,9 @@ public class Truck
 
     public string Guid { get; private set; } = null!;
     
-    public DateTime WriteOnDate { get; private set; }
+    public DateTime CommissionedDate { get; private set; }
     
-    public DateTime? WriteOffDate { get; private set; }
+    public DateTime? DecommissionedDate { get; private set; }
     
     public int? PermittedHazardClassesFlags { get; private set; }
     

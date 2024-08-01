@@ -63,12 +63,12 @@ public class User
     public string? Login { get; private set; }
 
     public string? Password { get; private set; }
-    
-    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
 
     public string Name { get; set; } = null!;
 
     public string Contact { get; set; } = null!;
+    
+    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
 
     private const string StaticPartOfSalt = "6d9ace9d25bca79be42c971f85a543b22dcee800101d9b39b9213741a5cdcf147b853dc142fa761f66b6cffb50e1a3c5183ae78013124fa58ff41a6edfc6e969";
 }
