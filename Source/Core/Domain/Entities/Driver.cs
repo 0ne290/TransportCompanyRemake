@@ -32,11 +32,7 @@ public class Driver
             HoursWorkedPerWeek = 0, TotalHoursWorked = 0, AdrQualificationFlag = null,
             AdrQualificationOfTank = false, BranchGuid = branchGuid, Name = name, IsAvailable = true
         };
-        
-        if (adrQualificationFlag != null)
-            driver.QualifyAdr(adrQualificationFlag.Value);
-        if (adrQualificationOfTank)
-            driver.QualifyAdrTank();
+        driver.QualifyAdr(adrQualificationFlag, adrQualificationOfTank);
 
         return driver;
     }
@@ -75,17 +71,20 @@ public class Driver
         
         HoursWorkedPerWeek = 0;
     }
-
-    public void DequalifyAdr()
+    
+    public void SetAdrQualificationFlag(int? adrQualificationFlag)
     {
         if (DismissalDate != null)
             throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
+        if (adrQualificationFlag != null && !AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag.Value))
+            throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
+                $"Driver {Guid}. AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
         
-        AdrQualificationOfTank = false;
-        AdrQualificationFlag = null;
+        
+        AdrQualificationFlag = adrQualificationFlag;
     }
     
-    public void QualifyAdr(int adrQualificationFlag)
+    public void SetAdrQualificationOfTank(bool adrQualificationOfTank)
     {
         if (DismissalDate != null)
             throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
@@ -94,25 +93,6 @@ public class Driver
                 $"Driver {Guid}. AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
         
         AdrQualificationFlag = adrQualificationFlag;
-    }
-    
-    public void QualifyAdrTank()
-    {
-        if (DismissalDate != null)
-            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
-        if (AdrQualificationFlag == null)
-            throw new InvalidOperationException(
-                $"Driver {Guid}. The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
-
-        AdrQualificationOfTank = true;
-    }
-
-    public void DequalifyAdrTank()
-    {
-        if (DismissalDate != null)
-            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
-        
-        AdrQualificationOfTank = false;
     }
 
     public void SetBranch(string branchGuid)
@@ -130,21 +110,13 @@ public class Driver
         
         Name = name;
     }
-
-    public void Work()
-    {
-        if (DismissalDate != null)
-            throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
-
-        IsAvailable = true;
-    }
     
-    public void Rest()
+    public void SetIsAvailable(bool isAvailable)
     {
         if (DismissalDate != null)
             throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
-
-        IsAvailable = false;
+        
+        IsAvailable = isAvailable;
     }
 
     public override string ToString() => $"Name = {Name}";

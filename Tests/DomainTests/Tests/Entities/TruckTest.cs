@@ -28,7 +28,7 @@ public class TruckTest
         Assert.Equal(TruckFixture.DefaultWeightPrice, truck.WeightPrice);
         Assert.Equal(TruckFixture.DefaultPricePerKm, truck.PricePerKm);
         Assert.True(truck.IsAvailable);
-        Assert.Equal(TruckFixture.DefaultTank, truck.Tank);
+        Assert.Equal(TruckFixture.DefaultTank, truck.TrailerIsTank);
         Assert.Equal(TruckFixture.DefaultNumber, truck.Number);
         Assert.Equal(TruckFixture.DefaultPermittedHazardClassessFlags, truck.PermittedHazardClassesFlags);
         Assert.Equal(expectedBranch, truck.Branch);
@@ -85,7 +85,7 @@ public class TruckTest
         Assert.Equal(TruckFixture.DefaultWeightPrice, truck.WeightPrice);
         Assert.Equal(TruckFixture.DefaultPricePerKm, truck.PricePerKm);
         Assert.True(truck.IsAvailable);
-        Assert.Equal(TruckFixture.DefaultTank, truck.Tank);
+        Assert.Equal(TruckFixture.DefaultTank, truck.TrailerIsTank);
         Assert.Equal(TruckFixture.DefaultNumber, truck.Number);
         Assert.Null(truck.PermittedHazardClassesFlags);
         Assert.Equal(expectedBranch, truck.Branch);

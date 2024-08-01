@@ -6,48 +6,32 @@ public class Truck
 {
     private Truck() { }
 
-    public static Truck New(string number, bool tank, decimal volumeMax,
-        decimal volumePrice, decimal weightMax, decimal weightPrice, decimal pricePerKm,
-        int permittedHazardClassesFlags, Branch branch)
+    public static Truck New(string number, bool tank, decimal volumeMax, decimal volumePrice, decimal weightMax,
+        decimal weightPrice, decimal pricePerKm, string branchGuid, int? permittedHazardClassesFlags)
     {
         var truck = new Truck
         {
-            Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, Number = number, Tank = tank,
-            VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice,
-            PricePerKm = pricePerKm
+            Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, WriteOffDate = null,
+            PermittedHazardClassesFlags = null, BranchGuid = branchGuid, Number = number, IsAvailable = true,
+            TrailerIsTank = tank, VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax,
+            WeightPrice = weightPrice, PricePerKm = pricePerKm
         };
-        truck.Reinstate();
-        truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags);
-        truck.SetBranch(branch);
+        if (permittedHazardClassesFlags != null)
+            truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags.Value);
 
         return truck;
-    }
-    
-    public static Truck New(string number, bool tank, decimal volumeMax,
-        decimal volumePrice, decimal weightMax, decimal weightPrice, decimal pricePerKm, Branch branch)
-    {
-        var truck = new Truck
-        {
-            Guid = System.Guid.NewGuid().ToString(), WriteOnDate = DateTime.Now, PermittedHazardClassesFlags = null, Number = number, Tank = tank,
-            VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax, WeightPrice = weightPrice,
-            PricePerKm = pricePerKm
-        };
-        truck.Reinstate();
-        truck.SetBranch(branch);
-
-        return truck;
-    }
-
-    public void WriteOff()
-    {
-        IsAvailable = false;
-        WriteOffDate = DateTime.Now;
     }
 
     public void Reinstate()
     {
         IsAvailable = true;
         WriteOffDate = null;
+    }
+
+    public void Dismiss()
+    {
+        IsAvailable = false;
+        WriteOffDate = DateTime.Now;
     }
     
     // В соответствии с действующим на момент 01.07.2024 ГОСТ Р 57479, существует 20 подклассов опасности грузов. Для
@@ -93,24 +77,24 @@ public class Truck
     public int? PermittedHazardClassesFlags { get; private set; }
     
     public string BranchGuid { get; private set; } = null!;
+    
+    public string Number { get; private set; } = null!;
 
+    public bool IsAvailable { get; private set; }
+    
+    public bool TrailerIsTank { get; private set; }
+
+    public decimal VolumeMax { get; private set; }
+    
+    public decimal VolumePrice { get; private set; }
+
+    public decimal WeightMax { get; private set; }
+    
+    public decimal WeightPrice { get; private set; }
+    
+    public decimal PricePerKm { get; private set; }
+    
     public virtual Branch Branch { get; private set; } = null!;
 
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
-    
-    public string Number { get; set; } = null!;
-
-    public bool IsAvailable { get; set; }
-    
-    public bool Tank { get; set; }
-
-    public decimal VolumeMax { get; set; }
-    
-    public decimal VolumePrice { get; set; }
-
-    public decimal WeightMax { get; set; }
-    
-    public decimal WeightPrice { get; set; }
-    
-    public decimal PricePerKm { get; set; }
 }

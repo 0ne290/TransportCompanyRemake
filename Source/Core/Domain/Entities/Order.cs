@@ -57,11 +57,11 @@ public class Order
                 "To assign a driver2 to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
                 nameof(driver2));
         
-        if (Tank && !truck.Tank)
+        if (Tank && !truck.TrailerIsTank)
             throw new ArgumentException(
                 "To assign a truck to an order with cargo that requires a tank, the truck must have a tank.",
                 nameof(truck));
-        if (!Tank && truck.Tank)
+        if (!Tank && truck.TrailerIsTank)
             throw new ArgumentException(
                 "To assign a truck to an order with cargo that does not require a tank, the truck must not have a tank.",
                 nameof(truck));

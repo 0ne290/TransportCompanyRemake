@@ -1,4 +1,5 @@
 using Application.Commands;
+using Application.Commands.Driver;
 using Application.Dtos;
 using Application.Interfaces;
 using Domain.Entities;
@@ -15,7 +16,7 @@ public class Administator(IEntityStorageService<Driver> driverStorageService, IE
                 nameof(creationRequests));
     }
     
-    public void UpdateDrivers(IEnumerable<MacroCommand<Driver>> macroCommands)
+    public void UpdateDrivers(IEnumerable<DriverMacroCommand> macroCommands)
     {
         foreach (var macroCommand in macroCommands)
         {
