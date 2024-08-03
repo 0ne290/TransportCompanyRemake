@@ -81,18 +81,18 @@ public class Order
 
         Driver1Guid = driver1.Guid;
         Driver1 = driver1;
-        Driver1.IsAvailable = false;
+        Driver1.SetIsAvailable(false);
         
         if (driver2 != null)
         {
             Driver2Guid = driver2.Guid;
             Driver2 = driver2;
-            Driver2.IsAvailable = false;
+            Driver2.SetIsAvailable(false);
         }
 
         TruckGuid = truck.Guid;
         Truck = truck;
-        Truck.IsAvailable = false;
+        Truck.SetIsAvailable(false);
 
         Branch = truck.Branch;
         BranchGuid = truck.BranchGuid;
@@ -128,15 +128,15 @@ public class Order
         if ((actualHoursWorkedByDriver2 != null && Driver2Guid == null) || (actualHoursWorkedByDriver2 == null && Driver2Guid != null))
             throw new ArgumentException("ActualHoursWorkedByDriver2 is invalid", nameof(actualHoursWorkedByDriver2));
 
-        Truck!.IsAvailable = true;
+        Truck!.SetIsAvailable(true);
         
-        Driver1!.IsAvailable = true;
+        Driver1!.SetIsAvailable(true);
         Driver1.AddHoursWorked(actualHoursWorkedByDriver1);
         ActualHoursWorkedByDriver1 = actualHoursWorkedByDriver1;
         
         if (Driver2 != null)
         {
-            Driver2.IsAvailable = true;
+            Driver2.SetIsAvailable(true);
             Driver2.AddHoursWorked(actualHoursWorkedByDriver2!.Value);
             ActualHoursWorkedByDriver2 = actualHoursWorkedByDriver2;
         }
