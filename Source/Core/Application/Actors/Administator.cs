@@ -5,13 +5,20 @@ using Domain.Entities;
 namespace Application.Actors;
 public class Administator(IEntityStorageService<Driver> driverStorageService, IEntityStorageService<Truck> truckStorageService, IEntityStorageService<Branch> branchStorageService)
 {
-    public void CreateDrivers(IEnumerable<DriverCreateRequest> createRequests)
+    public void CreateDrivers(IReadOnlyCollection<DriverCreateRequest> createRequests)
     {
-        if (!driverStorageService.Create(createRequests.Select(cr =>
-                Driver.New(cr.Name, cr.BranchGuid, cr.AdrQualificationFlag, cr.AdrQualificationOfTank))))
-            throw new ArgumentException(
-                "Unable to create drivers. Probably one of the creation requests refers to a non-existent branch.",
-                nameof(createRequests));
+        var drivers = new List<Driver>(createRequests.Count);
+        foreach (var createRequest in createRequests)
+        {
+            var branch = branchStorageService.FindByPrimaryKey(new object[] { createRequest.BranchGuid });
+            if (branch == null)
+                throw new ArgumentException($"The branch {createRequest.BranchGuid} does not exist.",
+                    nameof(createRequests));
+            
+            drivers.Add(Driver.New(createRequest.Name, branch, createRequest.AdrQualificationFlag, createRequest.AdrQualificationOfTank));
+        }
+        
+        driverStorageService.Create(drivers);
     }
 
     public void UpdateDrivers(IEnumerable<DriverUpdateRequest> updateRequests)

@@ -7,34 +7,25 @@ public class Order
 {
     private Order() { }
     
-    public static Order New(string userGuid, string startAddress, string endAddress, string cargoDescription,
+    public static Order New(User user, string startAddress, string endAddress, string cargoDescription,
         (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag = null)
+        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag)
     {
         if (hazardClassFlag != null && !HazardClassesFlags.IsFlag(hazardClassFlag.Value))
             throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
                 "The value is not a hazard class flag.");
-        
-        var order = new Order
-        {
-            Guid = System.Guid.NewGuid().ToString(), Status = OrderStatuses.AwaitingAssignmentOfPerformers,
-            DateCreated = DateTime.Now,
-            DateAssignmentOfPerformers = null, DatePaymentAndBegin = null, DateEnd = null,
-            HazardClassFlag = hazardClassFlag, Tank = tank,
-            LengthInKm = null, Price = null, ExpectedHoursWorkedByDrivers = null, ActualHoursWorkedByDriver1 = null,
-            ActualHoursWorkedByDriver2 = null, UserGuid = userGuid, TruckGuid = null, Driver1Guid = null,
-            Driver2Guid = null, BranchGuid = null, Truck = null, Driver1 = null, Driver2 = null,
-            Branch = null,
-            StartAddress = startAddress, EndAddress = endAddress, CargoDescription = cargoDescription,
-            StartPointLatitude = startPoint.Latitude, StartPointLongitude = startPoint.Longitude,
-            EndPointLatitude = endPoint.Latitude, EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume,
-            CargoWeight = cargoWeight
-        };
 
-        return order;
+        return new Order
+        {
+            UserGuid = user.Guid, User = user, StartAddress = startAddress, EndAddress = endAddress,
+            CargoDescription = cargoDescription, StartPointLatitude = startPoint.Latitude,
+            StartPointLongitude = startPoint.Longitude, EndPointLatitude = endPoint.Latitude,
+            EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight, Tank = tank,
+            HazardClassFlag = hazardClassFlag
+        };
     }
     
-    public void AssignPerformers(IGeolocationService geolocationService, Truck truck, Driver driver1, Driver? driver2 = null)
+    public void AssignPerformers(IGeolocationService geolocationService, Truck truck, Driver driver1, Driver? driver2)
     {
         if (Status != OrderStatuses.AwaitingAssignmentOfPerformers)
             throw new InvalidOperationException("Status is invalid");
@@ -120,7 +111,7 @@ public class Order
         DatePaymentAndBegin = DateTime.Now;
     }
 
-    public void Finish(double actualHoursWorkedByDriver1, double? actualHoursWorkedByDriver2 = null)
+    public void Finish(double actualHoursWorkedByDriver1, double? actualHoursWorkedByDriver2)
     {
         if (Status != OrderStatuses.InProgress)
             throw new InvalidOperationException("Status is invalid");
@@ -145,11 +136,11 @@ public class Order
         DateEnd = DateTime.Now;
     }
 
-    public string Guid { get; private set; } = null!;
-    
-    public string Status { get; private set; } = null!;
-    
-    public DateTime DateCreated { get; private set; }
+    public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
+
+    public string Status { get; private set; } = OrderStatuses.AwaitingAssignmentOfPerformers;
+
+    public DateTime DateCreated { get; private set; } = DateTime.Now;
     
     public DateTime? DateAssignmentOfPerformers { get; private set; }
     

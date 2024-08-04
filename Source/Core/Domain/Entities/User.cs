@@ -10,27 +10,14 @@ public class User
     
     public static User New(string name, string contact, string login, string password, ICryptographicService cryptographicService)
     {
-        var user = new User
-        {
-            Guid = System.Guid.NewGuid().ToString(), DynamicPartOfSalt = RandomNumberGenerator.GetHexString(128),
-            RegistrationDate = DateTime.Now, VkUserId = null, Name = name, Contact = contact
-        };
-        user.SetLogin(login);
-        user.SetPassword(cryptographicService, password);
+        var user = new User { Name = name, Contact = contact, Login = login };
+        user.Password = cryptographicService.EncryptAndHash(user.Salt(password));
         
         return user;
     }
-    
-    public static User New(string name, string contact, long vkUserId)
-    {
-        var user = new User
-        {
-            Guid = System.Guid.NewGuid().ToString(), DynamicPartOfSalt = RandomNumberGenerator.GetHexString(128),
-            RegistrationDate = DateTime.Now, VkUserId = vkUserId, Login = null, Password = null, Name = name, Contact = contact
-        };
-        
-        return user;
-    }
+
+    public static User New(string name, string contact, long vkUserId) =>
+        new() { Name = name, Contact = contact, VkUserId = vkUserId };
     
     public void SetLogin(string login)
     {
@@ -51,12 +38,12 @@ public class User
     private string Salt(string value) => value + RegistrationDate.ToString(CultureInfo.InvariantCulture) + StaticPartOfSalt + Login + value + DynamicPartOfSalt + Login;
     
     public override string ToString() => Login == null ? $"VkUserId = {VkUserId}" : $"Login = {Login}";
-    
-    public string Guid { get; private set; } = null!;
-    
-    public string DynamicPartOfSalt { get; private set; } = null!;
-    
-    public DateTime RegistrationDate { get; private set; }
+
+    public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
+
+    public string DynamicPartOfSalt { get; private set; } = RandomNumberGenerator.GetHexString(128);
+
+    public DateTime RegistrationDate { get; private set; } = DateTime.Now;
 
     public long? VkUserId { get; private set; }
 

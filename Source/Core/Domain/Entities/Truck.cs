@@ -6,19 +6,20 @@ public class Truck
 {
     private Truck() { }
 
-    public static Truck New(string number, bool tank, decimal volumeMax, decimal volumePrice, decimal weightMax,
-        decimal weightPrice, decimal pricePerKm, string branchGuid, int? permittedHazardClassesFlags)
+    public static Truck New(string number, bool trailerIsTank, decimal volumeMax, decimal volumePrice, decimal weightMax,
+        decimal weightPrice, decimal pricePerKm, Branch branch, int? permittedHazardClassesFlags)
     {
-        var truck = new Truck
-        {
-            Guid = System.Guid.NewGuid().ToString(), CommissionedDate = DateTime.Now, DecommissionedDate = null,
-            PermittedHazardClassesFlags = null, BranchGuid = branchGuid, Number = number, IsAvailable = true,
-            TrailerIsTank = tank, VolumeMax = volumeMax, VolumePrice = volumePrice, WeightMax = weightMax,
-            WeightPrice = weightPrice, PricePerKm = pricePerKm
-        };
-        truck.SetPermittedHazardClassesFlags(permittedHazardClassesFlags);
+        if (permittedHazardClassesFlags != null && !HazardClassesFlags.IsFlagCombination(permittedHazardClassesFlags.Value))
+            throw new ArgumentOutOfRangeException(nameof(permittedHazardClassesFlags), permittedHazardClassesFlags,
+                "The PermittedHazardClassesFlags describe 20 hazard subclasses. This means that the " +
+                "value of their combination must be in the range [1; 2^20 (1048576)).");
 
-        return truck;
+        return new Truck
+        {
+            Number = number, TrailerIsTank = trailerIsTank, VolumeMax = volumeMax, VolumePrice = volumePrice,
+            WeightMax = weightMax, WeightPrice = weightPrice, PricePerKm = pricePerKm, BranchGuid = branch.Guid,
+            Branch = branch, PermittedHazardClassesFlags = permittedHazardClassesFlags
+        };
     }
 
     public void Recommission()
@@ -57,12 +58,13 @@ public class Truck
         PermittedHazardClassesFlags = permittedHazardClassesFlags;
     }
 
-    public void SetBranch(string branchGuid)
+    public void SetBranch(Branch branch)
     {
         if (DecommissionedDate != null)
             throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
         
-        BranchGuid = branchGuid;
+        BranchGuid = branch.Guid;
+        Branch = branch;
     }
     
     public void SetNumber(string number)
@@ -139,9 +141,9 @@ public class Truck
 
     public override string ToString() => $"Number = {Number}";
 
-    public string Guid { get; private set; } = null!;
-    
-    public DateTime CommissionedDate { get; private set; }
+    public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
+
+    public DateTime CommissionedDate { get; private set; } = DateTime.Now;
     
     public DateTime? DecommissionedDate { get; private set; }
     
@@ -151,7 +153,7 @@ public class Truck
     
     public string Number { get; private set; } = null!;
 
-    public bool IsAvailable { get; private set; }
+    public bool IsAvailable { get; private set; } = true;
     
     public bool TrailerIsTank { get; private set; }
 

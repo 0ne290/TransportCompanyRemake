@@ -24,18 +24,23 @@ public class Driver
     // вычисляемых полей в отдельные методы-сеттеры.
     private Driver() { }
 
-    public static Driver New(string name, string branchGuid, int? adrQualificationFlag, bool adrQualificationOfTank)
+    public static Driver New(string name, Branch branch, int? adrQualificationFlag, bool adrQualificationOfTank)
     {
-        var driver = new Driver
+        if (adrQualificationFlag != null)
         {
-            Guid = System.Guid.NewGuid().ToString(), HireDate = DateTime.Now, DismissalDate = null,
-            HoursWorkedPerWeek = 0, TotalHoursWorked = 0, AdrQualificationFlag = null,
-            AdrQualificationOfTank = false, BranchGuid = branchGuid, Name = name, IsAvailable = true
-        };
-        driver.SetAdrQualificationFlag(adrQualificationFlag);
-        driver.SetAdrQualificationOfTank(adrQualificationOfTank);
+            if (!AdrDriverQualificationsFlags.IsFlag(adrQualificationFlag.Value))
+                throw new ArgumentOutOfRangeException(nameof(adrQualificationFlag), adrQualificationFlag,
+                    "AdrQualificationFlag describes the 3 ADR driver qualifications. Valid values: Base (917440), BaseAndClass7 (1048512), BaseAndClass1 (917503), Full (1048575).");
+        }
+        else if (adrQualificationOfTank)
+            throw new ArgumentOutOfRangeException(nameof(adrQualificationOfTank), adrQualificationOfTank,
+                "The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification");
 
-        return driver;
+        return new Driver
+        {
+            Name = name, BranchGuid = branch.Guid, Branch = branch, AdrQualificationFlag = adrQualificationFlag,
+            AdrQualificationOfTank = adrQualificationOfTank
+        };
     }
 
     public void Reinstate()
@@ -98,12 +103,13 @@ public class Driver
         AdrQualificationOfTank = adrQualificationOfTank;
     }
 
-    public void SetBranch(string branchGuid)
+    public void SetBranch(Branch branch)
     {
         if (DismissalDate != null)
             throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
         
-        BranchGuid = branchGuid;
+        BranchGuid = branch.Guid;
+        Branch = branch;
     }
     
     public void SetName(string name)
@@ -124,9 +130,9 @@ public class Driver
 
     public override string ToString() => $"Name = {Name}";
 
-    public string Guid { get; private set; } = null!;
-    
-    public DateTime HireDate { get; private set; }
+    public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
+
+    public DateTime HireDate { get; private set; } = DateTime.Now;
     
     public DateTime? DismissalDate { get; private set; }
     
@@ -141,8 +147,8 @@ public class Driver
     public string BranchGuid { get; private set; } = null!;
     
     public string Name { get; private set; } = null!;
-    
-    public bool IsAvailable { get; private set; }
+
+    public bool IsAvailable { get; private set; } = true;
     
     public virtual Branch Branch { get; private set; } = null!;
     

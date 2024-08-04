@@ -4,7 +4,7 @@ public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 {
     IEntityStorageService<TEntity> AsNoTracking();
     
-    bool Create(IEnumerable<TEntity> entities);
+    void Create(IEnumerable<TEntity> entities);
 
     IEnumerable<TEntity> AsEnumerable();
     
@@ -18,5 +18,5 @@ public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 
     void RemoveAll(Predicate<TEntity> predicate);
     
-    bool SaveChanges();
+    void SaveChanges();
 }
