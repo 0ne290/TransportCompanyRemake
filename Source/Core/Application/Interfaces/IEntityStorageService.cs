@@ -4,7 +4,7 @@ public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 {
     IEntityStorageService<TEntity> AsNoTracking();
     
-    void Create(IEnumerable<TEntity> entities);
+    void Create(TEntity entities);
 
     IEnumerable<TEntity> AsEnumerable();
     

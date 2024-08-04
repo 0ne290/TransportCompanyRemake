@@ -5,23 +5,17 @@ using Domain.Entities;
 namespace Application.Actors;
 public class Administator(IEntityStorageService<Driver> driverStorageService, IEntityStorageService<Truck> truckStorageService, IEntityStorageService<Branch> branchStorageService)
 {
-    public void CreateDrivers(IReadOnlyCollection<DriverCreateRequest> createRequests)
+    public void CreateDriver(DriverCreateRequest createRequest)
     {
-        var drivers = new List<Driver>(createRequests.Count);
-        foreach (var createRequest in createRequests)
-        {
-            var branch = branchStorageService.FindByPrimaryKey(new object[] { createRequest.BranchGuid });
-            if (branch == null)
-                throw new ArgumentException($"The branch {createRequest.BranchGuid} does not exist.",
-                    nameof(createRequests));
-            
-            drivers.Add(Driver.New(createRequest.Name, branch, createRequest.AdrQualificationFlag, createRequest.AdrQualificationOfTank));
-        }
-        
-        driverStorageService.Create(drivers);
+        var branch = branchStorageService.FindByPrimaryKey(new object[] { createRequest.BranchGuid });
+        if (branch == null)
+            throw new ArgumentException($"The branch {createRequest.BranchGuid} does not exist.",
+                nameof(createRequest));
+
+        driverStorageService.Create(Driver.New(createRequest.Name, branch, createRequest.AdrQualificationFlag, createRequest.AdrQualificationOfTank));
     }
 
-    public void UpdateDrivers(IEnumerable<DriverUpdateRequest> updateRequests)
+    public void UpdateDriver(DriverUpdateRequest updateRequest)
     {
         foreach (var updateRequest in updateRequests)
         {
@@ -80,4 +74,17 @@ public class Administator(IEntityStorageService<Driver> driverStorageService, IE
                 d.TotalHoursWorked, d.AdrQualificationFlag, d.AdrQualificationOfTank, d.Name, d.IsAvailable, null,
                 null))));
     }
+
+    public string CurrentDriverGuid
+    {
+        get => _currentDriverGuid;
+        set
+        {
+            
+        }
+    }
+
+    private string _currentDriverGuid;
+
+    private Driver _currentDriver;
 }
