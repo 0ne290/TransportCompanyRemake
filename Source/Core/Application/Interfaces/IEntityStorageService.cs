@@ -1,22 +1,18 @@
+using System.Linq.Expressions;
+
 namespace Application.Interfaces;
 
 public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 {
     IEntityStorageService<TEntity> AsNoTracking();
     
-    void Create(TEntity entities);
-
-    IEnumerable<TEntity> AsEnumerable();
+    void CreateRange(IEnumerable<TEntity> entities);
     
-    TEntity? FindByPrimaryKey(object[] primaryKey);
+    TEntity? Find(Expression<Func<TEntity, bool>> filter);
     
-    IEnumerable<TEntity> FindAll(Predicate<TEntity> predicate);
+    IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter);
     
-    bool Exists(Predicate<TEntity> predicate);
-    
-    bool Contains(TEntity entity);
-
-    void RemoveAll(Predicate<TEntity> predicate);
+    void RemoveAll(Expression<Func<TEntity, bool>> filter);
     
     void SaveChanges();
 }
