@@ -12,7 +12,7 @@ public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
     
     IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter);
     
-    void RemoveAll(Expression<Func<TEntity, bool>> filter);
+    void RemoveAll(IEnumerable<TEntity> entities);
     
     void SaveChanges();
 }

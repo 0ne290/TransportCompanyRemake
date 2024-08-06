@@ -1,0 +1,3 @@
+namespace Application.Dtos;
+
+public record OrderResponse(string Guid, string Status, DateTime DateCreated, DateTime? DateAssignmentOfPerformers, DateTime? DatePaymentAndBegin, DateTime? DateEnd, int? HazardClassFlag, bool Tank, double? LengthInKm, decimal? Price, double? ExpectedHoursWorkedByDrivers, double? ActualHoursWorkedByDriver1, double? ActualHoursWorkedByDriver2, UserResponse? User, TruckResponse? Truck, Response? Driver1, Response? Driver2, BranchResponse? Branch, string StartAddress, string EndAddress, string CargoDescription, double StartPointLatitude, double StartPointLongitude, double EndPointLatitude, double EndPointLongitude, decimal CargoVolume, decimal CargoWeight);
