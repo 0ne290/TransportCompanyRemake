@@ -6,125 +6,131 @@ namespace Application.Dtos.Driver;
 public class UpdateRequest : PropertiesSetFactCheckBase
 {
     [JsonProperty(Required = Required.Always)]
-    public string Guid { get; init; } = null!;
+    public required string Guid { get; init; }
     
     [DefaultValue(false)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public bool Reinstate
+    public required bool Reinstate
     {
         get => _reinstate;
         init
         {
-            if (!value)
-                return;
+            if (value)
+                SetProperty(nameof(Reinstate));
 
             _reinstate = value;
-            SetProperty(nameof(Reinstate));
         }
     }
 
     [DefaultValue(false)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public bool Dismiss
+    public required bool Dismiss
     {
         get => _dismiss;
         init
         {
-            if (!value)
-                return;
+            if (value)
+                SetProperty(nameof(Dismiss));
 
             _dismiss = value;
-            SetProperty(nameof(Dismiss));
         }
     }
 
     [DefaultValue(0d)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public double AddHoursWorked
+    public required double AddHoursWorked
     {
         get => _addHoursWorked;
         init
         {
-            if (value == 0)
-                return;
+            if (value != 0)
+                SetProperty(nameof(AddHoursWorked));
 
             _addHoursWorked = value;
-            SetProperty(nameof(AddHoursWorked));
         }
     }
 
     [DefaultValue(false)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public bool ResetHoursWorkedPerWeek
+    public required bool ResetHoursWorkedPerWeek
     {
         get => _resetHoursWorkedPerWeek;
         init
         {
-            if (!value)
-                return;
+            if (value)
+                SetProperty(nameof(ResetHoursWorkedPerWeek));
 
             _resetHoursWorkedPerWeek = value;
-            SetProperty(nameof(ResetHoursWorkedPerWeek));
         }
     }
 
     [DefaultValue(0)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public int? SetAdrQualificationFlag
+    public required int? SetAdrQualificationFlag
     {
         get => _setAdrQualificationFlag;
         init
         {
-            if (value == 0)
-                return;
+            if (value != 0)
+                SetProperty(nameof(SetAdrQualificationFlag));
 
             _setAdrQualificationFlag = value;
-            SetProperty(nameof(SetAdrQualificationFlag));
+        }
+    }
+    
+    [DefaultValue((bool?)null)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
+    public required bool? SetAdrQualificationOfTank
+    {
+        get => _setAdrQualificationOfTank;
+        init
+        {
+            if (value != null)
+                SetProperty(nameof(SetAdrQualificationOfTank));
+
+            _setAdrQualificationOfTank = value;
         }
     }
     
     [DefaultValue("")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
-    public string SetBranch
+    public required string SetBranch
     {
         get => _setBranch;
         init
         {
-            if (value == "")
-                return;
+            if (value != "")
+                SetProperty(nameof(SetBranch));
 
             _setBranch = value;
-            SetProperty(nameof(SetBranch));
         }
     }
     
     [DefaultValue("")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
-    public string SetName
+    public required string SetName
     {
         get => _setName;
         init
         {
-            if (value == "")
-                return;
+            if (value != "")
+                SetProperty(nameof(SetName));
 
             _setName = value;
-            SetProperty(nameof(SetName));
         }
     }
     
-    [DefaultValue(null)]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public bool? SetIsAvailable
+    [DefaultValue((bool?)null)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
+    public required bool? SetIsAvailable
     {
         get => _setIsAvailable;
         init
         {
-            if (value == null)
-                return;
+            if (value != null)
+                SetProperty(nameof(SetIsAvailable));
 
             _setIsAvailable = value;
-            SetProperty(nameof(SetIsAvailable));
         }
     }
 
@@ -137,6 +143,8 @@ public class UpdateRequest : PropertiesSetFactCheckBase
     private readonly bool _resetHoursWorkedPerWeek;
 
     private readonly int? _setAdrQualificationFlag = 0;
+
+    private readonly bool? _setAdrQualificationOfTank;
     
     private readonly string _setBranch = "";
     

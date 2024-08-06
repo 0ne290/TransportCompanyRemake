@@ -1,3 +1,5 @@
-namespace Application.Dtos;
+using Application.Dtos.Order;
 
-public record UserResponse(string Guid, DateTime RegistrationDate, long? VkUserId, string? Login, string? Password, string Name, string Contact, IEnumerable<OrderResponse> Orders);
+namespace Application.Dtos.User;
+
+public record UserResponse(string Guid, DateTime RegistrationDate, long? VkUserId, string? Login, string? Password, string Name, string Contact, IEnumerable<Response> Orders);

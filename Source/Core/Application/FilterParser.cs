@@ -1,7 +1,7 @@
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
-namespace Application.Parsers;
+namespace Application;
 
 public static class FilterParser
 {

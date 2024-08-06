@@ -1,3 +1,6 @@
-namespace Application.Dtos;
+using Application.Dtos.Branch;
+using Application.Dtos.Order;
 
-public record Response(string Guid, DateTime HireDate, DateTime? DismissalDate, double HoursWorkedPerWeek, double TotalHoursWorked, int? AdrQualificationFlag, bool AdrQualificationOfTank, string Name, bool IsAvailable, BranchResponse? Branch, IEnumerable<OrderResponse>? Orders);
+namespace Application.Dtos.Driver;
+
+public record Response(string Guid, DateTime HireDate, DateTime? DismissalDate, double HoursWorkedPerWeek, double TotalHoursWorked, int? AdrQualificationFlag, bool AdrQualificationOfTank, string Name, bool IsAvailable, Branch.Response? Branch, IEnumerable<Order.Response>? Orders);
