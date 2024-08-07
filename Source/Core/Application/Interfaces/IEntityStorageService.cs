@@ -4,15 +4,13 @@ namespace Application.Interfaces;
 
 public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
 {
-    IEntityStorageService<TEntity> AsNoTracking();
-    
     void CreateRange(IEnumerable<TEntity> entities);
     
-    TEntity? Find(Expression<Func<TEntity, bool>> filter);
+    TEntity? Find(Expression<Func<TEntity, bool>> filter, string includedData = "");
     
-    IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter);
+    IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter, string includedData = "");
     
-    void RemoveAll(IEnumerable<TEntity> entities);
+    void UpdateRange(IEnumerable<TEntity> entities);
     
-    void SaveChanges();
+    void RemoveRange(IEnumerable<TEntity> entities);
 }

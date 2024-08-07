@@ -31,7 +31,7 @@ public class OrderTest
         Assert.Null(order.DatePaymentAndBegin);
         Assert.Null(order.DateEnd);
         Assert.Equal(expectedHazardClassFlag, order.HazardClassFlag);
-        Assert.Equal(OrderFixture.DefaultTank, order.Tank);
+        Assert.Equal(OrderFixture.DefaultTank, order.TankRequired);
         Assert.Null(order.LengthInKm);
         Assert.Null(order.Price);
         Assert.Null(order.ExpectedHoursWorkedByDrivers);

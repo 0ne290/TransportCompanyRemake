@@ -9,7 +9,7 @@ public class Order
     
     public static Order New(User user, string startAddress, string endAddress, string cargoDescription,
         (double Latitude, double Longitude) startPoint, (double Latitude, double Longitude) endPoint,
-        decimal cargoVolume, decimal cargoWeight, bool tank, int? hazardClassFlag)
+        decimal cargoVolume, decimal cargoWeight, bool tankRequired, int? hazardClassFlag)
     {
         if (hazardClassFlag != null && !HazardClassesFlags.IsFlag(hazardClassFlag.Value))
             throw new ArgumentOutOfRangeException(nameof(hazardClassFlag), hazardClassFlag,
@@ -20,7 +20,7 @@ public class Order
             UserGuid = user.Guid, User = user, StartAddress = startAddress, EndAddress = endAddress,
             CargoDescription = cargoDescription, StartPointLatitude = startPoint.Latitude,
             StartPointLongitude = startPoint.Longitude, EndPointLatitude = endPoint.Latitude,
-            EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight, Tank = tank,
+            EndPointLongitude = endPoint.Longitude, CargoVolume = cargoVolume, CargoWeight = cargoWeight, TankRequired = tankRequired,
             HazardClassFlag = hazardClassFlag
         };
     }
@@ -39,20 +39,20 @@ public class Order
         if (!truck.IsAvailable)
             throw new ArgumentException("To assign a truck to an order, it must be available.", nameof(truck));
         
-        if (HazardClassFlag != null && Tank && !driver1.AdrQualificationOfTank)
+        if (HazardClassFlag != null && TankRequired && !driver1.AdrQualificationOfTank)
             throw new ArgumentException(
                 "To assign a driver1 to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
                 nameof(driver1));
-        if (HazardClassFlag != null && driver2 != null && Tank && !driver2.AdrQualificationOfTank)
+        if (HazardClassFlag != null && driver2 != null && TankRequired && !driver2.AdrQualificationOfTank)
             throw new ArgumentException(
                 "To assign a driver2 to an order with a hazard class load that requires a tank, that driver must have an ADR qualification for tanks.",
                 nameof(driver2));
         
-        if (Tank && !truck.TrailerIsTank)
+        if (TankRequired && !truck.TrailerIsTank)
             throw new ArgumentException(
                 "To assign a truck to an order with cargo that requires a tank, the truck must have a tank.",
                 nameof(truck));
-        if (!Tank && truck.TrailerIsTank)
+        if (!TankRequired && truck.TrailerIsTank)
             throw new ArgumentException(
                 "To assign a truck to an order with cargo that does not require a tank, the truck must not have a tank.",
                 nameof(truck));
@@ -150,7 +150,7 @@ public class Order
 
     public int? HazardClassFlag { get; private set; }
 
-    public bool Tank { get; private set; }
+    public bool TankRequired { get; private set; }
 
     public double? LengthInKm { get; private set; }
 
