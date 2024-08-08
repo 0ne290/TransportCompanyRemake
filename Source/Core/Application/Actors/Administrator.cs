@@ -1,13 +1,15 @@
 using Entities = Domain.Entities;
 using System.Linq.Expressions;
 using Application.Interfaces;
+using Domain.Constants;
 using Domain.Interfaces;
 
 namespace Application.Actors;
 
 // TODO: Упростить получение связанных данных: заменить все булевы аргументы одним строковым аргументом, описывающим подтягиваемые связанные свойства
 // TODO: Заменить тип Expression<Func<TEntity, bool>> аргументов фильтрации на string - эти строки должны парситься на выражения в слое Application, а не в UI
-public class Administrator(IEntityStorageService<Entities.Driver> driverStorageService, IEntityStorageService<Entities.Truck> truckStorageService, IEntityStorageService<Entities.User> userStorageService, IEntityStorageService<Entities.Branch> branchStorageService, IEntityStorageService<Entities.Order> orderStorageService, ICryptographicService cryptographicService)
+// TODO: Мой перфекционизм сыграл со мной злую шутку - пытаясь сделать универсальный супер-API, я бесмыссленно и неоправданно его переусложнил, тем самым выстрелив себе в ногу С ДРОБОВИКА %!?*№! В рамках Use Case'ов не будет задействована львиная доля системы. Этот комментарий останется, чтобы я всегда помнил эту ошибку и больше ее никогда не повторил
+public class Administrator(IEntityStorageService<Entities.Driver> driverStorageService, IEntityStorageService<Entities.Truck> truckStorageService, IEntityStorageService<Entities.User> userStorageService, IEntityStorageService<Entities.Branch> branchStorageService, IEntityStorageService<Entities.Order> orderStorageService, ICryptographicService cryptographicService, IGeolocationService geolocationService)
 {
     public void CreateDrivers(IReadOnlyCollection<Dtos.Driver.CreateRequest> createRequests)
     {
@@ -23,7 +25,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 throw new ArgumentException($"The branch {createRequest.BranchGuid} does not exist.",
                     nameof(createRequests));
             
-            drivers.Add(Entities.Driver.New(createRequest.Name, branch, createRequest.AdrQualificationFlag, createRequest.AdrQualificationOfTank));
+            drivers.Add(Entities.Driver.New(createRequest.Name, branch, createRequest.AdrQualificationFlag == null ? null : AdrDriverQualificationsFlags.StringToFlag(createRequest.AdrQualificationFlag), createRequest.AdrQualificationOfTank));
         }
         
         driverStorageService.CreateRange(drivers);
@@ -38,7 +40,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             includedData += "Branch;";
             getBranchResponse = d =>
                 new Dtos.Branch.Response(d.Branch.Guid, d.Branch.Address, d.Branch.Latitude, d.Branch.Longitude, null,
-                    null);
+                    null, null, null);
         }
         else
             getBranchResponse = _ => null;
@@ -48,7 +50,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         {
             includedData += "Orders;";
             getOrderResponses = d => d.Orders.Select(o => new Dtos.Order.Response(o.Guid, o.Status, o.DateCreated,
-                o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag, o.TankRequired, o.LengthInKm,
+                o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag == null ? null : HazardClassesFlags.FlagCombinationToString(o.HazardClassFlag.Value), o.TankRequired, o.LengthInKm,
                 o.Price, o.ExpectedHoursWorkedByDrivers, o.ActualHoursWorkedByDriver1, o.ActualHoursWorkedByDriver2,
                 null, null, null, null, null, o.StartAddress, o.EndAddress, o.CargoDescription, o.StartPointLatitude,
                 o.StartPointLongitude, o.EndPointLatitude, o.EndPointLongitude, o.CargoVolume, o.CargoWeight));
@@ -56,8 +58,11 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         else
             getOrderResponses = _ => null;
 
-        return driverStorageService.FindAll(filter, includedData).Select(d => new Dtos.Driver.Response(d.Guid, d.HireDate,
-            d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked, d.AdrQualificationFlag, d.AdrQualificationOfTank,
+        return driverStorageService.FindAll(filter, includedData).Select(d => new Dtos.Driver.Response(d.Guid,
+            d.HireDate, d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked,
+            d.AdrQualificationFlag == null
+                ? null
+                : AdrDriverQualificationsFlags.FlagToString(d.AdrQualificationFlag.Value), d.AdrQualificationOfTank,
             d.Name, d.IsAvailable, getBranchResponse(d), getOrderResponses(d)));
     }
     
@@ -89,7 +94,9 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             if (updateRequest.PropertyIsSet(nameof(updateRequest.ResetHoursWorkedPerWeek)))
                 driver.ResetHoursWorkedPerWeek();
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationFlag)))
-                driver.SetAdrQualificationFlag(updateRequest.SetAdrQualificationFlag);
+                driver.SetAdrQualificationFlag(updateRequest.SetAdrQualificationFlag == null
+                    ? null
+                    : AdrDriverQualificationsFlags.StringToFlag(updateRequest.SetAdrQualificationFlag));
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationOfTank)))
                 driver.SetAdrQualificationOfTank(updateRequest.SetAdrQualificationOfTank!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
@@ -125,7 +132,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
 
             trucks.Add(Entities.Truck.New(createRequest.Number, createRequest.TrailerIsTank, createRequest.VolumeMax,
                 createRequest.VolumePrice, createRequest.WeightMax, createRequest.WeightPrice, createRequest.PricePerKm,
-                branch, createRequest.PermittedHazardClassesFlags));
+                branch, createRequest.PermittedHazardClassesFlags == null ? null : HazardClassesFlags.StringToFlagCombination(createRequest.PermittedHazardClassesFlags)));
         }
         
         truckStorageService.CreateRange(trucks);
@@ -140,7 +147,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             includedData += "Branch;";
             getBranchResponse = t =>
                 new Dtos.Branch.Response(t.Branch.Guid, t.Branch.Address, t.Branch.Latitude, t.Branch.Longitude, null,
-                    null);
+                    null, null, null);
         }
         else
             getBranchResponse = _ => null;
@@ -150,7 +157,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         {
             includedData += "Orders;";
             getOrderResponses = t => t.Orders.Select(o => new Dtos.Order.Response(o.Guid, o.Status, o.DateCreated,
-                o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag, o.TankRequired, o.LengthInKm,
+                o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag == null ? null : HazardClassesFlags.FlagCombinationToString(o.HazardClassFlag.Value), o.TankRequired, o.LengthInKm,
                 o.Price, o.ExpectedHoursWorkedByDrivers, o.ActualHoursWorkedByDriver1, o.ActualHoursWorkedByDriver2,
                 null, null, null, null, null, o.StartAddress, o.EndAddress, o.CargoDescription, o.StartPointLatitude,
                 o.StartPointLongitude, o.EndPointLatitude, o.EndPointLongitude, o.CargoVolume, o.CargoWeight));
@@ -159,7 +166,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             getOrderResponses = _ => null;
 
         return truckStorageService.FindAll(filter, includedData).Select(t => new Dtos.Truck.Response(t.Guid,
-            t.CommissionedDate, t.DecommissionedDate, t.PermittedHazardClassesFlags, t.Number, t.IsAvailable,
+            t.CommissionedDate, t.DecommissionedDate, t.PermittedHazardClassesFlags == null ? null : HazardClassesFlags.FlagCombinationToString(t.PermittedHazardClassesFlags.Value), t.Number, t.IsAvailable,
             t.TrailerIsTank, t.VolumeMax, t.VolumePrice, t.WeightMax, t.WeightPrice, t.PricePerKm, getBranchResponse(t),
             getOrderResponses(t)));
     }
@@ -188,7 +195,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             if (updateRequest.PropertyIsSet(nameof(updateRequest.Decommission)))
                 truck.Decommission();
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetPermittedHazardClassesFlags)))
-                truck.SetPermittedHazardClassesFlags(updateRequest.SetPermittedHazardClassesFlags);
+                truck.SetPermittedHazardClassesFlags(updateRequest.SetPermittedHazardClassesFlags == null ? null : HazardClassesFlags.StringToFlagCombination(updateRequest.SetPermittedHazardClassesFlags));
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
             {
                 var branch = branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
@@ -240,7 +247,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         {
             includedData += "Orders;";
             getOrderResponses = u => u.Orders.Select(o => new Dtos.Order.Response(o.Guid, o.Status, o.DateCreated,
-                o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag, o.TankRequired, o.LengthInKm,
+                o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag == null ? null : HazardClassesFlags.FlagCombinationToString(o.HazardClassFlag.Value), o.TankRequired, o.LengthInKm,
                 o.Price, o.ExpectedHoursWorkedByDrivers, o.ActualHoursWorkedByDriver1, o.ActualHoursWorkedByDriver2,
                 null, null, null, null, null, o.StartAddress, o.EndAddress, o.CargoDescription, o.StartPointLatitude,
                 o.StartPointLongitude, o.EndPointLatitude, o.EndPointLongitude, o.CargoVolume, o.CargoWeight));
@@ -299,7 +306,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         {
             includedData += "Trucks;";
             getTruckResponses = b => b.Trucks.Select(t => new Dtos.Truck.Response(t.Guid, t.CommissionedDate,
-                t.DecommissionedDate, t.PermittedHazardClassesFlags, t.Number, t.IsAvailable, t.TrailerIsTank,
+                t.DecommissionedDate, t.PermittedHazardClassesFlags == null ? null : HazardClassesFlags.FlagCombinationToString(t.PermittedHazardClassesFlags.Value), t.Number, t.IsAvailable, t.TrailerIsTank,
                 t.VolumeMax, t.VolumePrice, t.WeightMax, t.WeightPrice, t.PricePerKm, null, null));
         }
         else
@@ -310,7 +317,10 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         {
             includedData += "Drivers;";
             getDriverResponses = b => b.Drivers.Select(d => new Dtos.Driver.Response(d.Guid, d.HireDate,
-                d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked, d.AdrQualificationFlag,
+                d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked,
+                d.AdrQualificationFlag == null
+                    ? null
+                    : AdrDriverQualificationsFlags.FlagToString(d.AdrQualificationFlag.Value),
                 d.AdrQualificationOfTank, d.Name, d.IsAvailable, null, null));
         }
         else
@@ -318,7 +328,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
 
         return branchStorageService.FindAll(filter, includedData).Select(b =>
             new Dtos.Branch.Response(b.Guid, b.Address, b.Latitude, b.Longitude, getTruckResponses(b),
-                getDriverResponses(b)));
+                getDriverResponses(b), null, null));
     }
     
     public void DeleteBranches(Expression<Func<Entities.Branch, bool>> filter)
@@ -351,30 +361,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         branchStorageService.UpdateRange(branches.Values);
     }
     
-    public void CreateOrders(IReadOnlyCollection<Dtos.Order.CreateRequest> createRequests)
-    {
-        var userGuids = new HashSet<string>(createRequests.Count);
-        foreach (var createRequest in createRequests)
-            userGuids.Add(createRequest.UserGuid);
-        var users = userStorageService.FindAll(b => userGuids.Contains(b.Guid)).ToDictionary(b => b.Guid);
-        
-        var orders = new List<Entities.Order>(createRequests.Count);
-        foreach (var createRequest in createRequests)
-        {
-            if (!users.TryGetValue(createRequest.UserGuid, out var user))
-                throw new ArgumentException($"The user {createRequest.UserGuid} does not exist.",
-                    nameof(createRequests));
-            
-            orders.Add(Entities.Order.New(user, createRequest.StartAddress, createRequest.EndAddress,
-                createRequest.CargoDescription, (createRequest.StartPointLatitude, createRequest.StartPointLongitude),
-                (createRequest.EndPointLatitude, createRequest.EndPointLongitude), createRequest.CargoVolume, createRequest.CargoWeight, createRequest.TankRequired,
-                createRequest.HazardClassFlag));
-        }
-        
-        orderStorageService.CreateRange(orders);
-    }
-
-    public IEnumerable<Dtos.Branch.Response> GetBranches(Expression<Func<Entities.Branch, bool>> filter, bool includeTrucks, bool includeDrivers)
+    /*public IEnumerable<Dtos.Branch.Response> GetOrders(Expression<Func<Entities.Branch, bool>> filter, bool includeTrucks, bool includeDrivers)
     {
         var includedData = "";
         Func<Entities.Branch, IEnumerable<Dtos.Truck.Response>?> getTruckResponses;
@@ -382,7 +369,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         {
             includedData += "Trucks;";
             getTruckResponses = b => b.Trucks.Select(t => new Dtos.Truck.Response(t.Guid, t.CommissionedDate,
-                t.DecommissionedDate, t.PermittedHazardClassesFlags, t.Number, t.IsAvailable, t.TrailerIsTank,
+                t.DecommissionedDate, t.PermittedHazardClassesFlags == null ? null : HazardClassesFlags.FlagCombinationToString(t.PermittedHazardClassesFlags.Value), t.Number, t.IsAvailable, t.TrailerIsTank,
                 t.VolumeMax, t.VolumePrice, t.WeightMax, t.WeightPrice, t.PricePerKm, null, null));
         }
         else
@@ -393,7 +380,10 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         {
             includedData += "Drivers;";
             getDriverResponses = b => b.Drivers.Select(d => new Dtos.Driver.Response(d.Guid, d.HireDate,
-                d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked, d.AdrQualificationFlag,
+                d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked,
+                d.AdrQualificationFlag == null
+                    ? null
+                    : AdrDriverQualificationsFlags.FlagToString(d.AdrQualificationFlag.Value),
                 d.AdrQualificationOfTank, d.Name, d.IsAvailable, null, null));
         }
         else
@@ -401,36 +391,59 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
 
         return branchStorageService.FindAll(filter, includedData).Select(b =>
             new Dtos.Branch.Response(b.Guid, b.Address, b.Latitude, b.Longitude, getTruckResponses(b),
-                getDriverResponses(b)));
-    }
+                getDriverResponses(b), null, null));
+    }*/
     
-    public void DeleteBranches(Expression<Func<Entities.Branch, bool>> filter)
+    public IEnumerable<Dtos.Branch.Response> GetPotentialOrderPerformersByBranches(string orderGuid)
     {
-        var branches = branchStorageService.FindAll(filter);
+        var order = orderStorageService.Find(o => o.Guid == orderGuid);
+        if (order == null)
+            throw new ArgumentException($"The orded {orderGuid} does not exist.", nameof(orderGuid));
         
-        branchStorageService.RemoveRange(branches);
-    }
-
-    public void UpdateBranches(IReadOnlyCollection<Dtos.Branch.UpdateRequest> updateRequests)
-    {
-        var branchGuids = new HashSet<string>(updateRequests.Count);
-        foreach (var updateRequest in updateRequests)
-            branchGuids.Add(updateRequest.Guid);
-        var branches = branchStorageService.FindAll(b => branchGuids.Contains(b.Guid)).ToDictionary(d => d.Guid);
-        
-        foreach (var updateRequest in updateRequests)
+        Func<Entities.Truck, bool> truckPredicate;
+        Func<Entities.Driver, bool> driverPredicate;
+        if (order.HazardClassFlag != null)
         {
-            if (!branches.TryGetValue(updateRequest.Guid, out var branch))
-                throw new ArgumentException($"The branch {updateRequest.Guid} does not exist.", nameof(updateRequests));
-            
-            if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAddress)))
-                branch.Address = updateRequest.SetAddress;
-            if (updateRequest.PropertyIsSet(nameof(updateRequest.SetLatitude)))
-                branch.Latitude = updateRequest.SetLatitude!.Value;
-            if (updateRequest.PropertyIsSet(nameof(updateRequest.SetLongitude)))
-                branch.Longitude = updateRequest.SetLongitude!.Value;
+            truckPredicate = t =>
+                t.IsAvailable && t.TrailerIsTank == order.TankRequired &&
+                (order.HazardClassFlag & t.PermittedHazardClassesFlags ?? 0) > 0;
+            if (order.TankRequired)
+                driverPredicate = d =>
+                    d.IsAvailable && (order.HazardClassFlag & d.AdrQualificationFlag ?? 0) > 1 &&
+                    d.AdrQualificationOfTank;
+            else
+                driverPredicate = d => d.IsAvailable && (order.HazardClassFlag & d.AdrQualificationFlag ?? 0) > 1;
         }
-        
-        branchStorageService.UpdateRange(branches.Values);
+        else
+        {
+            truckPredicate = t =>
+                t.IsAvailable && t.TrailerIsTank == order.TankRequired;
+            driverPredicate = d => d.IsAvailable;
+        }
+
+        var branches = branchStorageService.FindAll(_ => true, "Trucks;Drivers;").ToList();
+        var branchResponses = new List<Dtos.Branch.Response>(branches.Count);
+        foreach (var branch in branches)
+        {
+            var trucks = branch.Trucks.Where(t => truckPredicate(t)).Select(t => new Dtos.Truck.Response(t.Guid, t.CommissionedDate,
+                t.DecommissionedDate, t.PermittedHazardClassesFlags == null ? null : HazardClassesFlags.FlagCombinationToString(t.PermittedHazardClassesFlags.Value), t.Number, t.IsAvailable, t.TrailerIsTank,
+                t.VolumeMax, t.VolumePrice, t.WeightMax, t.WeightPrice, t.PricePerKm, null, null));
+            
+            var drivers = branch.Drivers.Where(d => driverPredicate(d)).Select(d => new Dtos.Driver.Response(d.Guid, d.HireDate,
+                d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked,
+                d.AdrQualificationFlag == null
+                    ? null
+                    : AdrDriverQualificationsFlags.FlagToString(d.AdrQualificationFlag.Value),
+                d.AdrQualificationOfTank, d.Name, d.IsAvailable, null, null));
+            
+            var lengthInKmAndDrivingHours = branch
+                .CalculateLengthInKmOfOrderRouteClosedAtBranchAndApproximateDrivingHoursOfTruckAlongIt(order,
+                    geolocationService);
+           
+            branchResponses.Add(new Dtos.Branch.Response(branch.Guid, branch.Address, branch.Latitude, branch.Longitude,
+                trucks, drivers, lengthInKmAndDrivingHours.LengthInKm,lengthInKmAndDrivingHours.DrivingHours));
+        }
+
+        return branchResponses;
     }
 }

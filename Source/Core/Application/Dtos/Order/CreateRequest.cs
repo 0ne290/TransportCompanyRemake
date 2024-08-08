@@ -38,5 +38,5 @@ public class CreateRequest
     public required bool TankRequired { get; init; }
     
     [JsonProperty(Required = Required.AllowNull)]
-    public required int? HazardClassFlag { get; init; }
+    public required string? HazardClassFlag { get; init; }
 }

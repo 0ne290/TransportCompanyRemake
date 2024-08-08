@@ -31,4 +31,6 @@ public class Branch
     public virtual ICollection<Truck> Trucks { get; private set; } = new List<Truck>();
     
     public virtual ICollection<Driver> Drivers { get; private set; } = new List<Driver>();
+    
+    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
 }

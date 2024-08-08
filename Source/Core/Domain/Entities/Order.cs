@@ -60,13 +60,13 @@ public class Order
         if (truck.BranchGuid != driver1.BranchGuid || (driver2 != null && truck.BranchGuid != driver2.BranchGuid))
             throw new ArgumentException("To assign drivers and truck to an order, they must belong to the same branch");
         
-        if ((HazardClassFlag & truck.PermittedHazardClassesFlags ?? 0) < 1)
+        if (HazardClassFlag != null && (HazardClassFlag & truck.PermittedHazardClassesFlags ?? 0) < 1)
             throw new ArgumentOutOfRangeException(nameof(truck), truck,
                 "The truck cannot transport cargo with this hazard class.");
-        if ((HazardClassFlag & driver1.AdrQualificationFlag ?? 0) < 1)
+        if (HazardClassFlag != null && (HazardClassFlag & driver1.AdrQualificationFlag ?? 0) < 1)
             throw new ArgumentOutOfRangeException(nameof(driver1), driver1,
                 "The driver1 is not qualified enough to transport cargo with this hazard class.");
-        if (driver2 != null && (HazardClassFlag & driver2.AdrQualificationFlag ?? 0) < 1)
+        if (HazardClassFlag != null && driver2 != null && (HazardClassFlag & driver2.AdrQualificationFlag ?? 0) < 1)
             throw new ArgumentOutOfRangeException(nameof(driver2), driver2,
                 "The driver2 is not qualified enough to transport cargo with this hazard class.");
 

@@ -2,7 +2,6 @@
 using Application.Interfaces;
 using Domain.Constants;
 using Domain.Entities;
-using Domain.Interfaces;
 using YooKassa.Constants;
 using YooKassa.Entities;
 using YooKassa.Entities.Payment;

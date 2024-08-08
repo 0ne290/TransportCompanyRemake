@@ -36,14 +36,14 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
 
-    [DefaultValue(0)]
+    [DefaultValue("Unknown flag combination")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required int? SetPermittedHazardClassesFlags
+    public required string? SetPermittedHazardClassesFlags
     {
         get => _setPermittedHazardClassesFlags;
         init
         {
-            if (value != 0)
+            if (value != "Unknown flag combination")
                 SetProperty(nameof(SetPermittedHazardClassesFlags));
 
             _setPermittedHazardClassesFlags = value;
@@ -180,7 +180,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
 
     private readonly bool _decommission;
 
-    private readonly int? _setPermittedHazardClassesFlags = 0;
+    private readonly string? _setPermittedHazardClassesFlags = "Unknown flag combination";
     
     private readonly string _setBranch = "";
     

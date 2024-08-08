@@ -50,7 +50,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    private readonly string _setAddress;
+    private readonly string _setAddress = null!;
 
     private readonly double? _setLatitude;
 

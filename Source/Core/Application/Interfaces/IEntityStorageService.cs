@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 namespace Application.Interfaces;
 
-public interface IEntityStorageService<TEntity> : IDisposable, IAsyncDisposable
+public interface IEntityStorageService<TEntity>
 {
     void CreateRange(IEnumerable<TEntity> entities);
     

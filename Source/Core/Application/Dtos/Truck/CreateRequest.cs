@@ -29,6 +29,6 @@ public class CreateRequest
     public required string BranchGuid { get; init; }
     
     [JsonProperty(Required = Required.AllowNull)]
-    public required int? PermittedHazardClassesFlags { get; init; }
+    public required string? PermittedHazardClassesFlags { get; init; }
     
 }

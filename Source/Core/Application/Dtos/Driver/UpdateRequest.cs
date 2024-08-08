@@ -64,14 +64,14 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
 
-    [DefaultValue(0)]
+    [DefaultValue("Unknown flag")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required int? SetAdrQualificationFlag
+    public required string? SetAdrQualificationFlag
     {
         get => _setAdrQualificationFlag;
         init
         {
-            if (value != 0)
+            if (value != "Unknown flag")
                 SetProperty(nameof(SetAdrQualificationFlag));
 
             _setAdrQualificationFlag = value;
@@ -142,7 +142,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
 
     private readonly bool _resetHoursWorkedPerWeek;
 
-    private readonly int? _setAdrQualificationFlag = 0;
+    private readonly string? _setAdrQualificationFlag = "Unknown flag";
 
     private readonly bool? _setAdrQualificationOfTank;
     
