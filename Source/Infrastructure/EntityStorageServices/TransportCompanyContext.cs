@@ -38,15 +38,13 @@ public sealed class TransportCompanyContext : DbContext
             var numberOfTrucks = faker.Random.Int(30, 60);
             for (var j = 0; j < numberOfTrucks; j++)
             {
-                var numberOfPermittedHazardClasses = faker.Random.Int(0, 6);
-                
                 int? permittedHazardClasses;
-                if (numberOfPermittedHazardClasses == 0)
-                    permittedHazardClasses = null;
-                else
+                if (faker.Random.Bool())
                     permittedHazardClasses = faker.Random
-                        .ArrayElements(hazardClassesFlags, numberOfPermittedHazardClasses)
+                        .ArrayElements(hazardClassesFlags, faker.Random.Int(1, 6))
                         .Aggregate<int, int?>(0, (current, hazardClassFlag) => current | hazardClassFlag);
+                else
+                    permittedHazardClasses = null;
 
                 trucks.Add(Truck.New(faker.Vehicle.Vin(), faker.Random.Bool(), faker.Random.Decimal(52, 92),
                     faker.Random.Decimal(0.7m, 1.4m), faker.Random.Decimal(27000, 33000),

@@ -1,3 +1,8 @@
+using Application.Actors;
+using Application.Interfaces;
+using Domain.DefaultImplementations;
+using Domain.Entities;
+using Domain.Interfaces;
 using EntityStorageServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +14,7 @@ using Serilog.Exceptions.Core;
 using Serilog.Exceptions.EntityFrameworkCore.Destructurers;
 using Serilog.Formatting.Json;
 using Web.Middlewares;
+using User = Application.Actors.User;
 
 namespace Web;
 
@@ -23,8 +29,16 @@ internal static class Program
     {
         var builder = WebApplication.CreateBuilder();
         
-        builder.Services.AddControllersWithViews();
-        
+        builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+
+        builder.Services.AddScoped<IEntityStorageService<Driver>, EntityFrameworkEntityStorageService<Driver>>();
+        builder.Services.AddScoped<IEntityStorageService<Truck>, EntityFrameworkEntityStorageService<Truck>>();
+        builder.Services.AddScoped<IEntityStorageService<Domain.Entities.User>, EntityFrameworkEntityStorageService<Domain.Entities.User>>();
+        builder.Services.AddScoped<IEntityStorageService<Branch>, EntityFrameworkEntityStorageService<Branch>>();
+        builder.Services.AddScoped<IEntityStorageService<Order>, EntityFrameworkEntityStorageService<Order>>();
+        builder.Services.AddScoped<ICryptographicService, DefaultCryptographicService>();
+        builder.Services.AddScoped<IGeolocationService, DefaultGeolocationService>();
+        builder.Services.AddScoped<Administrator>();
         builder.Services.AddDbContext<TransportCompanyContext>((serviceProvider, options) =>
         {
             var connectionString = serviceProvider.GetService<IConfiguration>()!.GetConnectionString("MySql")!;

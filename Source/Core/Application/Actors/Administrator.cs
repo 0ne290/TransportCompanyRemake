@@ -11,12 +11,12 @@ namespace Application.Actors;
 // TODO: Мой перфекционизм сыграл со мной злую шутку - пытаясь сделать универсальный супер-API, я бесмыссленно и неоправданно его переусложнил, тем самым выстрелив себе в ногу С ДРОБОВИКА %!?*№! В рамках Use Case'ов не будет задействована львиная доля системы. Этот комментарий останется, чтобы я всегда помнил эту ошибку и больше ее никогда не повторил
 public class Administrator(IEntityStorageService<Entities.Driver> driverStorageService, IEntityStorageService<Entities.Truck> truckStorageService, IEntityStorageService<Entities.User> userStorageService, IEntityStorageService<Entities.Branch> branchStorageService, IEntityStorageService<Entities.Order> orderStorageService, ICryptographicService cryptographicService, IGeolocationService geolocationService)
 {
-    public void CreateDrivers(IReadOnlyCollection<Dtos.Driver.CreateRequest> createRequests)
+    public async Task CreateDrivers(IReadOnlyCollection<Dtos.Driver.CreateRequest> createRequests)
     {
         var branchGuids = new HashSet<string>(createRequests.Count);
         foreach (var createRequest in createRequests)
             branchGuids.Add(createRequest.BranchGuid);
-        var branches = branchStorageService.FindAll(b => branchGuids.Contains(b.Guid)).ToDictionary(b => b.Guid);
+        var branches = (await branchStorageService.FindAll(b => branchGuids.Contains(b.Guid))).ToDictionary(b => b.Guid);
 
         var drivers = new List<Entities.Driver>(createRequests.Count);
         foreach (var createRequest in createRequests)
@@ -28,10 +28,10 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             drivers.Add(Entities.Driver.New(createRequest.Name, branch, createRequest.AdrQualificationFlag == null ? null : AdrDriverQualificationsFlags.StringToFlag(createRequest.AdrQualificationFlag), createRequest.AdrQualificationOfTank));
         }
         
-        driverStorageService.CreateRange(drivers);
+        await driverStorageService.CreateRange(drivers);
     }
 
-    public IEnumerable<Dtos.Driver.Response> GetDrivers(Expression<Func<Entities.Driver, bool>> filter, bool includeBranch, bool includeOrders)
+    public async Task<IEnumerable<Dtos.Driver.Response>> GetDrivers(Expression<Func<Entities.Driver, bool>> filter, bool includeBranch, bool includeOrders)
     {
         var includedData = "";
         Func<Entities.Driver, Dtos.Branch.Response?> getBranchResponse;
@@ -67,7 +67,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             getSecondaryOrderResponses = _ => null;
         }
 
-        return driverStorageService.FindAll(filter, includedData).Select(d => new Dtos.Driver.Response(d.Guid,
+        return (await driverStorageService.FindAll(filter, includedData)).Select(d => new Dtos.Driver.Response(d.Guid,
             d.HireDate, d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked,
             d.AdrQualificationFlag == null
                 ? null
@@ -75,19 +75,19 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             d.Name, d.IsAvailable, getBranchResponse(d), getPrimaryOrderResponses(d), getSecondaryOrderResponses(d)));
     }
     
-    public void DeleteDrivers(Expression<Func<Entities.Driver, bool>> filter)
+    public async Task DeleteDrivers(Expression<Func<Entities.Driver, bool>> filter)
     {
-        var drivers = driverStorageService.FindAll(filter);
+        var drivers = await driverStorageService.FindAll(filter);
         
-        driverStorageService.RemoveRange(drivers);
+        await driverStorageService.RemoveRange(drivers);
     }
 
-    public void UpdateDrivers(IReadOnlyCollection<Dtos.Driver.UpdateRequest> updateRequests)
+    public async Task UpdateDrivers(IReadOnlyCollection<Dtos.Driver.UpdateRequest> updateRequests)
     {
         var driverGuids = new HashSet<string>(updateRequests.Count);
         foreach (var updateRequest in updateRequests)
             driverGuids.Add(updateRequest.Guid);
-        var drivers = driverStorageService.FindAll(d => driverGuids.Contains(d.Guid)).ToDictionary(d => d.Guid);
+        var drivers = (await driverStorageService.FindAll(d => driverGuids.Contains(d.Guid))).ToDictionary(d => d.Guid);
         
         foreach (var updateRequest in updateRequests)
         {
@@ -110,7 +110,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 driver.SetAdrQualificationOfTank(updateRequest.SetAdrQualificationOfTank!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
             {
-                var branch = branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
+                var branch = await branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
                 if (branch == null)
                     throw new ArgumentException($"The branch {updateRequest.SetBranch} does not exist.", nameof(updateRequests));
                 
@@ -122,15 +122,15 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 driver.SetIsAvailable(updateRequest.SetIsAvailable!.Value);
         }
         
-        driverStorageService.UpdateRange(drivers.Values);
+        await driverStorageService.UpdateRange(drivers.Values);
     }
     
-    public void CreateTrucks(IReadOnlyCollection<Dtos.Truck.CreateRequest> createRequests)
+    public async Task CreateTrucks(IReadOnlyCollection<Dtos.Truck.CreateRequest> createRequests)
     {
         var branchGuids = new HashSet<string>(createRequests.Count);
         foreach (var createRequest in createRequests)
             branchGuids.Add(createRequest.BranchGuid);
-        var branches = branchStorageService.FindAll(b => branchGuids.Contains(b.Guid)).ToDictionary(b => b.Guid);
+        var branches = (await branchStorageService.FindAll(b => branchGuids.Contains(b.Guid))).ToDictionary(b => b.Guid);
 
         var trucks = new List<Entities.Truck>(createRequests.Count);
         foreach (var createRequest in createRequests)
@@ -144,10 +144,10 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 branch, createRequest.PermittedHazardClassesFlags == null ? null : HazardClassesFlags.StringToFlagCombination(createRequest.PermittedHazardClassesFlags)));
         }
         
-        truckStorageService.CreateRange(trucks);
+        await truckStorageService.CreateRange(trucks);
     }
 
-    public IEnumerable<Dtos.Truck.Response> GetTrucks(Expression<Func<Entities.Truck, bool>> filter, bool includeBranch, bool includeOrders)
+    public async Task<IEnumerable<Dtos.Truck.Response>> GetTrucks(Expression<Func<Entities.Truck, bool>> filter, bool includeBranch, bool includeOrders)
     {
         var includedData = "";
         Func<Entities.Truck, Dtos.Branch.Response?> getBranchResponse;
@@ -174,25 +174,25 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         else
             getOrderResponses = _ => null;
 
-        return truckStorageService.FindAll(filter, includedData).Select(t => new Dtos.Truck.Response(t.Guid,
+        return (await truckStorageService.FindAll(filter, includedData)).Select(t => new Dtos.Truck.Response(t.Guid,
             t.CommissionedDate, t.DecommissionedDate, t.PermittedHazardClassesFlags == null ? null : HazardClassesFlags.FlagCombinationToString(t.PermittedHazardClassesFlags.Value), t.Number, t.IsAvailable,
             t.TrailerIsTank, t.VolumeMax, t.VolumePrice, t.WeightMax, t.WeightPrice, t.PricePerKm, getBranchResponse(t),
             getOrderResponses(t)));
     }
     
-    public void DeleteTrucks(Expression<Func<Entities.Truck, bool>> filter)
+    public async Task DeleteTrucks(Expression<Func<Entities.Truck, bool>> filter)
     {
-        var trucks = truckStorageService.FindAll(filter);
+        var trucks = await truckStorageService.FindAll(filter);
         
-        truckStorageService.RemoveRange(trucks);
+        await truckStorageService.RemoveRange(trucks);
     }
 
-    public void UpdateTrucks(IReadOnlyCollection<Dtos.Truck.UpdateRequest> updateRequests)
+    public async Task UpdateTrucks(IReadOnlyCollection<Dtos.Truck.UpdateRequest> updateRequests)
     {
         var trucksGuids = new HashSet<string>(updateRequests.Count);
         foreach (var updateRequest in updateRequests)
             trucksGuids.Add(updateRequest.Guid);
-        var trucks = truckStorageService.FindAll(t => trucksGuids.Contains(t.Guid)).ToDictionary(d => d.Guid);
+        var trucks = (await truckStorageService.FindAll(t => trucksGuids.Contains(t.Guid))).ToDictionary(d => d.Guid);
         
         foreach (var updateRequest in updateRequests)
         {
@@ -207,7 +207,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 truck.SetPermittedHazardClassesFlags(updateRequest.SetPermittedHazardClassesFlags == null ? null : HazardClassesFlags.StringToFlagCombination(updateRequest.SetPermittedHazardClassesFlags));
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
             {
-                var branch = branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
+                var branch = await branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
                 if (branch == null)
                     throw new ArgumentException($"The branch {updateRequest.SetBranch} does not exist.", nameof(updateRequests));
                 
@@ -231,24 +231,24 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 truck.SetPricePerKm(updateRequest.SetPricePerKm);
         }
         
-        truckStorageService.UpdateRange(trucks.Values);
+        await truckStorageService.UpdateRange(trucks.Values);
     }
     
-    public void CreateVkUsers(IReadOnlyCollection<Dtos.User.CreateVkRequest> createRequests)
+    public async Task CreateVkUsers(IReadOnlyCollection<Dtos.User.CreateVkRequest> createRequests)
     {
         var users = createRequests.Select(cr => Entities.User.New(cr.Name, cr.Contact, cr.VkUserId));
 
-        userStorageService.CreateRange(users);
+        await userStorageService.CreateRange(users);
     }
     
-    public void CreateStandartUsers(IReadOnlyCollection<Dtos.User.CreateStandartRequest> createRequests)
+    public async Task CreateStandartUsers(IReadOnlyCollection<Dtos.User.CreateStandartRequest> createRequests)
     {
         var users = createRequests.Select(cr => Entities.User.New(cr.Name, cr.Contact, cr.Login, cr.Password, cryptographicService));
 
-        userStorageService.CreateRange(users);
+        await userStorageService.CreateRange(users);
     }
 
-    public IEnumerable<Dtos.User.Response> GetUsers(Expression<Func<Entities.User, bool>> filter, bool includeOrders)
+    public async Task<IEnumerable<Dtos.User.Response>> GetUsers(Expression<Func<Entities.User, bool>> filter, bool includeOrders)
     {
         var includedData = "";
         Func<Entities.User, IEnumerable<Dtos.Order.Response>?> getOrderResponses;
@@ -264,23 +264,23 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         else
             getOrderResponses = _ => null;
 
-        return userStorageService.FindAll(filter, includedData).Select(u => new Dtos.User.Response(u.Guid, u.RegistrationDate,
+        return (await userStorageService.FindAll(filter, includedData)).Select(u => new Dtos.User.Response(u.Guid, u.RegistrationDate,
             u.VkUserId, u.Login, u.Password, u.Name, u.Contact, getOrderResponses(u)));
     }
     
-    public void DeleteUsers(Expression<Func<Entities.User, bool>> filter)
+    public async Task DeleteUsers(Expression<Func<Entities.User, bool>> filter)
     {
-        var users = userStorageService.FindAll(filter);
+        var users = await userStorageService.FindAll(filter);
         
-        userStorageService.RemoveRange(users);
+        await userStorageService.RemoveRange(users);
     }
 
-    public void UpdateUsers(IReadOnlyCollection<Dtos.User.UpdateRequest> updateRequests)
+    public async Task UpdateUsers(IReadOnlyCollection<Dtos.User.UpdateRequest> updateRequests)
     {
         var userGuids = new HashSet<string>(updateRequests.Count);
         foreach (var updateRequest in updateRequests)
             userGuids.Add(updateRequest.Guid);
-        var users = userStorageService.FindAll(t => userGuids.Contains(t.Guid)).ToDictionary(d => d.Guid);
+        var users = (await userStorageService.FindAll(t => userGuids.Contains(t.Guid))).ToDictionary(d => d.Guid);
         
         foreach (var updateRequest in updateRequests)
         {
@@ -297,17 +297,17 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 user.Contact = updateRequest.SetContact;
         }
         
-        userStorageService.UpdateRange(users.Values);
+        await userStorageService.UpdateRange(users.Values);
     }
     
-    public void CreateBranches(IReadOnlyCollection<Dtos.Branch.CreateRequest> createRequests)
+    public async Task CreateBranches(IReadOnlyCollection<Dtos.Branch.CreateRequest> createRequests)
     {
         var branches = createRequests.Select(cr => Entities.Branch.New(cr.Address, (cr.Latitude, cr.Longitude)));
 
-        branchStorageService.CreateRange(branches);
+        await branchStorageService.CreateRange(branches);
     }
 
-    public IEnumerable<Dtos.Branch.Response> GetBranches(Expression<Func<Entities.Branch, bool>> filter, bool includeTrucks, bool includeDrivers)
+    public async Task<IEnumerable<Dtos.Branch.Response>> GetBranches(Expression<Func<Entities.Branch, bool>> filter, bool includeTrucks, bool includeDrivers)
     {
         var includedData = "";
         Func<Entities.Branch, IEnumerable<Dtos.Truck.Response>?> getTruckResponses;
@@ -335,24 +335,24 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         else
             getDriverResponses = _ => null;
 
-        return branchStorageService.FindAll(filter, includedData).Select(b =>
+        return (await branchStorageService.FindAll(filter, includedData)).Select(b =>
             new Dtos.Branch.Response(b.Guid, b.Address, b.Latitude, b.Longitude, getTruckResponses(b),
                 getDriverResponses(b), null, null));
     }
     
-    public void DeleteBranches(Expression<Func<Entities.Branch, bool>> filter)
+    public async Task DeleteBranches(Expression<Func<Entities.Branch, bool>> filter)
     {
-        var branches = branchStorageService.FindAll(filter);
+        var branches = await branchStorageService.FindAll(filter);
         
-        branchStorageService.RemoveRange(branches);
+        await branchStorageService.RemoveRange(branches);
     }
 
-    public void UpdateBranches(IReadOnlyCollection<Dtos.Branch.UpdateRequest> updateRequests)
+    public async Task UpdateBranches(IReadOnlyCollection<Dtos.Branch.UpdateRequest> updateRequests)
     {
         var branchGuids = new HashSet<string>(updateRequests.Count);
         foreach (var updateRequest in updateRequests)
             branchGuids.Add(updateRequest.Guid);
-        var branches = branchStorageService.FindAll(b => branchGuids.Contains(b.Guid)).ToDictionary(d => d.Guid);
+        var branches = (await branchStorageService.FindAll(b => branchGuids.Contains(b.Guid))).ToDictionary(d => d.Guid);
         
         foreach (var updateRequest in updateRequests)
         {
@@ -367,7 +367,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 branch.Longitude = updateRequest.SetLongitude!.Value;
         }
         
-        branchStorageService.UpdateRange(branches.Values);
+        await branchStorageService.UpdateRange(branches.Values);
     }
     
     /*public IEnumerable<Dtos.Branch.Response> GetOrders(Expression<Func<Entities.Branch, bool>> filter, bool includeTrucks, bool includeDrivers)
@@ -403,9 +403,9 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 getDriverResponses(b), null, null));
     }*/
     
-    public IEnumerable<Dtos.Branch.Response> GetPotentialOrderPerformersByBranches(string orderGuid)
+    public async Task<IEnumerable<Dtos.Branch.Response>> GetPotentialOrderPerformersByBranches(string orderGuid)
     {
-        var order = orderStorageService.Find(o => o.Guid == orderGuid);
+        var order = await orderStorageService.Find(o => o.Guid == orderGuid);
         if (order == null)
             throw new ArgumentException($"The orded {orderGuid} does not exist.", nameof(orderGuid));
         
@@ -430,7 +430,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             driverPredicate = d => d.IsAvailable;
         }
 
-        var branches = branchStorageService.FindAll(_ => true, "Trucks;Drivers;").ToList();
+        var branches = await branchStorageService.FindAll(_ => true, "Trucks;Drivers;");
         var branchResponses = new List<Dtos.Branch.Response>(branches.Count);
         foreach (var branch in branches)
         {

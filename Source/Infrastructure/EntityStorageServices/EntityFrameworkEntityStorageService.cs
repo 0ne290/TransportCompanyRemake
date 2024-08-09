@@ -6,24 +6,13 @@ namespace EntityStorageServices;
 
 public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContext dbContext) : IEntityStorageService<TEntity> where TEntity : class
 {
-    public void CreateRange(IEnumerable<TEntity> entities)
+    public async Task CreateRange(IEnumerable<TEntity> entities)
     {
-        dbContext.AddRangeAsync(entities);
-        dbContext.SaveChangesAsync();
+        await dbContext.AddRangeAsync(entities);
+        await dbContext.SaveChangesAsync();
     }
 
-    public TEntity? Find(Expression<Func<TEntity, bool>> filter, string includedData = "")
-    {
-        var includedProperties = includedData.Split(";");
-        
-        var query = dbContext.Set<TEntity>().AsNoTrackingWithIdentityResolution();
-        query = includedProperties.Where(includedProperty => !string.IsNullOrEmpty(includedProperty))
-            .Aggregate(query, (current, includedProperty) => current.Include(includedProperty));
-
-        return query.SingleOrDefault(filter);
-    }
-
-    public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter, string includedData = "")
+    public async Task<TEntity?> Find(Expression<Func<TEntity, bool>> filter, string includedData = "")
     {
         var includedProperties = includedData.Split(";");
         
@@ -31,22 +20,33 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
         query = includedProperties.Where(includedProperty => !string.IsNullOrEmpty(includedProperty))
             .Aggregate(query, (current, includedProperty) => current.Include(includedProperty));
 
-        return query.Where(filter);
+        return await query.SingleOrDefaultAsync(filter);
     }
 
-    public void UpdateRange(IEnumerable<TEntity> entities)
+    public async Task<ICollection<TEntity>> FindAll(Expression<Func<TEntity, bool>> filter, string includedData = "")
+    {
+        var includedProperties = includedData.Split(";");
+        
+        var query = dbContext.Set<TEntity>().AsNoTrackingWithIdentityResolution();
+        query = includedProperties.Where(includedProperty => !string.IsNullOrEmpty(includedProperty))
+            .Aggregate(query, (current, includedProperty) => current.Include(includedProperty));
+
+        return await query.Where(filter).ToListAsync();
+    }
+
+    public async Task UpdateRange(IEnumerable<TEntity> entities)
     {
         var entityStore = dbContext.Set<TEntity>();
         entityStore.AttachRange();
         foreach (var entity in entities)
             dbContext.Entry(entity).State = EntityState.Modified;
 
-        dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
     }
 
-    public void RemoveRange(IEnumerable<TEntity> entities)
+    public async Task RemoveRange(IEnumerable<TEntity> entities)
     {
         dbContext.RemoveRange(entities);
-        dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
     }
 }
