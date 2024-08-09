@@ -78,7 +78,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue((bool?)null)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
     public required bool? SetAdrQualificationOfTank
     {
@@ -120,7 +120,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue((bool?)null)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
     public required bool? SetIsAvailable
     {

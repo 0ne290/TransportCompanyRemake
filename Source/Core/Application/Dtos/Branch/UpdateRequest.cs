@@ -22,7 +22,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
 
-    [DefaultValue((double?)null)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required double? SetLatitude
     {
@@ -36,7 +36,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
 
-    [DefaultValue((double?)null)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required double? SetLongitude
     {

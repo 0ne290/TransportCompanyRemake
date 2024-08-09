@@ -1,3 +1,4 @@
+using EntityStorageServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,40 @@ namespace Web;
 internal static class Program
 {
     private static async Task Main(string[] args)
+    {
+        await TestBuild();
+    }
+
+    private static async Task TestBuild()
+    {
+        var builder = WebApplication.CreateBuilder();
+        
+        builder.Services.AddControllersWithViews();
+        
+        builder.Services.AddDbContext<TransportCompanyContext>((serviceProvider, options) =>
+        {
+            var connectionString = serviceProvider.GetService<IConfiguration>()!.GetConnectionString("MySql")!;
+
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        });
+        
+        var app = builder.Build();
+
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Login}/{action=Index}/{id?}");
+
+        await app.RunAsync();
+    }
+    
+    /*private static async Task RealeseBuild()
     {
         Log.Logger = new LoggerConfiguration()
             //.MinimumLevel.Debug()
@@ -98,5 +133,5 @@ internal static class Program
         {
             await Log.CloseAndFlushAsync();
         }
-    }
+    }*/
 }

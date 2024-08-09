@@ -152,5 +152,7 @@ public class Driver
     
     public virtual Branch Branch { get; private set; } = null!;
     
-    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
+    public virtual ICollection<Order> PrimaryOrders { get; private set; } = new List<Order>();
+    
+    public virtual ICollection<Order> SecondaryOrders { get; private set; } = new List<Order>();
 }

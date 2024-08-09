@@ -75,6 +75,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Core\Application\Application.csproj" />
       <ProjectReference Include="..\Core\Domain\Domain.csproj" />
+      <ProjectReference Include="..\Infrastructure\EntityStorageServices\EntityStorageServices.csproj" />
     </ItemGroup>
 
     <ItemGroup>

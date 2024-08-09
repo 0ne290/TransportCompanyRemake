@@ -45,25 +45,34 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         else
             getBranchResponse = _ => null;
         
-        Func<Entities.Driver, IEnumerable<Dtos.Order.Response>?> getOrderResponses;
+        Func<Entities.Driver, IEnumerable<Dtos.Order.Response>?> getPrimaryOrderResponses;
+        Func<Entities.Driver, IEnumerable<Dtos.Order.Response>?> getSecondaryOrderResponses;
         if (includeOrders)
         {
-            includedData += "Orders;";
-            getOrderResponses = d => d.Orders.Select(o => new Dtos.Order.Response(o.Guid, o.Status, o.DateCreated,
+            includedData += "PrimaryOrders;SecondaryOrders;";
+            getPrimaryOrderResponses = d => d.PrimaryOrders.Select(o => new Dtos.Order.Response(o.Guid, o.Status, o.DateCreated,
+                o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag == null ? null : HazardClassesFlags.FlagCombinationToString(o.HazardClassFlag.Value), o.TankRequired, o.LengthInKm,
+                o.Price, o.ExpectedHoursWorkedByDrivers, o.ActualHoursWorkedByDriver1, o.ActualHoursWorkedByDriver2,
+                null, null, null, null, null, o.StartAddress, o.EndAddress, o.CargoDescription, o.StartPointLatitude,
+                o.StartPointLongitude, o.EndPointLatitude, o.EndPointLongitude, o.CargoVolume, o.CargoWeight));
+            getSecondaryOrderResponses = d => d.SecondaryOrders.Select(o => new Dtos.Order.Response(o.Guid, o.Status, o.DateCreated,
                 o.DateAssignmentOfPerformers, o.DatePaymentAndBegin, o.DateEnd, o.HazardClassFlag == null ? null : HazardClassesFlags.FlagCombinationToString(o.HazardClassFlag.Value), o.TankRequired, o.LengthInKm,
                 o.Price, o.ExpectedHoursWorkedByDrivers, o.ActualHoursWorkedByDriver1, o.ActualHoursWorkedByDriver2,
                 null, null, null, null, null, o.StartAddress, o.EndAddress, o.CargoDescription, o.StartPointLatitude,
                 o.StartPointLongitude, o.EndPointLatitude, o.EndPointLongitude, o.CargoVolume, o.CargoWeight));
         }
         else
-            getOrderResponses = _ => null;
+        {
+            getPrimaryOrderResponses = _ => null;
+            getSecondaryOrderResponses = _ => null;
+        }
 
         return driverStorageService.FindAll(filter, includedData).Select(d => new Dtos.Driver.Response(d.Guid,
             d.HireDate, d.DismissalDate, d.HoursWorkedPerWeek, d.TotalHoursWorked,
             d.AdrQualificationFlag == null
                 ? null
                 : AdrDriverQualificationsFlags.FlagToString(d.AdrQualificationFlag.Value), d.AdrQualificationOfTank,
-            d.Name, d.IsAvailable, getBranchResponse(d), getOrderResponses(d)));
+            d.Name, d.IsAvailable, getBranchResponse(d), getPrimaryOrderResponses(d), getSecondaryOrderResponses(d)));
     }
     
     public void DeleteDrivers(Expression<Func<Entities.Driver, bool>> filter)
@@ -321,7 +330,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 d.AdrQualificationFlag == null
                     ? null
                     : AdrDriverQualificationsFlags.FlagToString(d.AdrQualificationFlag.Value),
-                d.AdrQualificationOfTank, d.Name, d.IsAvailable, null, null));
+                d.AdrQualificationOfTank, d.Name, d.IsAvailable, null, null, null));
         }
         else
             getDriverResponses = _ => null;
@@ -434,7 +443,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 d.AdrQualificationFlag == null
                     ? null
                     : AdrDriverQualificationsFlags.FlagToString(d.AdrQualificationFlag.Value),
-                d.AdrQualificationOfTank, d.Name, d.IsAvailable, null, null));
+                d.AdrQualificationOfTank, d.Name, d.IsAvailable, null, null, null));
             
             var lengthInKmAndDrivingHours = branch
                 .CalculateLengthInKmOfOrderRouteClosedAtBranchAndApproximateDrivingHoursOfTruckAlongIt(order,

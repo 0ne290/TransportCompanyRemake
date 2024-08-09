@@ -78,7 +78,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue((bool?)null)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
     public required bool? SetIsAvailable
     {
@@ -92,7 +92,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue((bool?)null)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
     public required bool? SetTrailerIsTank
     {
@@ -106,7 +106,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue(0m)]
+    [DefaultValue(0.0)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required decimal SetVolumeMax
     {
@@ -120,7 +120,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue(0m)]
+    [DefaultValue(0.0)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required decimal SetVolumePrice
     {
@@ -134,7 +134,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue(0m)]
+    [DefaultValue(0.0)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required decimal SetWeightMax
     {
@@ -148,7 +148,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue(0m)]
+    [DefaultValue(0.0)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required decimal SetWeightPrice
     {
@@ -162,7 +162,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue(0m)]
+    [DefaultValue(0.0)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required decimal SetPricePerKm
     {
