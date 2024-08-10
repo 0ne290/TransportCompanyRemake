@@ -8,7 +8,7 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
 {
     public async Task CreateRange(IEnumerable<TEntity> entities)
     {
-        await dbContext.AddRangeAsync(entities);
+        await dbContext.Set<TEntity>().AddRangeAsync(entities);
         await dbContext.SaveChangesAsync();
     }
 
@@ -16,7 +16,7 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
     {
         var includedProperties = includedData.Split(";");
         
-        var query = dbContext.Set<TEntity>().AsNoTrackingWithIdentityResolution();
+        var query = dbContext.Set<TEntity>().AsQueryable();
         query = includedProperties.Where(includedProperty => !string.IsNullOrEmpty(includedProperty))
             .Aggregate(query, (current, includedProperty) => current.Include(includedProperty));
 
@@ -27,17 +27,17 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
     {
         var includedProperties = includedData.Split(";");
         
-        var query = dbContext.Set<TEntity>().AsNoTrackingWithIdentityResolution();
+        var query = dbContext.Set<TEntity>().AsQueryable();
         query = includedProperties.Where(includedProperty => !string.IsNullOrEmpty(includedProperty))
             .Aggregate(query, (current, includedProperty) => current.Include(includedProperty));
 
         return await query.Where(filter).ToListAsync();
     }
 
-    public async Task UpdateRange(IEnumerable<TEntity> entities)
+    public async Task UpdateRange(ICollection<TEntity> entities)
     {
         var entityStore = dbContext.Set<TEntity>();
-        entityStore.AttachRange();
+        entityStore.AttachRange(entities);
         foreach (var entity in entities)
             dbContext.Entry(entity).State = EntityState.Modified;
 
@@ -46,7 +46,7 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
 
     public async Task RemoveRange(IEnumerable<TEntity> entities)
     {
-        dbContext.RemoveRange(entities);
+        dbContext.Set<TEntity>().RemoveRange(entities);
         await dbContext.SaveChangesAsync();
     }
 }

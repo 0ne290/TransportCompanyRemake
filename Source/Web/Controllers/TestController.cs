@@ -1,4 +1,6 @@
+using Application;
 using Application.Actors;
+using Domain.Entities;
 using EntityStorageServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +24,7 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
     
     [HttpPost]
     [Route("create-drivers")]
-    public async Task CreateDrivers(IReadOnlyCollection<Application.Dtos.Driver.CreateRequest> createRequests)
+    public async Task CreateDrivers([FromBody]IReadOnlyCollection<Application.Dtos.Driver.CreateRequest> createRequests)
     {
         await administrator.CreateDrivers(createRequests);
     }
@@ -31,7 +33,13 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
     [Route("create-branches")]
     public async Task CreateBranches([FromBody]IReadOnlyCollection<Application.Dtos.Branch.CreateRequest> createRequests)
     {
-        Console.WriteLine(createRequests.Count);
         await administrator.CreateBranches(createRequests);
+    }
+    
+    [HttpGet]
+    [Route("get-branches")]
+    public async Task<JsonResult> GetBranches(string filter, bool includeTrucks, bool includeDrivers)
+    {
+        return Json(await administrator.GetBranches(FilterParser.Parse<Branch>(filter), includeTrucks, includeDrivers));
     }
 }
