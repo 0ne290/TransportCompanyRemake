@@ -8,16 +8,25 @@
     src: url("../fonts/montserrat/Montserrat-VariableFont_wght.ttf") format("truetype-variations");
 }
 
-* {
+.header {
+    width: 100vw;
+    height: 7vh;
+}
+
+.main {
+    width: 100vw;
+    min-height: 93vh;
+    padding-top: 10vh;
+}
+
+.primary {
     font-family: "Montserrat", sans-serif;
+    background-color: var(--second-color);
+    color: var(--first-color);
 }
 
-html {
+.inverse-primary {
+    font-family: "Montserrat", sans-serif;
     background-color: var(--first-color);
-}
-
-.report-title {
-    background-color: #000000;
-    color: #ffffff;
-    width: 100%;
+    color: var(--second-color);
 }

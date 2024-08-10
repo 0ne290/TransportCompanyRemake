@@ -30,16 +30,30 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
     }
     
     [HttpPost]
-    [Route("create-branches")]
+    [Route("branches")]
     public async Task CreateBranches([FromBody]IReadOnlyCollection<Application.Dtos.Branch.CreateRequest> createRequests)
     {
         await administrator.CreateBranches(createRequests);
     }
     
     [HttpGet]
-    [Route("get-branches")]
-    public async Task<JsonResult> GetBranches(string filter, bool includeTrucks, bool includeDrivers)
+    [Route("branches")]
+    public async Task<IActionResult> GetBranches()
     {
-        return Json(await administrator.GetBranches(FilterParser.Parse<Branch>(filter), includeTrucks, includeDrivers));
+        return View("Branches", await administrator.GetBranches(FilterParser.Parse<Branch>("true"), true, true));
+    }
+    
+    [HttpDelete]
+    [Route("branches")]
+    public async Task DeleteBranches(string filter)
+    {
+        await administrator.DeleteBranches(FilterParser.Parse<Branch>(filter));
+    }
+    
+    [HttpPatch]
+    [Route("branches")]
+    public async Task UpdateBranches([FromBody]IReadOnlyCollection<Application.Dtos.Branch.UpdateRequest> updateRequests)
+    {
+        await administrator.UpdateBranches(updateRequests);
     }
 }
