@@ -1,32 +1,52 @@
 :root {
-    --first-color: #1a1f25;
-    --second-color: #e6b333;
+    --first-color: #1a1f25 !important;
+    --second-color: #e6b333 !important;
 }
 
 @font-face {
-    font-family: "Montserrat";
-    src: url("../fonts/montserrat/Montserrat-VariableFont_wght.ttf") format("truetype-variations");
+    font-family: "Montserrat" !important;
+    src: url("../fonts/montserrat/Montserrat-VariableFont_wght.ttf") format("truetype-variations") !important;
 }
 
 .header {
-    width: 100vw;
-    height: 7vh;
+    width: 100vw !important;
+    height: 7vh !important;
 }
 
 .main {
-    width: 100vw;
-    min-height: 93vh;
-    padding-top: 10vh;
+    width: 100vw !important;
+    min-height: 93vh !important;
+    padding-top: 10vh !important;
 }
 
-.primary {
-    font-family: "Montserrat", sans-serif;
-    background-color: var(--second-color);
-    color: var(--first-color);
+.first-font {
+    font-family: "Montserrat", sans-serif !important;
 }
 
-.inverse-primary {
-    font-family: "Montserrat", sans-serif;
-    background-color: var(--first-color);
-    color: var(--second-color);
+.first-font * {
+    font-family: inherit !important;
+}
+
+.first-background-color {
+    background-color: var(--first-color) !important;
+}
+
+.second-background-color {
+    background-color: var(--second-color) !important;
+}
+
+.first-text-color {
+    color: var(--first-color) !important;
+}
+
+.second-text-color {
+    color: var(--second-color) !important;
+}
+
+.first-border-color {
+    border-color: var(--first-color) !important;
+}
+
+.second-border-color {
+    border-color: var(--second-color) !important;
 }

@@ -10,12 +10,17 @@
   <link rel="stylesheet" href="~/dist/site.css">
 </head>
 
-<body>
-<header class="header primary">Header</header>
-<main class="main inverse-primary">
-  <div class="container inverse-primary">
-    @RenderBody()
+<body class="first-font">
+<header class="header second-background-color first-text-color">
+  <div class="container-fluid h-100">
+    <div class="row h-100">
+      <div class="col d-flex justify-content-center align-items-center h-100 border-end first-border-color"><h2>Заказы</h2></div>
+      <div class="col d-flex justify-content-center align-items-center h-100 border-start first-border-color"><h2>Администрирование</h2></div>
+    </div>
   </div>
+</header>
+<main class="main first-background-color second-text-color">
+  @RenderBody()
 </main>
 </body>
 
