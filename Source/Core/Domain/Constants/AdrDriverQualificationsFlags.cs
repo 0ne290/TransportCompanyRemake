@@ -26,13 +26,13 @@ public static class AdrDriverQualificationsFlags
 
     private static readonly Dictionary<string, int> FlagsByStrings = new(new[]
     {
-        new KeyValuePair<string, int>("AdrDriverQualificationsFlags.Base", Base), new KeyValuePair<string, int>("AdrDriverQualificationsFlags.BaseAndClass7", BaseAndClass7),
-        new KeyValuePair<string, int>("AdrDriverQualificationsFlags.BaseAndClass1", BaseAndClass1), new KeyValuePair<string, int>("AdrDriverQualificationsFlags.Full", Full)
+        new KeyValuePair<string, int>("Base", Base), new KeyValuePair<string, int>("BaseAnd7", BaseAndClass7),
+        new KeyValuePair<string, int>("BaseAnd1", BaseAndClass1), new KeyValuePair<string, int>("Full", Full)
     });
     
     private static readonly Dictionary<int, string> StringsByFlags = new(new[]
     {
-        new KeyValuePair<int, string>(Base, "AdrDriverQualificationsFlags.Base"), new KeyValuePair<int, string>(BaseAndClass7, "AdrDriverQualificationsFlags.BaseAndClass7"),
-        new KeyValuePair<int, string>(BaseAndClass1, "AdrDriverQualificationsFlags.BaseAndClass1"), new KeyValuePair<int, string>(Full, "AdrDriverQualificationsFlags.Full")
+        new KeyValuePair<int, string>(Base, "Base"), new KeyValuePair<int, string>(BaseAndClass7, "BaseAnd7"),
+        new KeyValuePair<int, string>(BaseAndClass1, "BaseAnd1"), new KeyValuePair<int, string>(Full, "Full")
     });
 }

@@ -81,26 +81,26 @@ public static class HazardClassesFlags
 
     private static readonly IEnumerable<KeyValuePair<string, int>> FlagStringPairs = new[]
     {
-        new KeyValuePair<string, int>("HazardClassesFlags.Class11", Class11),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class12", Class12),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class13", Class13),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class14", Class14),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class15", Class15),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class16", Class16),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class21", Class21),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class22", Class22),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class23", Class23),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class3", Class3),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class41", Class41),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class42", Class42),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class43", Class43),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class51", Class51),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class52", Class52),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class61", Class61),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class62", Class62),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class7", Class7),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class8", Class8),
-        new KeyValuePair<string, int>("HazardClassesFlags.Class9", Class9)
+        new KeyValuePair<string, int>("11", Class11),
+        new KeyValuePair<string, int>("12", Class12),
+        new KeyValuePair<string, int>("13", Class13),
+        new KeyValuePair<string, int>("14", Class14),
+        new KeyValuePair<string, int>("15", Class15),
+        new KeyValuePair<string, int>("16", Class16),
+        new KeyValuePair<string, int>("21", Class21),
+        new KeyValuePair<string, int>("22", Class22),
+        new KeyValuePair<string, int>("23", Class23),
+        new KeyValuePair<string, int>("3", Class3),
+        new KeyValuePair<string, int>("41", Class41),
+        new KeyValuePair<string, int>("42", Class42),
+        new KeyValuePair<string, int>("43", Class43),
+        new KeyValuePair<string, int>("51", Class51),
+        new KeyValuePair<string, int>("52", Class52),
+        new KeyValuePair<string, int>("61", Class61),
+        new KeyValuePair<string, int>("62", Class62),
+        new KeyValuePair<string, int>("7", Class7),
+        new KeyValuePair<string, int>("8", Class8),
+        new KeyValuePair<string, int>("9", Class9)
     };
     
     private static readonly Dictionary<string, int> FlagsByStrings = new(FlagStringPairs);

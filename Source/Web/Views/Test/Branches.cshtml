@@ -3,77 +3,80 @@
     Layout = "_Layout";
 }
 
-@using System.Globalization
 @model IEnumerable<Application.Dtos.Branch.Response>
 
 <div class="container border border-2 rounded second-border-color p-0">
-    <div class="row m-0 p-0 second-background-color first-text-color">
-        <div class="col text-center p-3 border-end first-border-color">Филиалы</div>
-        <div class="col text-center p-3 border-start border-end first-border-color">Водители</div>
-        <div class="col text-center p-3 border-start border-end first-border-color">Фуры</div>
-        <div class="col text-center p-3 border-start first-border-color">Сохранить изменения</div>
-    </div>
-    <div class="row m-0 p-0">
-        <table class="table my-table m-0 p-0">
-            <thead>
-            <tr>
-                <th scope="col">Адрес</th>
-                <th scope="col">Широта</th>
-                <th scope="col">Долгота</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var branch in Model)
-            {
+    <ul class="nav nav-tabs row m-0 p-0 second-background-color first-text-color" role="tablist">
+        <li role="presentation" class="nav-item col text-center p-3 border-end first-border-color"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">Филиалы</button></li>
+        <li role="presentation" class="nav-item col text-center p-3 border-start border-end first-border-color"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">Водители</button></li>
+        <li role="presentation" class="nav-item col text-center p-3 border-start border-end first-border-color"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">Фуры</button></li>
+        <li class="col text-center p-3 border-start first-border-color">Сохранить изменения</li>
+    </ul>
+    <div class="tab-content row m-0 p-0 overflow-x-scroll">
+        <div role="tabpanel" class="tab-pane fade show active" id="tab1">
+            <table class="table my-table m-0 p-0">
+                <thead>
                 <tr>
-                    <th scope="row"><input class="unmodified-input" type="text" value="@branch.Address"></th>
-                    <td><input class="unmodified-input" type="text" value="@branch.Latitude"></td>
-                    <td><input class="modified-input" type="text" value="@branch.Longitude"></td>
+                    <th scope="col">Адрес</th>
+                    <th scope="col">Широта</th>
+                    <th scope="col">Долгота</th>
                 </tr>
-            }
-            </tbody>
-        </table>
-    </div>
-    <div class="row m-0 p-0 overflow-x-scroll">
-        <table class="table my-table m-0 p-0">
-            <thead>
-            <tr>
-                <th scope="col">Номер</th>
-                <th scope="col">Филиал</th>
-                <th scope="col">Дата начала эксплуатации</th>
-                <th scope="col">Дата конца эксплуатации</th>
-                <th scope="col">Допустимые классы опасности</th>
-                <th scope="col">Готов к выполнению заказа</th>
-                <th scope="col">Тип полуприцепа</th>
-                <th scope="col">Максимальный объем груза (м^3)</th>
-                <th scope="col">Цена км/м^3 (₽)</th>
-                <th scope="col">Максимальный вес груза (кг)</th>
-                <th scope="col">Цена км/кг (₽)</th>
-                <th scope="col">Ценовой коэффициент</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var branch in Model)
-            {
-                @foreach (var truck in branch.Trucks!)
+                </thead>
+                <tbody>
+                @foreach (var branch in Model)
                 {
                     <tr>
-                        <th scope="row"><input class="unmodified-input" type="text" value="@truck.Number"></th>
                         <th scope="row"><input class="unmodified-input" type="text" value="@branch.Address"></th>
-                        <td>@truck.CommissionedDate</td>
-                        <td>@(truck.DecommissionedDate?.ToString() ?? "Эксплуатируется")</td>
-                        <th scope="row"><input class="unmodified-input" type="text" value="@(truck.PermittedHazardClassesFlags ?? "None")"></th>
-                        <td><input class="unmodified-input" type="text" value="@(truck.IsAvailable ? "Да" : "Нет")"></td>
-                        <td><input class="modified-input" type="text" value="@(truck.TrailerIsTank ? "Цистерна" : "Тент")"></td>
-                        <th scope="row"><input class="unmodified-input" type="text" value="@truck.VolumeMax"></th>
-                        <td><input class="unmodified-input" type="text" value="@truck.VolumePrice"></td>
-                        <td><input class="modified-input" type="text" value="@truck.WeightMax"></td>
-                        <th scope="row"><input class="unmodified-input" type="text" value="@truck.WeightPrice"></th>
-                        <td><input class="unmodified-input" type="text" value="@truck.PricePerKm"></td>
+                        <td><input class="unmodified-input" type="text" value="@branch.Latitude"></td>
+                        <td><input class="modified-input" type="text" value="@branch.Longitude"></td>
                     </tr>
                 }
-            }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="tab3">
+            <table class="table my-table m-0 p-0">
+                <thead>
+                <tr>
+                    <th scope="col">Номер</th>
+                    <th scope="col">Филиал</th>
+                    <th scope="col">Дата начала эксплуатации</th>
+                    <th scope="col">Дата конца эксплуатации</th>
+                    <th scope="col">Допустимые классы опасности</th>
+                    <th scope="col">Готов к выполнению заказа</th>
+                    <th scope="col">Тип полуприцепа</th>
+                    <th scope="col">Максимальный объем груза (м^3)</th>
+                    <th scope="col">Цена м^3/км (₽)</th>
+                    <th scope="col">Максимальный вес груза (кг)</th>
+                    <th scope="col">Цена кг/км (₽)</th>
+                    <th scope="col">Ценовой коэффициент (₽)</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var branch in Model)
+                {
+                    @foreach (var truck in branch.Trucks!)
+                    {
+                        <tr>
+                            <th scope="row"><input class="unmodified-input" type="text" value="@truck.Number"></th>
+                            <th scope="row"><input class="unmodified-input" type="text" value="@branch.Address"></th>
+                            <td>@truck.CommissionedDate</td>
+                            <td>@(truck.DecommissionedDate?.ToString() ?? "Эксплуатируется")</td>
+                            <th scope="row"><input class="unmodified-input" type="text" value="@(truck.PermittedHazardClassesFlags ?? "None")"></th>
+                            <td><input class="unmodified-input" type="text" value="@(truck.IsAvailable ? "Да" : "Нет")"></td>
+                            <td><input class="modified-input" type="text" value="@(truck.TrailerIsTank ? "Цистерна" : "Тент")"></td>
+                            <th scope="row"><input class="unmodified-input" type="text" value="@truck.VolumeMax"></th>
+                            <td><input class="unmodified-input" type="text" value="@truck.VolumePrice"></td>
+                            <td><input class="modified-input" type="text" value="@truck.WeightMax"></td>
+                            <th scope="row"><input class="unmodified-input" type="text" value="@truck.WeightPrice"></th>
+                            <td><input class="unmodified-input" type="text" value="@truck.PricePerKm"></td>
+                            <td><button class="second-background-color first-text-color" type="button" value="@(truck.DecommissionedDate == null ? "Decommission" : "Recommission")">@(truck.DecommissionedDate == null ? "Вывести из эксплуатации" : "Ввести в эксплуатацию")</button></td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
