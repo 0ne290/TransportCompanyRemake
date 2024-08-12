@@ -1,6 +1,7 @@
 :root {
     --first-color: #1a1f25 !important;
     --second-color: #e6b333 !important;
+    --third-color: #bdc2c9 !important;
 }
 
 @font-face {
@@ -19,6 +20,23 @@
     padding-top: 10vh !important;
 }
 
+.my-table th, td {
+    background-color: var(--first-color) !important;
+    color: var(--third-color) !important;
+}
+
+.unmodified-input {
+    background-color: var(--first-color) !important;
+    color: var(--third-color) !important;
+    border: 1px solid var(--third-color);
+}
+
+.modified-input {
+    background-color: var(--first-color) !important;
+    color: var(--third-color) !important;
+    border: 1px solid var(--second-color);
+}
+
 .first-font {
     font-family: "Montserrat", sans-serif !important;
 }
@@ -35,6 +53,10 @@
     background-color: var(--second-color) !important;
 }
 
+.third-background-color {
+    background-color: var(--third-color) !important;
+}
+
 .first-text-color {
     color: var(--first-color) !important;
 }
@@ -43,10 +65,18 @@
     color: var(--second-color) !important;
 }
 
+.third-text-color {
+    color: var(--third-color) !important;
+}
+
 .first-border-color {
     border-color: var(--first-color) !important;
 }
 
 .second-border-color {
     border-color: var(--second-color) !important;
+}
+
+.third-border-color {
+    border-color: var(--third-color) !important;
 }
