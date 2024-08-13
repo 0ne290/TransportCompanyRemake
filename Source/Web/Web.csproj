@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <Folder Include="ClientApplication\src\fonts\" />
-      <Folder Include="Models\" />
     </ItemGroup>
 
     <ItemGroup>

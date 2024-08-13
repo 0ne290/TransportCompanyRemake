@@ -1,9 +1,27 @@
+@using System.Text
+
+@model ICollection<Web.ViewModels.Branch>
+
 @{
     ViewBag.Title = "Branches";
     Layout = "_Layout";
+    
+    var branches = new StringBuilder(400 * Model.Count);
+    var drivers = new StringBuilder(1);
+    var trucks = new StringBuilder(1);
+    @foreach (var branch in Model)
+    {
+        branches.Append($"<tr><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{branch.Address}\"></th><td><input class=\"unmodified-input\" type=\"text\" value=\"{branch.Latitude}\"></td><td><input class=\"modified-input\" type=\"text\" value=\"{branch.Longitude}\"></td></tr>");
+        
+        drivers.Capacity += 1200 * branch.Drivers.Count;
+        @foreach (var driver in branch.Drivers)
+            drivers.Append($"<tr><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{driver.Name}\"></th><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{branch.Address}\"></th><td>{driver.HireDate}</td><td>{driver.DismissalDate}</td><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{driver.AdrQualificationFlag}\"></th><td><input class=\"unmodified-input\" type=\"text\" value=\"{driver.IsAvailable}\"></td><td><input class=\"modified-input\" type=\"text\" value=\"{driver.AdrQualificationOfTank}\"></td><td>{driver.HoursWorkedPerWeek}</td><td>{driver.TotalHoursWorked}</td><td><button class=\"second-background-color first-text-color\" type=\"button\" value=\"{driver.ButtonValue}\">{driver.ButtonText}</button></td><td><input class=\"modified-input\" type=\"text\" placeholder=\"Добавить отработанных часов\"></td><td><button class=\"second-background-color first-text-color\" type=\"button\" value=\"ResetHoursWorkedPerWeek\">Сбросить часы, отработанные за неделю</button></td></tr>");
+		
+        trucks.Capacity += 1200 * branch.Trucks.Count;
+        @foreach (var truck in branch.Trucks)
+            trucks.Append($"<tr><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{truck.Number}\"></th><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{branch.Address}\"></th><td>{truck.CommissionedDate}</td><td>{truck.DecommissionedDate}</td><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{truck.PermittedHazardClassesFlags}\"></th><td><input class=\"unmodified-input\" type=\"text\" value=\"{truck.IsAvailable}\"></td><td><input class=\"modified-input\" type=\"text\" value=\"{truck.TrailerIsTank}\"></td><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{truck.VolumeMax}\"></th><td><input class=\"unmodified-input\" type=\"text\" value=\"{truck.VolumePrice}\"></td><td><input class=\"modified-input\" type=\"text\" value=\"{truck.WeightMax}\"></td><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{truck.WeightPrice}\"></th><td><input class=\"unmodified-input\" type=\"text\" value=\"{truck.PricePerKm}\"></td><td><button class=\"second-background-color first-text-color\" type=\"button\" value=\"{truck.ButtonValue}\">{truck.ButtonText}</button></td></tr>");
+    }
 }
-
-@model IEnumerable<Application.Dtos.Branch.Response>
 
 <div class="container border border-2 rounded second-border-color p-0">
     <ul class="nav nav-tabs row m-0 p-0 second-background-color first-text-color" role="tablist">
@@ -23,14 +41,28 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach (var branch in Model)
-                {
-                    <tr>
-                        <th scope="row"><input class="unmodified-input" type="text" value="@branch.Address"></th>
-                        <td><input class="unmodified-input" type="text" value="@branch.Latitude"></td>
-                        <td><input class="modified-input" type="text" value="@branch.Longitude"></td>
-                    </tr>
-                }
+                @Html.Raw(branches.ToString())
+                </tbody>
+            </table>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="tab2">
+            <table class="table my-table m-0 p-0">
+                <thead>
+                <tr>
+                    <th scope="col">ФИО</th>
+                    <th scope="col">Филиал</th>
+                    <th scope="col">Дата приема на работу</th>
+                    <th scope="col">Дата увольнения</th>
+                    <th scope="col">Квалификация ДОПОГ</th>
+                    <th scope="col">Готов к выполнению заказа</th>
+                    <th scope="col">Есть квалификация ДОПОГ на перевозку цистерн</th>
+                    <th scope="col">Часов отработано за неделю</th>
+                    <th scope="col">Всего часов отработано</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                @Html.Raw(drivers.ToString())
                 </tbody>
             </table>
         </div>
@@ -54,27 +86,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach (var branch in Model)
-                {
-                    @foreach (var truck in branch.Trucks!)
-                    {
-                        <tr>
-                            <th scope="row"><input class="unmodified-input" type="text" value="@truck.Number"></th>
-                            <th scope="row"><input class="unmodified-input" type="text" value="@branch.Address"></th>
-                            <td>@truck.CommissionedDate</td>
-                            <td>@(truck.DecommissionedDate?.ToString() ?? "Эксплуатируется")</td>
-                            <th scope="row"><input class="unmodified-input" type="text" value="@(truck.PermittedHazardClassesFlags ?? "None")"></th>
-                            <td><input class="unmodified-input" type="text" value="@(truck.IsAvailable ? "Да" : "Нет")"></td>
-                            <td><input class="modified-input" type="text" value="@(truck.TrailerIsTank ? "Цистерна" : "Тент")"></td>
-                            <th scope="row"><input class="unmodified-input" type="text" value="@truck.VolumeMax"></th>
-                            <td><input class="unmodified-input" type="text" value="@truck.VolumePrice"></td>
-                            <td><input class="modified-input" type="text" value="@truck.WeightMax"></td>
-                            <th scope="row"><input class="unmodified-input" type="text" value="@truck.WeightPrice"></th>
-                            <td><input class="unmodified-input" type="text" value="@truck.PricePerKm"></td>
-                            <td><button class="second-background-color first-text-color" type="button" value="@(truck.DecommissionedDate == null ? "Decommission" : "Recommission")">@(truck.DecommissionedDate == null ? "Вывести из эксплуатации" : "Ввести в эксплуатацию")</button></td>
-                        </tr>
-                    }
-                }
+                @Html.Raw(trucks.ToString())
                 </tbody>
             </table>
         </div>

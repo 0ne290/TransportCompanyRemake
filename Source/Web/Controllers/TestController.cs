@@ -40,7 +40,7 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
     [Route("branches")]
     public async Task<IActionResult> GetBranches()
     {
-        return View("Branches", await administrator.GetBranches(FilterParser.Parse<Branch>("true"), true, true));
+        return View("Branches", (await administrator.GetBranches(FilterParser.Parse<Branch>("true"), true, true)).Select(b => new ViewModels.Branch(b)).ToList());
     }
     
     [HttpDelete]

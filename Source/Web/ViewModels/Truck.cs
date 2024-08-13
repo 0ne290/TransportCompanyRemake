@@ -1,0 +1,63 @@
+using System.Globalization;
+using Application.Dtos.Truck;
+
+namespace Web.ViewModels;
+
+public record Truck
+{
+    public Truck(Response truck)
+    {
+        Guid = truck.Guid;
+        CommissionedDate = truck.CommissionedDate.ToString(CultureInfo.InvariantCulture);
+        PermittedHazardClassesFlags = truck.PermittedHazardClassesFlags ?? "Нет";
+        Number = truck.Number;
+        IsAvailable = truck.IsAvailable ? "Да" : "Нет";
+        TrailerIsTank = truck.TrailerIsTank ? "Цистерна" : "Тент";
+        VolumeMax = truck.VolumeMax.ToString(CultureInfo.InvariantCulture);
+        VolumePrice = truck.VolumePrice.ToString(CultureInfo.InvariantCulture);
+        WeightMax = truck.WeightMax.ToString(CultureInfo.InvariantCulture);
+        WeightPrice = truck.WeightPrice.ToString(CultureInfo.InvariantCulture);
+        PricePerKm = truck.PricePerKm.ToString(CultureInfo.InvariantCulture);
+
+        if (truck.DecommissionedDate == null)
+        {
+            DecommissionedDate = "Эксплуатируется";
+            ButtonValue = "Decommission";
+            ButtonText = "Вывести из эксплуатации";
+        }
+        else
+        {
+            DecommissionedDate = truck.DecommissionedDate.Value.ToString(CultureInfo.InvariantCulture);
+            ButtonValue = "Recommission";
+            ButtonText = "Вернуть в эксплуатацию";
+        }
+    }
+
+    public string Guid { get; }
+    
+    public string CommissionedDate { get; }
+    
+    public string DecommissionedDate { get; }
+    
+    public string PermittedHazardClassesFlags { get; }
+    
+    public string Number { get; }
+    
+    public string IsAvailable { get; }
+    
+    public string TrailerIsTank { get; }
+    
+    public string VolumeMax { get; }
+    
+    public string VolumePrice { get; }
+    
+    public string WeightMax { get; }
+    
+    public string WeightPrice { get; }
+    
+    public string PricePerKm { get; }
+    
+    public string ButtonValue { get; }
+    
+    public string ButtonText { get; }
+}
