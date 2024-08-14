@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@ViewData["Title"]</title>
   <script src="~/dist/site.entry.js" defer></script>
-  @await RenderSectionAsync("Scripts", false)
+  @await RenderSectionAsync("ImportScripts", false)
   <link rel="stylesheet" href="~/dist/site.css">
 </head>
 
@@ -22,6 +22,7 @@
 <main class="main first-background-color second-text-color">
   @RenderBody()
 </main>
+@await RenderSectionAsync("Scripts", false)
 </body>
 
 </html>
