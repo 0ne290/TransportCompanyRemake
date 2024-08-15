@@ -11,7 +11,7 @@
     var trucks = new StringBuilder(1);
     @foreach (var branch in Model)
     {
-        branches.Append($"<tr><th scope=\"row\"><input class=\"unmodified-input\" type=\"text\" value=\"{branch.Address}\"></th><td><input class=\"unmodified-input\" type=\"text\" value=\"{branch.Latitude}\"></td><td><input class=\"unmodified-input\" type=\"text\" value=\"{branch.Longitude}\"></td></tr>");
+        branches.Append($"<tr><th scope=\"row\"><input data-branch-guid=\"{branch.Guid}\" class=\"unmodified-input\" type=\"text\" value=\"{branch.Address}\" oninput=\"setBranchAddress(this)\"></th><td><input data-branch-guid=\"{branch.Guid}\" class=\"unmodified-input\" type=\"text\" value=\"{branch.Latitude}\" oninput=\"setBranchLatitude(this)\"></td><td><input data-branch-guid=\"{branch.Guid}\" class=\"unmodified-input\" type=\"text\" value=\"{branch.Longitude}\" oninput=\"setBranchLongitude(this)\"></td></tr>");
         
         drivers.Capacity += 1200 * branch.Drivers.Count;
         @foreach (var driver in branch.Drivers)
@@ -23,12 +23,65 @@
     }
 }
 
+@section Scripts
+{
+    <script>
+    let branchUpdateRequests = new Map();
+    
+    function setBranchAddress(input) {
+        let branchGuid = input.dataset.branchGuid;
+        let newAddress = input.value;
+        if (branchUpdateRequests.has(branchGuid)) {
+            let branchUpdateRequest = branchUpdateRequests.get(branchGuid);
+            branchUpdateRequest.SetAddress = newAddress;
+        }
+        else
+            branchUpdateRequests.set(branchGuid, { Guid: branchGuid, SetAddress: newAddress });
+    }
+    
+    function setBranchLatitude(input) {
+        let branchGuid = input.dataset.branchGuid;
+        let newLatitude = input.value;
+        if (branchUpdateRequests.has(branchGuid)) {
+            let branchUpdateRequest = branchUpdateRequests.get(branchGuid);
+            branchUpdateRequest.SetLatitude = newLatitude;
+        }
+        else
+            branchUpdateRequests.set(branchGuid, { Guid: branchGuid, SetLatitude: newLatitude });
+    }
+    
+    function setBranchLongitude(input) {
+        let branchGuid = input.dataset.branchGuid;
+        let newLongitude = input.value;
+        if (branchUpdateRequests.has(branchGuid)) {
+            let branchUpdateRequest = branchUpdateRequests.get(branchGuid);
+            branchUpdateRequest.SetLongitude = newLongitude;
+        }
+        else
+            branchUpdateRequests.set(branchGuid, { Guid: branchGuid, SetLongitude: newLongitude });
+    }
+    
+    async function saveChanges() {
+        let response = await fetch('http://192.168.0.103/test/branches', {
+            method: 'PATCH',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(Array.from(branchUpdateRequests.values()))
+        });
+        alert(response.status);
+        location.reload();
+    }
+    </script>
+}
+
 <div class="container border border-2 rounded second-border-color p-0">
     <ul class="nav nav-tabs row m-0 p-0 second-background-color first-text-color" role="tablist">
         <li role="presentation" class="nav-item col text-center p-3 border-end first-border-color"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">Филиалы</button></li>
         <li role="presentation" class="nav-item col text-center p-3 border-start border-end first-border-color"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">Водители</button></li>
         <li role="presentation" class="nav-item col text-center p-3 border-start border-end first-border-color"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">Фуры</button></li>
-        <li class="col text-center p-3 border-start first-border-color">Сохранить изменения</li>
+        <li class="col text-center p-3 border-start first-border-color" style="cursor: pointer" onclick="saveChanges()">Сохранить изменения</li>
     </ul>
     <div class="tab-content row m-0 p-0">
         <div role="tabpanel" class="tab-pane fade show active overflow-auto" id="tab1" style="height: 74vh">

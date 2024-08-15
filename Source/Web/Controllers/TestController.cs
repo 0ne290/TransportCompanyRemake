@@ -3,6 +3,7 @@ using Application.Actors;
 using Domain.Entities;
 using EntityStorageServices;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Web.Controllers;
 
@@ -54,6 +55,7 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
     [Route("branches")]
     public async Task UpdateBranches([FromBody]IReadOnlyCollection<Application.Dtos.Branch.UpdateRequest> updateRequests)
     {
+        Console.WriteLine(JsonConvert.SerializeObject(updateRequests));
         await administrator.UpdateBranches(updateRequests);
     }
 }
