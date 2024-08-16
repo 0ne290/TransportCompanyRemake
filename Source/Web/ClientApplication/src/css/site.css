@@ -25,13 +25,13 @@
     color: var(--third-color) !important;
 }
 
-.unmodified-input {
+.inactive {
     background-color: var(--first-color) !important;
     color: var(--third-color) !important;
     border: 1px solid var(--third-color);
 }
 
-.modified-input {
+.active {
     background-color: var(--first-color) !important;
     color: var(--third-color) !important;
     border: 1px solid var(--second-color);
