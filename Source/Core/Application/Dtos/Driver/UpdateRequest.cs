@@ -36,14 +36,14 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
 
-    [DefaultValue(0d)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required double AddHoursWorked
+    public required double? AddHoursWorked
     {
         get => _addHoursWorked;
         init
         {
-            if (value != 0)
+            if (value != null)
                 SetProperty(nameof(AddHoursWorked));
 
             _addHoursWorked = value;
@@ -79,7 +79,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
     }
     
     [DefaultValue(null)]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required bool? SetAdrQualificationOfTank
     {
         get => _setAdrQualificationOfTank;
@@ -92,28 +92,28 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
-    public required string SetBranch
+    [DefaultValue(null)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    public required string? SetBranch
     {
         get => _setBranch;
         init
         {
-            if (value != "")
+            if (value != null)
                 SetProperty(nameof(SetBranch));
 
             _setBranch = value;
         }
     }
     
-    [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
+    [DefaultValue(null)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required string SetName
     {
         get => _setName;
         init
         {
-            if (value != "")
+            if (value != null)
                 SetProperty(nameof(SetName));
 
             _setName = value;
@@ -121,7 +121,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
     }
     
     [DefaultValue(null)]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required bool? SetIsAvailable
     {
         get => _setIsAvailable;
@@ -138,7 +138,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
 
     private readonly bool _dismiss;
 
-    private readonly double _addHoursWorked;
+    private readonly double? _addHoursWorked;
 
     private readonly bool _resetHoursWorkedPerWeek;
 
@@ -146,9 +146,9 @@ public class UpdateRequest : PropertiesSetFactCheckBase
 
     private readonly bool? _setAdrQualificationOfTank;
     
-    private readonly string _setBranch = "";
+    private readonly string? _setBranch;
     
-    private readonly string _setName = "";
+    private readonly string? _setName;
 
     private readonly bool? _setIsAvailable;
 }
