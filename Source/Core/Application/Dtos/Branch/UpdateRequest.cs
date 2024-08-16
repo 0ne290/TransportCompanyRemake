@@ -8,14 +8,14 @@ public class UpdateRequest : PropertiesSetFactCheckBase
     [JsonProperty(Required = Required.Always)]
     public required string Guid { get; init; }
     
-    [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
-    public required string SetAddress
+    [DefaultValue(null)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    public required string? SetAddress
     {
         get => _setAddress;
         init
         {
-            if (value != "")
+            if (value != null)
                 SetProperty(nameof(SetAddress));
 
             _setAddress = value;
@@ -50,7 +50,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    private readonly string _setAddress = null!;
+    private readonly string? _setAddress;
 
     private readonly double? _setLatitude;
 
