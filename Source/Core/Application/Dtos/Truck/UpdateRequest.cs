@@ -50,28 +50,28 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
-    public required string SetBranch
+    [DefaultValue(null)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    public required string? SetBranch
     {
         get => _setBranch;
         init
         {
-            if (value != "")
+            if (value != null)
                 SetProperty(nameof(SetBranch));
 
             _setBranch = value;
         }
     }
     
-    [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
-    public required string SetNumber
+    [DefaultValue(null)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    public required string? SetNumber
     {
         get => _setNumber;
         init
         {
-            if (value != "")
+            if (value != null)
                 SetProperty(nameof(SetNumber));
 
             _setNumber = value;
@@ -79,7 +79,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
     }
     
     [DefaultValue(null)]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required bool? SetIsAvailable
     {
         get => _setIsAvailable;
@@ -93,7 +93,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
     }
     
     [DefaultValue(null)]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public required bool? SetTrailerIsTank
     {
         get => _setTrailerIsTank;
@@ -106,70 +106,70 @@ public class UpdateRequest : PropertiesSetFactCheckBase
         }
     }
     
-    [DefaultValue(0.0)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required decimal SetVolumeMax
+    public required decimal? SetVolumeMax
     {
         get => _setVolumeMax;
         init
         {
-            if (value != 0)
+            if (value != null)
                 SetProperty(nameof(SetVolumeMax));
 
             _setVolumeMax = value;
         }
     }
     
-    [DefaultValue(0.0)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required decimal SetVolumePrice
+    public required decimal? SetVolumePrice
     {
         get => _setVolumePrice;
         init
         {
-            if (value != 0)
+            if (value != null)
                 SetProperty(nameof(SetVolumePrice));
 
             _setVolumePrice = value;
         }
     }
     
-    [DefaultValue(0.0)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required decimal SetWeightMax
+    public required decimal? SetWeightMax
     {
         get => _setWeightMax;
         init
         {
-            if (value != 0)
+            if (value != null)
                 SetProperty(nameof(SetWeightMax));
 
             _setWeightMax = value;
         }
     }
     
-    [DefaultValue(0.0)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required decimal SetWeightPrice
+    public required decimal? SetWeightPrice
     {
         get => _setWeightPrice;
         init
         {
-            if (value != 0)
+            if (value != null)
                 SetProperty(nameof(SetWeightPrice));
 
             _setWeightPrice = value;
         }
     }
     
-    [DefaultValue(0.0)]
+    [DefaultValue(null)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public required decimal SetPricePerKm
+    public required decimal? SetPricePerKm
     {
         get => _setPricePerKm;
         init
         {
-            if (value != 0)
+            if (value != null)
                 SetProperty(nameof(SetPricePerKm));
 
             _setPricePerKm = value;
@@ -182,21 +182,21 @@ public class UpdateRequest : PropertiesSetFactCheckBase
 
     private readonly string? _setPermittedHazardClassesFlags = "Unknown flag combination";
     
-    private readonly string _setBranch = "";
+    private readonly string? _setBranch;
     
-    private readonly string _setNumber = "";
+    private readonly string? _setNumber;
 
     private readonly bool? _setIsAvailable;
 
     private readonly bool? _setTrailerIsTank;
     
-    private readonly decimal _setVolumeMax;
+    private readonly decimal? _setVolumeMax;
     
-    private readonly decimal _setVolumePrice;
+    private readonly decimal? _setVolumePrice;
     
-    private readonly decimal _setWeightMax;
+    private readonly decimal? _setWeightMax;
     
-    private readonly decimal _setWeightPrice;
+    private readonly decimal? _setWeightPrice;
     
-    private readonly decimal _setPricePerKm;
+    private readonly decimal? _setPricePerKm;
 }
