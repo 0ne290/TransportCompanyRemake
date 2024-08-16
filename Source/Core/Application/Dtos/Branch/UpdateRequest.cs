@@ -9,7 +9,7 @@ public class UpdateRequest : PropertiesSetFactCheckBase
     public required string Guid { get; init; }
     
     [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate, Required = Required.DisallowNull)]
     public required string SetAddress
     {
         get => _setAddress;
