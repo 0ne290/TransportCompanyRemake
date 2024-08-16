@@ -7,7 +7,7 @@ public class CreateRequest
     [JsonProperty(Required = Required.Always)]
     public required string Address { get; init; }
     
-    [JsonProperty(Required = Required.AllowNull)]
+    [JsonProperty(Required = Required.Allow)]
     public required double Latitude { get; init; }
     
     [JsonProperty(Required = Required.Always)]
