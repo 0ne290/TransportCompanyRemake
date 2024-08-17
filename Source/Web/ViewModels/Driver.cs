@@ -11,10 +11,10 @@ public record Driver
         HireDate = driver.HireDate.ToString(CultureInfo.InvariantCulture);
         HoursWorkedPerWeek = driver.HoursWorkedPerWeek.ToString(CultureInfo.InvariantCulture);
         TotalHoursWorked = driver.TotalHoursWorked.ToString(CultureInfo.InvariantCulture);
-        AdrQualificationFlag = driver.AdrQualificationFlag ?? "Нет";
-        AdrQualificationOfTank = driver.AdrQualificationOfTank ? "Да" : "Нет";
+        AdrQualificationFlag = driver.AdrQualificationFlag ?? "null";
+        AdrQualificationOfTank = driver.AdrQualificationOfTank ? "true" : "false";
         Name = driver.Name;
-        IsAvailable = driver.IsAvailable ? "Да" : "Нет";
+        IsAvailable = driver.IsAvailable ? "true" : "false";
         
         if (driver.DismissalDate == null)
         {

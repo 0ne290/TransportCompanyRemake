@@ -9,15 +9,15 @@ public record Truck
     {
         Guid = truck.Guid;
         CommissionedDate = truck.CommissionedDate.ToString(CultureInfo.InvariantCulture);
-        PermittedHazardClassesFlags = truck.PermittedHazardClassesFlags ?? "Нет";
+        PermittedHazardClassesFlags = truck.PermittedHazardClassesFlags ?? "null";
         Number = truck.Number;
-        IsAvailable = truck.IsAvailable ? "Да" : "Нет";
-        TrailerIsTank = truck.TrailerIsTank ? "Цистерна" : "Тент";
-        VolumeMax = truck.VolumeMax.ToString(CultureInfo.InvariantCulture);
-        VolumePrice = truck.VolumePrice.ToString(CultureInfo.InvariantCulture);
-        WeightMax = truck.WeightMax.ToString(CultureInfo.InvariantCulture);
-        WeightPrice = truck.WeightPrice.ToString(CultureInfo.InvariantCulture);
-        PricePerKm = truck.PricePerKm.ToString(CultureInfo.InvariantCulture);
+        IsAvailable = truck.IsAvailable ? "true" : "false";
+        TrailerIsTank = truck.TrailerIsTank ? "true" : "false";
+        VolumeMax = truck.VolumeMax.ToString("F6", CultureInfo.InvariantCulture);
+        VolumePrice = truck.VolumePrice.ToString("F6", CultureInfo.InvariantCulture);
+        WeightMax = truck.WeightMax.ToString("F6", CultureInfo.InvariantCulture);
+        WeightPrice = truck.WeightPrice.ToString("F6", CultureInfo.InvariantCulture);
+        PricePerKm = truck.PricePerKm.ToString("F6", CultureInfo.InvariantCulture);
 
         if (truck.DecommissionedDate == null)
         {

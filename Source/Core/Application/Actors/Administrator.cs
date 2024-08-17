@@ -96,18 +96,31 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             
             if (updateRequest.PropertyIsSet(nameof(updateRequest.Reinstate)))
                 driver.Reinstate();
-            if (updateRequest.PropertyIsSet(nameof(updateRequest.Dismiss)))
-                driver.Dismiss();
             if (updateRequest.PropertyIsSet(nameof(updateRequest.AddHoursWorked)))
-                driver.AddHoursWorked(updateRequest.AddHoursWorked);
+                driver.AddHoursWorked(updateRequest.AddHoursWorked!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.ResetHoursWorkedPerWeek)))
                 driver.ResetHoursWorkedPerWeek();
-            if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationFlag)))
-                driver.SetAdrQualificationFlag(updateRequest.SetAdrQualificationFlag == null
-                    ? null
-                    : AdrDriverQualificationsFlags.StringToFlag(updateRequest.SetAdrQualificationFlag));
-            if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationOfTank)))
-                driver.SetAdrQualificationOfTank(updateRequest.SetAdrQualificationOfTank!.Value);
+            // Причина, по которой валидация должна быть вынесена в отдельные классы. ВАЛИДАЦИЯ ДОЛЖНА ВАЛИДИРОВАТЬ СОСТОЯНИЕ, А НЕ ОТВЕЧАТЬ НА ВОПРОС "ЯВЛЯЕТСЯ ЛИ ТЕКУЩЕЕ СОСТОЯНИЕ ОБЪЕКТА КОРРЕКТНЫМ ДЛЯ ВЫЗОВА ЭТОГО МЕТОДА". Сейчас в моей проге происходит валидация ПЕРЕХОДОВ в состояния, а не самого СОСТОЯНИЯ. Получается, если выполнить транзакцию из последовательного выполнения 7 переходов, то мы получим 6 ПРОМЕЖУТОЧНЫХ СОСТОЯНИй и 1 КОНЕЧНОЕ - зачем валидировать каждое промежуточное состояние (хотя в моей проге, как я уже сказал, все еще хуже - я валидирую переходы, а не состояния)? Валидировать нужно только результат транзакции - т. е. конечное состояние
+            try// Это завершится успешно в сценарии, когда я одновременно устанавливаю SetAdrQualificationFlag из !=null в null и SetAdrQualificationOfTank из true в false. Этот сценарий не вызовет исключения только тогда, когда сперва установится SetAdrQualificationOfTank, и только после него SetAdrQualificationFlag - иначе будет исключение из SetAdrQualificationFlag. В этом и смысл данного блока try
+            {
+                if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationOfTank)))
+                    driver.SetAdrQualificationOfTank(updateRequest.SetAdrQualificationOfTank!.Value);
+                if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationFlag)))
+                    driver.SetAdrQualificationFlag(updateRequest.SetAdrQualificationFlag == null
+                        ? null
+                        : AdrDriverQualificationsFlags.StringToFlag(updateRequest.SetAdrQualificationFlag));
+            }
+            catch (InvalidOperationException e)// Это завершится успешно в сценарии, когда я одновременно устанавливаю SetAdrQualificationFlag из null в !=null и SetAdrQualificationOfTank из false в true. Этот сценарий не вызовет исключения только тогда, когда сперва установится SetAdrQualificationFlag, и только после него SetAdrQualificationOfTank - иначе будет исключение из SetAdrQualificationOfTank. В этом и смысл данного блока catch
+            {
+                if (e.Message != $"Driver {driver.Guid}. The driver cannot simultaneously have an ADR qualification for the transportation of tanks and not have any other ADR qualification")
+                    throw;
+                if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationFlag)))
+                    driver.SetAdrQualificationFlag(updateRequest.SetAdrQualificationFlag == null
+                        ? null
+                        : AdrDriverQualificationsFlags.StringToFlag(updateRequest.SetAdrQualificationFlag));
+                if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAdrQualificationOfTank)))
+                    driver.SetAdrQualificationOfTank(updateRequest.SetAdrQualificationOfTank!.Value);
+            }
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
             {
                 var branch = await branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
@@ -120,6 +133,8 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 driver.SetName(updateRequest.SetName);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetIsAvailable)))
                 driver.SetIsAvailable(updateRequest.SetIsAvailable!.Value);
+            if (updateRequest.PropertyIsSet(nameof(updateRequest.Dismiss)))
+                driver.Dismiss();
         }
         
         await driverStorageService.UpdateRange(drivers.Values);
@@ -201,8 +216,6 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             
             if (updateRequest.PropertyIsSet(nameof(updateRequest.Recommission)))
                 truck.Recommission();
-            if (updateRequest.PropertyIsSet(nameof(updateRequest.Decommission)))
-                truck.Decommission();
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetPermittedHazardClassesFlags)))
                 truck.SetPermittedHazardClassesFlags(updateRequest.SetPermittedHazardClassesFlags == null ? null : HazardClassesFlags.StringToFlagCombination(updateRequest.SetPermittedHazardClassesFlags));
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
@@ -214,21 +227,23 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 truck.SetBranch(branch);
             }
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetNumber)))
-                truck.SetNumber(updateRequest.SetNumber);
+                truck.SetNumber(updateRequest.SetNumber!);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetIsAvailable)))
                 truck.SetIsAvailable(updateRequest.SetIsAvailable!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetTrailerIsTank)))
                 truck.SetTrailerIsTank(updateRequest.SetTrailerIsTank!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetVolumeMax)))
-                truck.SetVolumeMax(updateRequest.SetVolumeMax);
+                truck.SetVolumeMax(updateRequest.SetVolumeMax!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetVolumePrice)))
-                truck.SetVolumePrice(updateRequest.SetVolumePrice);
+                truck.SetVolumePrice(updateRequest.SetVolumePrice!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetWeightMax)))
-                truck.SetWeightMax(updateRequest.SetWeightMax);
+                truck.SetWeightMax(updateRequest.SetWeightMax!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetWeightPrice)))
-                truck.SetWeightPrice(updateRequest.SetWeightPrice);
+                truck.SetWeightPrice(updateRequest.SetWeightPrice!.Value);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetPricePerKm)))
-                truck.SetPricePerKm(updateRequest.SetPricePerKm);
+                truck.SetPricePerKm(updateRequest.SetPricePerKm!.Value);
+            if (updateRequest.PropertyIsSet(nameof(updateRequest.Decommission)))
+                truck.Decommission();
         }
         
         await truckStorageService.UpdateRange(trucks.Values);
@@ -288,13 +303,13 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 throw new ArgumentException($"The user {updateRequest.Guid} does not exist.", nameof(updateRequests));
             
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetLogin)))
-                user.SetLogin(updateRequest.SetLogin);
+                user.SetLogin(updateRequest.SetLogin!);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetPassword)))
-                user.SetPassword(cryptographicService, updateRequest.SetPassword);
+                user.SetPassword(cryptographicService, updateRequest.SetPassword!);
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetName)))
-                user.Name = updateRequest.SetName;
+                user.Name = updateRequest.SetName!;
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetContact)))
-                user.Contact = updateRequest.SetContact;
+                user.Contact = updateRequest.SetContact!;
         }
         
         await userStorageService.UpdateRange(users.Values);
@@ -360,7 +375,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 throw new ArgumentException($"The branch {updateRequest.Guid} does not exist.", nameof(updateRequests));
             
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetAddress)))
-                branch.Address = updateRequest.SetAddress;
+                branch.Address = updateRequest.SetAddress!;
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetLatitude)))
                 branch.Latitude = updateRequest.SetLatitude!.Value;
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetLongitude)))

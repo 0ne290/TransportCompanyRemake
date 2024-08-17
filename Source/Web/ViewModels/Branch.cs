@@ -9,8 +9,8 @@ public record Branch
     {
         Guid = branch.Guid;
         Address = branch.Address;
-        Latitude = branch.Latitude.ToString(CultureInfo.InvariantCulture);
-        Longitude = branch.Longitude.ToString(CultureInfo.InvariantCulture);
+        Latitude = branch.Latitude.ToString("F6", CultureInfo.InvariantCulture);
+        Longitude = branch.Longitude.ToString("F6", CultureInfo.InvariantCulture);
         Trucks = branch.Trucks!.Select(t => new Truck(t)).ToList();
         Drivers = branch.Drivers!.Select(d => new Driver(d)).ToList();
     }

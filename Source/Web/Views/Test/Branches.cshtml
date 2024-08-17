@@ -10,7 +10,7 @@
     var selectOfBranches = new StringBuilder(150 * Model.Count);
     @foreach (var branch in Model)
     {
-        branches.Append($"<tr><th scope=\"row\"><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Address}\" oninput=\"setBranchAddress(this)\"></th><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Latitude}\" oninput=\"setBranchLatitude(this)\"></td><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Longitude}\" oninput=\"setBranchLongitude(this)\"></td></tr>");
+        branches.Append($"<tr><th scope=\"row\"><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Address}\" oninput=\"setBranchAddress(this)\" size=\"47\"></th><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Latitude}\" oninput=\"setBranchLatitude(this)\"></td><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Longitude}\" oninput=\"setBranchLongitude(this)\"></td></tr>");
         selectOfBranches.Append($"<option value=\"{branch.Guid}\">{branch.Address}</option>");
     }
     selectOfBranches.Append("</select>");
@@ -23,7 +23,7 @@
         @foreach (var driver in branch.Drivers)
         {
             selectOfBranches.Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>");
-            drivers.Append($"<tr><th scope=\"row\"><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" value=\"{driver.Name}\" oninput=\"setDriverName(this)\"></th><th scope=\"row\">{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverBranch(this)\">" + selectOfBranches.ToString().Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{driver.HireDate}</td><td>{driver.DismissalDate}</td><th scope=\"row\"><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" value=\"{driver.AdrQualificationFlag}\" oninput=\"setDriverAdrQualificationFlag(this)\"></th><td><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" value=\"{driver.IsAvailable}\" oninput=\"setDriverIsAvailable(this)\"></td><td><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" value=\"{driver.AdrQualificationOfTank}\" oninput=\"setDriverAdrQualificationOfTank(this)\"></td><td>{driver.HoursWorkedPerWeek}</td><td>{driver.TotalHoursWorked}</td><td><button data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"{driver.ButtonValue}\" onclick=\"dismissOrReinstateDriver(this)\">{driver.ButtonText}</button></td><td><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" size=\"27\" placeholder=\"Добавить отработанных часов\" oninput=\"addDriverHoursWorked(this)\"></td><td><button data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"ResetHoursWorkedPerWeek\" onclick=\"resetDriverHoursWorkedPerWeek(this)\">Сбросить часы, отработанные за неделю</button></td></tr>");
+            drivers.Append($"<tr><th scope=\"row\"><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" value=\"{driver.Name}\" oninput=\"setDriverName(this)\"></th><th scope=\"row\">{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverBranch(this)\" style=\"width: 47ch\">" + selectOfBranches.ToString().Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{driver.HireDate}</td><td>{driver.DismissalDate}</td><th scope=\"row\">{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverAdrQualificationFlag(this)\"><option value=\"null\">Нет</option><option value=\"Base\">Базовая</option><option value=\"BaseAnd7\">Базовая + класс 7</option><option value=\"BaseAnd1\">Базовая + класс 1</option><option value=\"Full\">Полная</option></select>".Replace($"option value=\"{driver.AdrQualificationFlag}\"", $"option selected value=\"{driver.AdrQualificationFlag}\"")}</th><td>{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverIsAvailable(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{driver.IsAvailable}\"", $"option selected value=\"{driver.IsAvailable}\"")}</td><td>{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverAdrQualificationOfTank(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{driver.AdrQualificationOfTank}\"", $"option selected value=\"{driver.AdrQualificationOfTank}\"")}</td><td>{driver.HoursWorkedPerWeek}</td><td>{driver.TotalHoursWorked}</td><td><button data-pressed=\"false\" data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"{driver.ButtonValue}\" onclick=\"dismissOrReinstateDriver(this)\">{driver.ButtonText}</button></td><td><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" size=\"27\" placeholder=\"Добавить отработанных часов\" oninput=\"addDriverHoursWorked(this)\"></td><td><button data-pressed=\"false\" data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"ResetHoursWorkedPerWeek\" onclick=\"resetDriverHoursWorkedPerWeek(this)\">Сбросить часы, отработанные за неделю</button></td></tr>");
             selectOfBranches.Replace($"<option selected value=\"{branch.Guid}\">{branch.Address}</option>", $"<option value=\"{branch.Guid}\">{branch.Address}</option>");
         }
 		
@@ -57,7 +57,7 @@
     
     function setBranchLatitude(input) {
         let branchGuid = input.dataset.branchGuid;
-        let newLatitude = input.value;
+        let newLatitude = Number(input.value);
         
         if (branchUpdateRequests.has(branchGuid)) {
             let branchUpdateRequest = branchUpdateRequests.get(branchGuid);
@@ -71,7 +71,7 @@
     
     function setBranchLongitude(input) {
         let branchGuid = input.dataset.branchGuid;
-        let newLongitude = input.value;
+        let newLongitude = Number(input.value);
         
         if (branchUpdateRequests.has(branchGuid)) {
             let branchUpdateRequest = branchUpdateRequests.get(branchGuid);
@@ -110,26 +110,129 @@
        
        select.classList.replace('inactive', 'active')
    }
+   
+   function setDriverAdrQualificationFlag(select) {
+       let driverGuid = select.dataset.driverGuid;
+       let newAdrQualificationFlag = select.options[select.selectedIndex].value;
+       if (newAdrQualificationFlag === "null")
+           newAdrQualificationFlag = null;
+       
+       if (driverUpdateRequests.has(driverGuid)) {
+           let driverUpdateRequest = driverUpdateRequests.get(driverGuid);
+           driverUpdateRequest.SetAdrQualificationFlag = newAdrQualificationFlag;
+       }
+       else
+           driverUpdateRequests.set(driverGuid, { Guid: driverGuid, SetAdrQualificationFlag: newAdrQualificationFlag });
+       
+       select.classList.replace('inactive', 'active')
+   }
+   
+   function setDriverIsAvailable(select) {
+       let driverGuid = select.dataset.driverGuid;
+       let newIsAvailable = select.options[select.selectedIndex].value === "true";
+       
+       if (driverUpdateRequests.has(driverGuid)) {
+           let driverUpdateRequest = driverUpdateRequests.get(driverGuid);
+           driverUpdateRequest.SetIsAvailable = newIsAvailable;
+       }
+       else
+           driverUpdateRequests.set(driverGuid, { Guid: driverGuid, SetIsAvailable: newIsAvailable });
+       
+       select.classList.replace('inactive', 'active')
+   }
+   
+   function setDriverAdrQualificationOfTank(select) {
+       let driverGuid = select.dataset.driverGuid;
+       let newAdrQualificationOfTank = select.options[select.selectedIndex].value === "true";
+       
+       if (driverUpdateRequests.has(driverGuid)) {
+           let driverUpdateRequest = driverUpdateRequests.get(driverGuid);
+           driverUpdateRequest.SetAdrQualificationOfTank = newAdrQualificationOfTank;
+       }
+       else
+           driverUpdateRequests.set(driverGuid, { Guid: driverGuid, SetAdrQualificationOfTank: newAdrQualificationOfTank });
+       
+       select.classList.replace('inactive', 'active')
+   }
+   
+   function dismissOrReinstateDriver(button) {
+       let driverGuid = button.dataset.driverGuid;
+       let dismissOrReinstate = button.value;
+       let newPressed = button.dataset.pressed === "false";
+       
+       if (driverUpdateRequests.has(driverGuid)) {
+           let driverUpdateRequest = driverUpdateRequests.get(driverGuid);
+           driverUpdateRequest[dismissOrReinstate] = newPressed;
+       }
+       else
+           driverUpdateRequests.set(driverGuid, { Guid: driverGuid, [dismissOrReinstate]: newPressed });
+       
+       if (newPressed)
+           button.classList.replace('inactive', 'active')
+       else
+           button.classList.replace('active', 'inactive')
+           
+       button.dataset.pressed = newPressed.toString();
+   }
+   
+   function addDriverHoursWorked(input) {
+       let driverGuid = input.dataset.driverGuid;
+       let hoursWorked = Number(input.value);
+       
+       if (driverUpdateRequests.has(driverGuid)) {
+           let driverUpdateRequest = driverUpdateRequests.get(driverGuid);
+           driverUpdateRequest.AddHoursWorked = hoursWorked;
+       }
+       else
+           branchUpdateRequests.set(driverGuid, { Guid: driverGuid, AddHoursWorked: hoursWorked });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function resetDriverHoursWorkedPerWeek(button) {
+       let driverGuid = button.dataset.driverGuid;
+       let resetHoursWorkedPerWeek = button.value;
+       let newPressed = button.dataset.pressed === "false";
+       
+       if (driverUpdateRequests.has(driverGuid)) {
+           let driverUpdateRequest = driverUpdateRequests.get(driverGuid);
+           driverUpdateRequest[resetHoursWorkedPerWeek] = newPressed;
+       }
+       else
+           driverUpdateRequests.set(driverGuid, { Guid: driverGuid, [resetHoursWorkedPerWeek]: newPressed });
+       
+       if (newPressed)
+           button.classList.replace('inactive', 'active')
+       else
+           button.classList.replace('active', 'inactive')
+           
+       button.dataset.pressed = newPressed.toString();
+   }
     
     async function saveChanges() {
-        let response1 = await fetch('http://192.168.0.103/test/branches', {
-            method: 'PATCH',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(Array.from(branchUpdateRequests.values()))
-        });
-        let response2 = await fetch('http://192.168.0.103/test/drivers', {
-            method: 'PATCH',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(Array.from(driverUpdateRequests.values()))
-        });
-        alert(response1.status);
-        alert(response2.status);
+        if (branchUpdateRequests.size > 0) {
+            let response1 = await fetch('http://192.168.0.103/test/branches', {
+                method: 'PATCH',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Array.from(branchUpdateRequests.values()))
+            });
+            alert(response1.status);
+        }
+        if (driverUpdateRequests.size > 0) {
+            let response2 = await fetch('http://192.168.0.103/test/drivers', {
+                method: 'PATCH',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Array.from(driverUpdateRequests.values()))
+            });
+            alert(response2.status);
+        }
+        
         location.reload();
     }
     </script>
