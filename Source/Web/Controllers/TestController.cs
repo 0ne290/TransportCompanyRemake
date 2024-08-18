@@ -38,6 +38,14 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
         await administrator.UpdateDrivers(updateRequests);
     }
     
+    [HttpPatch]
+    [Route("trucks")]
+    public async Task UpdateTrucks([FromBody]IReadOnlyCollection<Application.Dtos.Truck.UpdateRequest> updateRequests)
+    {
+        Console.WriteLine(JsonConvert.SerializeObject(updateRequests));
+        await administrator.UpdateTrucks(updateRequests);
+    }
+    
     [HttpPost]
     [Route("branches")]
     public async Task CreateBranches([FromBody]IReadOnlyCollection<Application.Dtos.Branch.CreateRequest> createRequests)

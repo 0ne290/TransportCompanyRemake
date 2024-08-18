@@ -26,7 +26,7 @@
 		
         trucks.Capacity += 1600 * branch.Trucks.Count;
         @foreach (var truck in branch.Trucks)
-            trucks.Append($"<tr><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.Number}\" oninput=\"setTruckNumber(this)\"></th><th scope=\"row\">{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckBranch(this)\" style=\"width: 47ch\">" + stringSelectOfBranches.Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{truck.CommissionedDate}</td><td>{truck.DecommissionedDate}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PermittedHazardClassesFlags}\" oninput=\"setTruckPermittedHazardClassesFlags\"></th><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckIsAvailable(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{truck.IsAvailable}\"", $"option selected value=\"{truck.IsAvailable}\"")}</td><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckTrailerIsTank(this)\"><option value=\"true\">Цистерна</option><option value=\"false\">Тент</option></select>".Replace($"option value=\"{truck.TrailerIsTank}\"", $"option selected value=\"{truck.TrailerIsTank}\"")}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumeMax} oninput=\"setTruckVolumeMax(this)\"\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumePrice}\" oninput=\"setTruckVolumePrice(this)\"></td><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightMax}\" oninput=\"setTruckWeightMax(this)\"></td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightPrice}\" oninput=\"setTruckWeightPrice(this)\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PricePerKm}\" oninput=\"setTruckPricePerKm(this)\"></td><td><button data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"button\" value=\"{truck.ButtonValue}\">{truck.ButtonText}</button></td></tr>");
+            trucks.Append($"<tr><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.Number}\" oninput=\"setTruckNumber(this)\"></th><th scope=\"row\">{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckBranch(this)\" style=\"width: 47ch\">" + stringSelectOfBranches.Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{truck.CommissionedDate}</td><td>{truck.DecommissionedDate}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PermittedHazardClassesFlags}\" oninput=\"setTruckPermittedHazardClassesFlags(this)\"></th><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckIsAvailable(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{truck.IsAvailable}\"", $"option selected value=\"{truck.IsAvailable}\"")}</td><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckTrailerIsTank(this)\"><option value=\"true\">Цистерна</option><option value=\"false\">Тент</option></select>".Replace($"option value=\"{truck.TrailerIsTank}\"", $"option selected value=\"{truck.TrailerIsTank}\"")}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumeMax}\" oninput=\"setTruckVolumeMax(this)\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumePrice}\" oninput=\"setTruckVolumePrice(this)\"></td><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightMax}\" oninput=\"setTruckWeightMax(this)\"></td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightPrice}\" oninput=\"setTruckWeightPrice(this)\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PricePerKm}\" oninput=\"setTruckPricePerKm(this)\"></td><td><button data-pressed=\"false\" data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"button\" value=\"{truck.ButtonValue}\" onclick=\"decommissionOrRecommissionTruck(this)\">{truck.ButtonText}</button></td></tr>");
     }
 }
 
@@ -35,6 +35,7 @@
     <script>
     let branchUpdateRequests = new Map();
     let driverUpdateRequests = new Map();
+    let truckUpdateRequests = new Map();
     
     function setBranchAddress(input) {
         let branchGuid = input.dataset.branchGuid;
@@ -203,10 +204,172 @@
            
        button.dataset.pressed = newPressed.toString();
    }
+   
+   function setTruckNumber(input) {
+       let truckGuid = input.dataset.truckGuid;
+       let newNumber = input.value;
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetNumber = newNumber;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetNumber: newNumber });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckBranch(select) {
+       let truckGuid = select.dataset.truckGuid;
+       let newBranch = select.options[select.selectedIndex].value;
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetBranch = newBranch;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetBranch: newBranch });
+       
+       select.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckPermittedHazardClassesFlags(input) {
+       let truckGuid = input.dataset.truckGuid;
+       let newPermittedHazardClassesFlags = input.value;
+       if (newPermittedHazardClassesFlags === "null")
+           newPermittedHazardClassesFlags = null;
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetPermittedHazardClassesFlags = newPermittedHazardClassesFlags;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetPermittedHazardClassesFlags: newPermittedHazardClassesFlags });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckIsAvailable(select) {
+       let truckGuid = select.dataset.truckGuid;
+       let newIsAvailable = select.options[select.selectedIndex].value === "true";
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetIsAvailable = newIsAvailable;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetIsAvailable: newIsAvailable });
+       
+       select.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckTrailerIsTank(select) {
+       let truckGuid = select.dataset.truckGuid;
+       let newTrailerIsTank = select.options[select.selectedIndex].value === "true";
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetTrailerIsTank = newTrailerIsTank;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetTrailerIsTank: newTrailerIsTank });
+       
+       select.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckVolumeMax(input) {
+       let truckGuid = input.dataset.truckGuid;
+       let newVolumeMax = Number(input.value);
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetVolumeMax = newVolumeMax;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetVolumeMax: newVolumeMax });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckVolumePrice(input) {
+       let truckGuid = input.dataset.truckGuid;
+       let newVolumePrice = Number(input.value);
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetVolumePrice = newVolumePrice;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetVolumePrice: newVolumePrice });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckWeightMax(input) {
+       let truckGuid = input.dataset.truckGuid;
+       let newWeightMax = Number(input.value);
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetWeightMax = newWeightMax;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetWeightMax: newWeightMax });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckWeightPrice(input) {
+       let truckGuid = input.dataset.truckGuid;
+       let newWeightPrice = Number(input.value);
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetWeightPrice = newWeightPrice;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetWeightPrice: newWeightPrice });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function setTruckPricePerKm(input) {
+       let truckGuid = input.dataset.truckGuid;
+       let newPricePerKm = Number(input.value);
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest.SetPricePerKm = newPricePerKm;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, SetPricePerKm: newPricePerKm });
+       
+       input.classList.replace('inactive', 'active')
+   }
+   
+   function decommissionOrRecommissionTruck(button) {
+       let truckGuid = button.dataset.truckGuid;
+       let decommissionOrRecommission = button.value;
+       let newPressed = button.dataset.pressed === "false";
+       
+       if (truckUpdateRequests.has(truckGuid)) {
+           let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
+           truckUpdateRequest[decommissionOrRecommission] = newPressed;
+       }
+       else
+           truckUpdateRequests.set(truckGuid, { Guid: truckGuid, [decommissionOrRecommission]: newPressed });
+       
+       if (newPressed)
+           button.classList.replace('inactive', 'active')
+       else
+           button.classList.replace('active', 'inactive')
+           
+       button.dataset.pressed = newPressed.toString();
+   }
     
     async function saveChanges() {
         if (branchUpdateRequests.size > 0) {
-            let response1 = await fetch('http://192.168.0.103/test/branches', {
+            let response = await fetch('http://192.168.0.103/test/branches', {
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -214,10 +377,11 @@
                 },
                 body: JSON.stringify(Array.from(branchUpdateRequests.values()))
             });
-            alert(response1.status);
+            if (response.status !== 200)
+                alert("При попытке внесения изменений в таблицу филиалов произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
         if (driverUpdateRequests.size > 0) {
-            let response2 = await fetch('http://192.168.0.103/test/drivers', {
+            let response = await fetch('http://192.168.0.103/test/drivers', {
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -225,7 +389,20 @@
                 },
                 body: JSON.stringify(Array.from(driverUpdateRequests.values()))
             });
-            alert(response2.status);
+            if (response.status !== 200)
+                alert("При попытке внесения изменений в таблицу водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        if (truckUpdateRequests.size > 0) {
+            let response = await fetch('http://192.168.0.103/test/trucks', {
+                method: 'PATCH',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Array.from(truckUpdateRequests.values()))
+            });
+            if (response.status !== 200)
+                alert("При попытке внесения изменений в таблицу водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
         
         location.reload();
