@@ -510,7 +510,6 @@
             }
             branchCreateRequests.push(branchCreateRequest);
         }
-        console.log(JSON.stringify(branchCreateRequests));
         let response = await fetch(`http://192.168.0.103/test/branches`, {
             method: 'POST',
             headers: {
