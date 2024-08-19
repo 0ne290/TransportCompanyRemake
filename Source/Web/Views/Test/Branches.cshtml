@@ -411,7 +411,7 @@
    }
    
    function createBranch() {
-       branchTable.insertAdjacentHTML('afterbegin', '<tr class="new-branch active"><th scope="row"><input data-field-name="Address" class="new-branch-field active" type="text" size="47"></th><td><input data-field-name="Latitude" class="new-branch-field active" type="text"></td><td><input data-field-name="Longitude" class="new-branch-field active" type="text"></td></tr>');
+       branchTable.insertAdjacentHTML('afterbegin', '<tr class="new-branch active"><th scope="row"><input data-field-type="string" data-field-name="Address" class="new-branch-field active" type="text" size="47"></th><td><input data-field-type="number" data-field-name="Latitude" class="new-branch-field active" type="text"></td><td><input data-field-type="number" data-field-name="Longitude" class="new-branch-field active" type="text"></td></tr>');
    }
     
     async function saveChanges() {
@@ -427,6 +427,7 @@
             if (response.status !== 200)
                 alert("При попытке внесения изменений в записи таблицы филиалов произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
+        
         if (guidsOfBranchesToBeDeleted.size > 0) {
             let guids = 'new[] { ';
             for (let guid of guidsOfBranchesToBeDeleted)
@@ -439,6 +440,8 @@
             if (response.status !== 200)
                 alert("При попытке удаления записей таблицы филиалов произошла ошибка. Изменения не сохранены. Удалите всех водителей и фур, связанных с удаляемыми филиалами и повторите попытку.");
         }
+        
+        
         if (driverUpdateRequests.size > 0) {
             let response = await fetch('http://192.168.0.103/test/drivers', {
                 method: 'PATCH',
@@ -451,6 +454,7 @@
             if (response.status !== 200)
                 alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
+        
         if (guidsOfDriversToBeDeleted.size > 0) {
             let guids = 'new[] { ';
             for (let guid of guidsOfDriversToBeDeleted)
@@ -463,6 +467,8 @@
             if (response.status !== 200)
                 alert("При попытке удаления записей таблицы водителей произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми водителями.");
         }
+        
+        
         if (truckUpdateRequests.size > 0) {
             let response = await fetch('http://192.168.0.103/test/trucks', {
                 method: 'PATCH',
@@ -475,6 +481,7 @@
             if (response.status !== 200)
                 alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
+        
         if (guidsOfTrucksToBeDeleted.size > 0) {
             let guids = 'new[] { ';
             for (let guid of guidsOfTrucksToBeDeleted)
@@ -487,6 +494,33 @@
             if (response.status !== 200)
                 alert("При попытке удаления записей таблицы фур произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми фурами.");
         }
+        
+        
+        let branchCreateRequests = [];
+        let newBranches = document.getElementsByClassName('new-branch');
+        for (let newBranch of newBranches) {
+            let fieldsOfNewBranch = newBranch.getElementsByClassName('new-branch-field');
+            let branchCreateRequest = {};
+            for (let fieldOfNewBranch of fieldsOfNewBranch) {
+                let key = fieldOfNewBranch.dataset.fieldName;
+                let value = fieldOfNewBranch.value;
+                if (fieldOfNewBranch.dataset.fieldType === "number")
+                    value = Number(value);
+                branchCreateRequest[key] = value;
+            }
+            branchCreateRequests.push(branchCreateRequest);
+        }
+        console.log(JSON.stringify(branchCreateRequests));
+        let response = await fetch(`http://192.168.0.103/test/branches`, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(branchCreateRequests)
+        });
+        if (response.status !== 200)
+            alert("При попытке создания записей таблицы филиалов произошла ошибка. Изменения не сохранены. Вероятно, это баг.");
         
         location.reload();
     }
@@ -504,7 +538,7 @@
         <div role="tabpanel" class="tab-pane fade show active overflow-auto" id="tab1" style="height: 74vh">
             <table class="table my-table m-0 p-0">
                 <thead class="sticky-top">
-                <tr>
+                <tr class="active">
                     <th scope="col">Адрес</th>
                     <th scope="col">Широта</th>
                     <th scope="col">Долгота</th>
@@ -519,7 +553,7 @@
         <div role="tabpanel" class="tab-pane fade overflow-auto" id="tab2" style="height: 74vh">
             <table class="table my-table m-0 p-0">
                 <thead class="sticky-top">
-                <tr>
+                <tr class="active">
                     <th scope="col">ФИО</th>
                     <th scope="col">Филиал</th>
                     <th scope="col">Дата приема на работу</th>
@@ -541,7 +575,7 @@
         <div role="tabpanel" class="tab-pane fade overflow-auto" id="tab3" style="height: 74vh">
             <table class="table my-table m-0 p-0">
                 <thead class="sticky-top">
-                <tr>
+                <tr class="active">
                     <th scope="col">Номер</th>
                     <th scope="col">Филиал</th>
                     <th scope="col">Дата начала эксплуатации</th>
