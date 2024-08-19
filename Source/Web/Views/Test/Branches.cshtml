@@ -10,7 +10,7 @@
     var selectOfBranches = new StringBuilder(150 * Model.Count);
     @foreach (var branch in Model)
     {
-        branches.Append($"<tr><th scope=\"row\"><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Address}\" oninput=\"setBranchAddress(this)\" size=\"47\"></th><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Latitude}\" oninput=\"setBranchLatitude(this)\"></td><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Longitude}\" oninput=\"setBranchLongitude(this)\"></td><td><i class=\"fa-solid fa-minus second-text-color\"></i></td></td></tr>");
+        branches.Append($"<tr><th scope=\"row\"><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Address}\" oninput=\"setBranchAddress(this)\" size=\"47\"></th><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Latitude}\" oninput=\"setBranchLatitude(this)\"></td><td><input data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"text\" value=\"{branch.Longitude}\" oninput=\"setBranchLongitude(this)\"></td><td><button data-branch-guid=\"{branch.Guid}\" class=\"inactive\" type=\"button\" onclick=\"deleteBranch(this)\"><i class=\"fa-solid fa-minus second-text-color\"></i></button></td></tr>");
         selectOfBranches.Append($"<option value=\"{branch.Guid}\">{branch.Address}</option>");
     }
     selectOfBranches.Append("</select>");
@@ -22,11 +22,11 @@
     {
         drivers.Capacity += 1600 * branch.Drivers.Count;
         @foreach (var driver in branch.Drivers)
-            drivers.Append($"<tr><th scope=\"row\"><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" value=\"{driver.Name}\" oninput=\"setDriverName(this)\"></th><th scope=\"row\">{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverBranch(this)\" style=\"width: 47ch\">" + stringSelectOfBranches.Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{driver.HireDate}</td><td>{driver.DismissalDate}</td><th scope=\"row\">{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverAdrQualificationFlag(this)\"><option value=\"null\">Нет</option><option value=\"Base\">Базовая</option><option value=\"BaseAnd7\">Базовая + класс 7</option><option value=\"BaseAnd1\">Базовая + класс 1</option><option value=\"Full\">Полная</option></select>".Replace($"option value=\"{driver.AdrQualificationFlag}\"", $"option selected value=\"{driver.AdrQualificationFlag}\"")}</th><td>{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverIsAvailable(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{driver.IsAvailable}\"", $"option selected value=\"{driver.IsAvailable}\"")}</td><td>{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverAdrQualificationOfTank(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{driver.AdrQualificationOfTank}\"", $"option selected value=\"{driver.AdrQualificationOfTank}\"")}</td><td>{driver.HoursWorkedPerWeek}</td><td>{driver.TotalHoursWorked}</td><td><button data-pressed=\"false\" data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"{driver.ButtonValue}\" onclick=\"dismissOrReinstateDriver(this)\">{driver.ButtonText}</button></td><td><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" size=\"27\" placeholder=\"Добавить отработанных часов\" oninput=\"addDriverHoursWorked(this)\"></td><td><button data-pressed=\"false\" data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"ResetHoursWorkedPerWeek\" onclick=\"resetDriverHoursWorkedPerWeek(this)\">Сбросить часы, отработанные за неделю</button></td><td><i class=\"fa-solid fa-minus second-text-color\"></i></td></td></tr>");
+            drivers.Append($"<tr><th scope=\"row\"><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" value=\"{driver.Name}\" oninput=\"setDriverName(this)\"></th><th scope=\"row\">{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverBranch(this)\" style=\"width: 47ch\">" + stringSelectOfBranches.Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{driver.HireDate}</td><td>{driver.DismissalDate}</td><th scope=\"row\">{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverAdrQualificationFlag(this)\"><option value=\"null\">Нет</option><option value=\"Base\">Базовая</option><option value=\"BaseAnd7\">Базовая + класс 7</option><option value=\"BaseAnd1\">Базовая + класс 1</option><option value=\"Full\">Полная</option></select>".Replace($"option value=\"{driver.AdrQualificationFlag}\"", $"option selected value=\"{driver.AdrQualificationFlag}\"")}</th><td>{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverIsAvailable(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{driver.IsAvailable}\"", $"option selected value=\"{driver.IsAvailable}\"")}</td><td>{$"<select data-driver-guid=\"{driver.Guid}\" class=\"form-select inactive\" onchange=\"setDriverAdrQualificationOfTank(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{driver.AdrQualificationOfTank}\"", $"option selected value=\"{driver.AdrQualificationOfTank}\"")}</td><td>{driver.HoursWorkedPerWeek}</td><td>{driver.TotalHoursWorked}</td><td><button data-pressed=\"false\" data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"{driver.ButtonValue}\" onclick=\"dismissOrReinstateDriver(this)\">{driver.ButtonText}</button></td><td><input data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"text\" size=\"27\" placeholder=\"Добавить отработанных часов\" oninput=\"addDriverHoursWorked(this)\"></td><td><button data-pressed=\"false\" data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" value=\"ResetHoursWorkedPerWeek\" onclick=\"resetDriverHoursWorkedPerWeek(this)\">Сбросить часы, отработанные за неделю</button></td><td><button data-driver-guid=\"{driver.Guid}\" class=\"inactive\" type=\"button\" onclick=\"deleteDriver(this)\"><i class=\"fa-solid fa-minus second-text-color\"></i></button></td></tr>");
 		
         trucks.Capacity += 1600 * branch.Trucks.Count;
         @foreach (var truck in branch.Trucks)
-            trucks.Append($"<tr><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.Number}\" oninput=\"setTruckNumber(this)\"></th><th scope=\"row\">{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckBranch(this)\" style=\"width: 47ch\">" + stringSelectOfBranches.Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{truck.CommissionedDate}</td><td>{truck.DecommissionedDate}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PermittedHazardClassesFlags}\" oninput=\"setTruckPermittedHazardClassesFlags(this)\"></th><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckIsAvailable(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{truck.IsAvailable}\"", $"option selected value=\"{truck.IsAvailable}\"")}</td><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckTrailerIsTank(this)\"><option value=\"true\">Цистерна</option><option value=\"false\">Тент</option></select>".Replace($"option value=\"{truck.TrailerIsTank}\"", $"option selected value=\"{truck.TrailerIsTank}\"")}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumeMax}\" oninput=\"setTruckVolumeMax(this)\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumePrice}\" oninput=\"setTruckVolumePrice(this)\"></td><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightMax}\" oninput=\"setTruckWeightMax(this)\"></td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightPrice}\" oninput=\"setTruckWeightPrice(this)\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PricePerKm}\" oninput=\"setTruckPricePerKm(this)\"></td><td><button data-pressed=\"false\" data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"button\" value=\"{truck.ButtonValue}\" onclick=\"decommissionOrRecommissionTruck(this)\">{truck.ButtonText}</button></td><td><i class=\"fa-solid fa-minus second-text-color\"></i></td></td></tr>");
+            trucks.Append($"<tr><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.Number}\" oninput=\"setTruckNumber(this)\"></th><th scope=\"row\">{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckBranch(this)\" style=\"width: 47ch\">" + stringSelectOfBranches.Replace($"<option value=\"{branch.Guid}\">{branch.Address}</option>", $"<option selected value=\"{branch.Guid}\">{branch.Address}</option>")}</th><td>{truck.CommissionedDate}</td><td>{truck.DecommissionedDate}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PermittedHazardClassesFlags}\" oninput=\"setTruckPermittedHazardClassesFlags(this)\"></th><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckIsAvailable(this)\"><option value=\"true\">Да</option><option value=\"false\">Нет</option></select>".Replace($"option value=\"{truck.IsAvailable}\"", $"option selected value=\"{truck.IsAvailable}\"")}</td><td>{$"<select data-truck-guid=\"{truck.Guid}\" class=\"form-select inactive\" onchange=\"setTruckTrailerIsTank(this)\"><option value=\"true\">Цистерна</option><option value=\"false\">Тент</option></select>".Replace($"option value=\"{truck.TrailerIsTank}\"", $"option selected value=\"{truck.TrailerIsTank}\"")}</td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumeMax}\" oninput=\"setTruckVolumeMax(this)\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.VolumePrice}\" oninput=\"setTruckVolumePrice(this)\"></td><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightMax}\" oninput=\"setTruckWeightMax(this)\"></td><th scope=\"row\"><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.WeightPrice}\" oninput=\"setTruckWeightPrice(this)\"></th><td><input data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"text\" value=\"{truck.PricePerKm}\" oninput=\"setTruckPricePerKm(this)\"></td><td><button data-pressed=\"false\" data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"button\" value=\"{truck.ButtonValue}\" onclick=\"decommissionOrRecommissionTruck(this)\">{truck.ButtonText}</button></td><td><button data-truck-guid=\"{truck.Guid}\" class=\"inactive\" type=\"button\" onclick=\"deleteTruck(this)\"><i class=\"fa-solid fa-minus second-text-color\"></i></button></td></tr>");
     }
 }
 
@@ -36,6 +36,10 @@
     let branchUpdateRequests = new Map();
     let driverUpdateRequests = new Map();
     let truckUpdateRequests = new Map();
+    let guidsOfBranchesToBeDeleted = new Set();
+    let guidsOfDriversToBeDeleted = new Set();
+    let guidsOfTrucksToBeDeleted = new Set();
+    let branchTable = document.getElementById('branch-table');
     
     function setBranchAddress(input) {
         let branchGuid = input.dataset.branchGuid;
@@ -366,6 +370,49 @@
            
        button.dataset.pressed = newPressed.toString();
    }
+   
+   function deleteBranch(button) {
+       let branchGuid = button.dataset.branchGuid;
+       
+       if (guidsOfBranchesToBeDeleted.has(branchGuid)) {
+           guidsOfBranchesToBeDeleted.delete(branchGuid);
+           button.classList.replace('active', 'inactive')
+       }
+       else {
+           guidsOfBranchesToBeDeleted.add(branchGuid);
+           button.classList.replace('inactive', 'active');
+       }
+   }
+   
+   function deleteDriver(button) {
+       let driverGuid = button.dataset.driverGuid;
+       
+       if (guidsOfDriversToBeDeleted.has(driverGuid)) {
+           guidsOfDriversToBeDeleted.delete(driverGuid);
+           button.classList.replace('active', 'inactive')
+       }
+       else {
+           guidsOfDriversToBeDeleted.add(driverGuid);
+           button.classList.replace('inactive', 'active');
+       }
+   }
+      
+   function deleteTruck(button) {
+       let truckGuid = button.dataset.truckGuid;
+       
+       if (guidsOfTrucksToBeDeleted.has(truckGuid)) {
+           guidsOfTrucksToBeDeleted.delete(truckGuid);
+           button.classList.replace('active', 'inactive')
+       }
+       else {
+           guidsOfTrucksToBeDeleted.add(truckGuid);
+           button.classList.replace('inactive', 'active');
+       }
+   }
+   
+   function createBranch() {
+       branchTable.insertAdjacentHTML('afterbegin', '<tr class="new-branch active"><th scope="row"><input data-field-name="Address" class="new-branch-field active" type="text" size="47"></th><td><input data-field-name="Latitude" class="new-branch-field active" type="text"></td><td><input data-field-name="Longitude" class="new-branch-field active" type="text"></td></tr>');
+   }
     
     async function saveChanges() {
         if (branchUpdateRequests.size > 0) {
@@ -378,7 +425,19 @@
                 body: JSON.stringify(Array.from(branchUpdateRequests.values()))
             });
             if (response.status !== 200)
-                alert("При попытке внесения изменений в таблицу филиалов произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+                alert("При попытке внесения изменений в записи таблицы филиалов произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        if (guidsOfBranchesToBeDeleted.size > 0) {
+            let guids = 'new[] { ';
+            for (let guid of guidsOfBranchesToBeDeleted)
+                guids += `"${guid}", `;
+            guids = guids.slice(0, -2) + ' }';
+            
+            let response = await fetch(`http://192.168.0.103/test/branches?filter=${guids}.Contains(Guid)`, {
+                method: 'DELETE'
+            });
+            if (response.status !== 200)
+                alert("При попытке удаления записей таблицы филиалов произошла ошибка. Изменения не сохранены. Удалите всех водителей и фур, связанных с удаляемыми филиалами и повторите попытку.");
         }
         if (driverUpdateRequests.size > 0) {
             let response = await fetch('http://192.168.0.103/test/drivers', {
@@ -390,7 +449,19 @@
                 body: JSON.stringify(Array.from(driverUpdateRequests.values()))
             });
             if (response.status !== 200)
-                alert("При попытке внесения изменений в таблицу водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+                alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        if (guidsOfDriversToBeDeleted.size > 0) {
+            let guids = 'new[] { ';
+            for (let guid of guidsOfDriversToBeDeleted)
+                guids += `"${guid}", `;
+            guids = guids.slice(0, -2) + ' }';
+            
+            let response = await fetch(`http://192.168.0.103/test/drivers?filter=${guids}.Contains(Guid)`, {
+                method: 'DELETE'
+            });
+            if (response.status !== 200)
+                alert("При попытке удаления записей таблицы водителей произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми водителями.");
         }
         if (truckUpdateRequests.size > 0) {
             let response = await fetch('http://192.168.0.103/test/trucks', {
@@ -402,7 +473,19 @@
                 body: JSON.stringify(Array.from(truckUpdateRequests.values()))
             });
             if (response.status !== 200)
-                alert("При попытке внесения изменений в таблицу водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+                alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        if (guidsOfTrucksToBeDeleted.size > 0) {
+            let guids = 'new[] { ';
+            for (let guid of guidsOfTrucksToBeDeleted)
+                guids += `"${guid}", `;
+            guids = guids.slice(0, -2) + ' }';
+            
+            let response = await fetch(`http://192.168.0.103/test/trucks?filter=${guids}.Contains(Guid)`, {
+                method: 'DELETE'
+            });
+            if (response.status !== 200)
+                alert("При попытке удаления записей таблицы фур произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми фурами.");
         }
         
         location.reload();
@@ -425,10 +508,10 @@
                     <th scope="col">Адрес</th>
                     <th scope="col">Широта</th>
                     <th scope="col">Долгота</th>
-                    <th scope="col"><i class="fa-solid fa-plus second-text-color"></i></th>
+                    <th scope="col"><button class="active\" type="button" onclick="createBranch()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="branch-table">
                 @Html.Raw(branches.ToString())
                 </tbody>
             </table>
@@ -447,7 +530,7 @@
                     <th scope="col">Часов отработано за неделю</th>
                     <th scope="col">Всего часов отработано</th>
                     <th scope="col" colspan="3" class="text-center">Действия</th>
-                    <th scope="col"><i class="fa-solid fa-plus second-text-color"></i></th>
+                    <th scope="col"><button class="active\" type="button" onclick="createDriver()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -472,7 +555,7 @@
                     <th scope="col">Цена кг/км (₽)</th>
                     <th scope="col">Ценовой коэффициент (₽)</th>
                     <th scope="col">Действия</th>
-                    <th scope="col"><i class="fa-solid fa-plus second-text-color"></i></th>
+                    <th scope="col"><button class="active\" type="button" onclick="createTruck()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
                 </tr>
                 </thead>
                 <tbody>

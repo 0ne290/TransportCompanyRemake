@@ -67,6 +67,20 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
         await administrator.DeleteBranches(FilterParser.Parse<Branch>(filter));
     }
     
+    [HttpDelete]
+    [Route("drivers")]
+    public async Task DeleteDrivers(string filter)
+    {
+        await administrator.DeleteDrivers(FilterParser.Parse<Driver>(filter));
+    }
+    
+    [HttpDelete]
+    [Route("trucks")]
+    public async Task DeleteTrucks(string filter)
+    {
+        await administrator.DeleteTrucks(FilterParser.Parse<Truck>(filter));
+    }
+    
     [HttpPatch]
     [Route("branches")]
     public async Task UpdateBranches([FromBody]IReadOnlyCollection<Application.Dtos.Branch.UpdateRequest> updateRequests)
