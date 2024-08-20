@@ -40,6 +40,8 @@
     let guidsOfDriversToBeDeleted = new Set();
     let guidsOfTrucksToBeDeleted = new Set();
     let branchTable = document.getElementById('branch-table');
+    let driverTable = document.getElementById('driver-table');
+    let truckTable = document.getElementById('truck-table');
     
     function setBranchAddress(input) {
         let branchGuid = input.dataset.branchGuid;
@@ -184,7 +186,7 @@
            driverUpdateRequest.AddHoursWorked = hoursWorked;
        }
        else
-           branchUpdateRequests.set(driverGuid, { Guid: driverGuid, AddHoursWorked: hoursWorked });
+           driverUpdateRequests.set(driverGuid, { Guid: driverGuid, AddHoursWorked: hoursWorked });
        
        input.classList.replace('inactive', 'active')
    }
@@ -413,8 +415,42 @@
    function createBranch() {
        branchTable.insertAdjacentHTML('afterbegin', '<tr class="new-branch active"><th scope="row"><input data-field-type="string" data-field-name="Address" class="new-branch-field active" type="text" size="47"></th><td><input data-field-type="number" data-field-name="Latitude" class="new-branch-field active" type="text"></td><td><input data-field-type="number" data-field-name="Longitude" class="new-branch-field active" type="text"></td></tr>');
    }
+   
+   function createDriver() {
+       driverTable.insertAdjacentHTML('afterbegin', '<tr class="new-driver active"><th scope="row"><input data-field-type="string" data-field-name="Name" class="new-driver-field active" type="text"></th><th scope="row">@Html.Raw("<select data-field-type=\"string\" data-field-name=\"BranchGuid\" class=\"new-driver-field form-select active\" style=\"width: 47ch\">" + stringSelectOfBranches)</th><td></td><td></td><th scope="row"><select data-field-type="string?" data-field-name="AdrQualificationFlag" class="new-driver-field form-select active"><option value="null">Нет</option><option value="Base">Базовая</option><option value="BaseAnd7">Базовая + класс 7</option><option value="BaseAnd1">Базовая + класс 1</option><option value="Full">Полная</option></select></th><td></td><td><select data-field-type="bool" data-field-name="AdrQualificationOfTank" class="new-driver-field form-select active"><option value="true">Да</option><option value="false">Нет</option></select></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>');
+   }
+      
+   function createTruck() {
+       truckTable.insertAdjacentHTML('afterbegin', '<tr class="new-truck active"><th scope="row"><input data-field-type="string" data-field-name="Number" class="new-truck-field active" type="text"></th><th scope="row">@Html.Raw("<select data-field-type=\"string\" data-field-name=\"BranchGuid\" class=\"new-truck-field form-select active\" style=\"width: 47ch\">" + stringSelectOfBranches)</th><td></td><td></td><th scope="row"><input data-field-type="string?" data-field-name="PermittedHazardClassesFlags" class="new-truck-field active" type="text" type="text"></th><td></td><td><select data-field-type="bool" data-field-name="TrailerIsTank" class="new-truck-field active"><option value="true">Цистерна</option><option value="false">Тент</option></select></td><th scope="row"><input data-field-type="number" data-field-name="VolumeMax" class="new-truck-field active" type="text"></th><td><input data-field-type="number" data-field-name="VolumePrice" class="new-truck-field active" type="text"></td><td><input data-field-type="number" data-field-name="WeightMax" class="new-truck-field active" type="text"></td><th scope="row"><input data-field-type="number" data-field-name="WeightPrice" class="new-truck-field active" type="text"></th><td><input data-field-type="number" data-field-name="PricePerKm" class="new-truck-field active" type="text"></td><td></td><td></td></tr>');
+   }
     
     async function saveChanges() {
+        if (driverUpdateRequests.size > 0) {
+            let response = await fetch('http://192.168.0.103/test/drivers', {
+                method: 'PATCH',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Array.from(driverUpdateRequests.values()))
+            });
+            if (response.status !== 200)
+                alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        
+        if (truckUpdateRequests.size > 0) {
+            let response = await fetch('http://192.168.0.103/test/trucks', {
+                method: 'PATCH',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Array.from(truckUpdateRequests.values()))
+            });
+            if (response.status !== 200)
+                alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        
         if (branchUpdateRequests.size > 0) {
             let response = await fetch('http://192.168.0.103/test/branches', {
                 method: 'PATCH',
@@ -426,6 +462,33 @@
             });
             if (response.status !== 200)
                 alert("При попытке внесения изменений в записи таблицы филиалов произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        
+        
+        if (guidsOfDriversToBeDeleted.size > 0) {
+            let guids = 'new[] { ';
+            for (let guid of guidsOfDriversToBeDeleted)
+                guids += `"${guid}", `;
+            guids = guids.slice(0, -2) + ' }';
+            
+            let response = await fetch(`http://192.168.0.103/test/drivers?filter=${guids}.Contains(Guid)`, {
+                method: 'DELETE'
+            });
+            if (response.status !== 200)
+                alert("При попытке удаления записей таблицы водителей произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми водителями.");
+        }
+        
+        if (guidsOfTrucksToBeDeleted.size > 0) {
+            let guids = 'new[] { ';
+            for (let guid of guidsOfTrucksToBeDeleted)
+                guids += `"${guid}", `;
+            guids = guids.slice(0, -2) + ' }';
+            
+            let response = await fetch(`http://192.168.0.103/test/trucks?filter=${guids}.Contains(Guid)`, {
+                method: 'DELETE'
+            });
+            if (response.status !== 200)
+                alert("При попытке удаления записей таблицы фур произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми фурами.");
         }
         
         if (guidsOfBranchesToBeDeleted.size > 0) {
@@ -442,59 +505,73 @@
         }
         
         
-        if (driverUpdateRequests.size > 0) {
-            let response = await fetch('http://192.168.0.103/test/drivers', {
-                method: 'PATCH',
+        let driverCreateRequests = [];
+        let newDrivers = document.getElementsByClassName('new-driver');
+        for (let newDriver of newDrivers) {
+            let fieldsOfNewDriver = newDriver.getElementsByClassName('new-driver-field');
+            let driverCreateRequest = {};
+            for (let fieldOfNewDriver of fieldsOfNewDriver) {
+                let key = fieldOfNewDriver.dataset.fieldName;
+                let value;
+                if (fieldOfNewDriver.nodeName === 'SELECT')
+                    value = fieldOfNewDriver.options[fieldOfNewDriver.selectedIndex].value;
+                else
+                    value = fieldOfNewDriver.value;
+                if (fieldOfNewDriver.dataset.fieldType === "string?" && value === "null")
+                    value = null;
+                if (fieldOfNewDriver.dataset.fieldType === "bool")
+                    value = value === "true";
+                driverCreateRequest[key] = value;
+            }
+            driverCreateRequests.push(driverCreateRequest);
+        }
+        if (driverCreateRequests.length > 0) {
+            let response = await fetch(`http://192.168.0.103/test/drivers`, {
+                method: 'POST',
                 headers: {
                   'Accept': 'application/json',
                   'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(Array.from(driverUpdateRequests.values()))
+                body: JSON.stringify(driverCreateRequests)
             });
             if (response.status !== 200)
-                alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+                alert("При попытке создания записей таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
         
-        if (guidsOfDriversToBeDeleted.size > 0) {
-            let guids = 'new[] { ';
-            for (let guid of guidsOfDriversToBeDeleted)
-                guids += `"${guid}", `;
-            guids = guids.slice(0, -2) + ' }';
-            
-            let response = await fetch(`http://192.168.0.103/test/drivers?filter=${guids}.Contains(Guid)`, {
-                method: 'DELETE'
-            });
-            if (response.status !== 200)
-                alert("При попытке удаления записей таблицы водителей произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми водителями.");
+        let truckCreateRequests = [];
+        let newTrucks = document.getElementsByClassName('new-truck');
+        for (let newTruck of newTrucks) {
+            let fieldsOfNewTruck = newTruck.getElementsByClassName('new-truck-field');
+            let truckCreateRequest = {};
+            for (let fieldOfNewTruck of fieldsOfNewTruck) {
+                let key = fieldOfNewTruck.dataset.fieldName;
+                let value;
+                if (fieldOfNewTruck.nodeName === 'SELECT')
+                    value = fieldOfNewTruck.options[fieldOfNewTruck.selectedIndex].value;
+                else
+                    value = fieldOfNewTruck.value;
+                if (fieldOfNewTruck.dataset.fieldType === "string?" && value === "null")
+                    value = null;
+                if (fieldOfNewTruck.dataset.fieldType === "bool")
+                    value = value === "true";
+                if (fieldOfNewTruck.dataset.fieldType === "number")
+                    value = Number(value);
+                truckCreateRequest[key] = value;
+            }
+            truckCreateRequests.push(truckCreateRequest);
         }
-        
-        
-        if (truckUpdateRequests.size > 0) {
-            let response = await fetch('http://192.168.0.103/test/trucks', {
-                method: 'PATCH',
+        if (truckCreateRequests.length > 0) {
+            let response = await fetch(`http://192.168.0.103/test/trucks`, {
+                method: 'POST',
                 headers: {
                   'Accept': 'application/json',
                   'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(Array.from(truckUpdateRequests.values()))
+                body: JSON.stringify(truckCreateRequests)
             });
             if (response.status !== 200)
-                alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+                alert("При попытке создания записей таблицы фур произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
-        
-        if (guidsOfTrucksToBeDeleted.size > 0) {
-            let guids = 'new[] { ';
-            for (let guid of guidsOfTrucksToBeDeleted)
-                guids += `"${guid}", `;
-            guids = guids.slice(0, -2) + ' }';
-            
-            let response = await fetch(`http://192.168.0.103/test/trucks?filter=${guids}.Contains(Guid)`, {
-                method: 'DELETE'
-            });
-            if (response.status !== 200)
-                alert("При попытке удаления записей таблицы фур произошла ошибка. Изменения не сохранены. Вероятно, в БД имеются заказы, связанные с удаляемыми фурами.");
-        }
-        
         
         let branchCreateRequests = [];
         let newBranches = document.getElementsByClassName('new-branch');
@@ -510,16 +587,19 @@
             }
             branchCreateRequests.push(branchCreateRequest);
         }
-        let response = await fetch(`http://192.168.0.103/test/branches`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(branchCreateRequests)
-        });
-        if (response.status !== 200)
-            alert("При попытке создания записей таблицы филиалов произошла ошибка. Изменения не сохранены. Вероятно, это баг.");
+        if (branchCreateRequests.length > 0) {
+            let response = await fetch(`http://192.168.0.103/test/branches`, {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(branchCreateRequests)
+            });
+            if (response.status !== 200)
+                alert("При попытке создания записей таблицы филиалов произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+        }
+        
         
         location.reload();
     }
@@ -566,7 +646,7 @@
                     <th scope="col"><button class="active\" type="button" onclick="createDriver()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="driver-table">
                 @Html.Raw(drivers.ToString())
                 </tbody>
             </table>
@@ -591,7 +671,7 @@
                     <th scope="col"><button class="active\" type="button" onclick="createTruck()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="truck-table">
                 @Html.Raw(trucks.ToString())
                 </tbody>
             </table>
