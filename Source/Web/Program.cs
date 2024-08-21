@@ -57,7 +57,7 @@ internal static class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=Login}/{action=Index}/{id?}");
+            pattern: "{controller=test}/{action=branches}");
 
         await app.RunAsync();
     }
