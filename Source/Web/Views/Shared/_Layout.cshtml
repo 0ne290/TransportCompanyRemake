@@ -15,9 +15,9 @@
 <header class="header second-background-color first-text-color">
   <div class="container-fluid h-100">
     <div class="row h-100">
-      <div class="col d-flex justify-content-center align-items-center h-100 border-end first-border-color"><h2>Заказы</h2></div>
-      <div class="col d-flex justify-content-center align-items-center h-100 border-start first-border-color"><h2>Администрирование</h2></div>
-      <div id="VkIdSdkOneTap"></div>
+      <div class="col d-flex justify-content-center align-items-center h-100 border-end first-border-color" style="cursor: pointer"><h2>Заказы</h2></div>
+      <div class="col d-flex justify-content-center align-items-center h-100 border-start border-end first-border-color" style="cursor: pointer"><h2>Администрирование</h2></div>
+      <div class="col-2 d-flex justify-content-center align-items-center h-100 border-start first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/user/auth';"><h2>Вход</h2></div>
     </div>
   </div>
 </header>
@@ -25,40 +25,5 @@
   @RenderBody()
 </main>
 @await RenderSectionAsync("Scripts", false)
-<script>
-  function generateCodeVerifier(length) {
-      let result = '';
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      const charactersLength = characters.length;
-      let counter = 0;
-      while (counter < length) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        counter += 1;
-      }
-      return result;
-  }
-  
-  function vkIdErrorHandler() {
-      alert('Лажа.');
-  }
-
-  const VKID = window.VKIDSDK;
-  
-  VKID.Config.init({
-    app: 52175387,
-    redirectUrl: 'https://one290.ru/login/user',
-    state: generateCodeVerifier(64),
-    codeVerifier: generateCodeVerifier(64),
-    scope: 'vkid.personal_info',
-    mode: VKID.ConfigAuthMode.InNewTab
-  });
-  
-  const oneTap = new VKID.OneTap();
-  
-  const container = document.getElementById('VkIdSdkOneTap');
-  
-  oneTap.render({ container: container, scheme: VKID.Scheme.LIGHT, lang: VKID.Languages.RUS }).on(VKID.WidgetEvents.ERROR, vkIdErrorHandler);
-</script>
 </body>
-
 </html>

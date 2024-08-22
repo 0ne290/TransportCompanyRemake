@@ -72,7 +72,7 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
 
     [HttpGet]
     [Route("branches")]
-    public async Task<IActionResult> GetBranches()
+    public async Task<IActionResult> GetAdminPage()
     {
         return View("Branches",
             (await administrator.GetBranches(FilterParser.Parse<Branch>("true"), true, true))

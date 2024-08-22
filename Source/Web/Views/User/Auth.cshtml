@@ -1,0 +1,57 @@
+@{
+    ViewBag.Title = "Auth";
+    Layout = "_Layout";
+}
+
+@section Scripts
+{
+    <script>
+      function generateCodeVerifier(length) {
+          let result = '';
+          const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+          const charactersLength = characters.length;
+          let counter = 0;
+          while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
+          }
+          return result;
+      }
+      
+      function vkIdErrorHandler(sfg) {
+          alert(sfg);
+      }
+    
+      const VKID = window.VKIDSDK;
+      
+      VKID.Config.init({
+        app: 52175387,
+        redirectUrl: 'https://one290.ru/user',
+        state: generateCodeVerifier(64),
+        codeVerifier: generateCodeVerifier(64),
+        scope: 'vkid.personal_info',
+        mode: VKID.ConfigAuthMode.InNewTab
+      });
+      
+      const oneTap = new VKID.OneTap();
+      
+      const container = document.getElementById('VkIdSdkOneTap');
+      
+      oneTap.render({ container: container, scheme: VKID.Scheme.LIGHT, lang: VKID.Languages.RUS }).on(VKID.WidgetEvents.ERROR, vkIdErrorHandler);
+    </script>
+}
+
+<div class="container border border-2 rounded second-border-color p-0">
+    <ul class="nav nav-tabs row m-0 p-0 second-background-color first-text-color" role="tablist">
+        <li role="presentation" class="nav-item col text-center p-3 border-end first-border-color"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">Регистрация</button></li>
+        <li role="presentation" class="nav-item col text-center p-3 border-start first-border-color"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">Вход</button></li>
+    </ul>
+    <div class="tab-content row m-0 p-0">
+        <div role="tabpanel" class="tab-pane fade show overflow-auto" id="tab1" style="height: 74vh">
+            Stub
+        </div>
+        <div role="tabpanel" class="tab-pane fade show active overflow-auto" id="tab2" style="height: 74vh">
+            <div id="VkIdSdkOneTap"></div>
+        </div>
+    </div>
+</div>
