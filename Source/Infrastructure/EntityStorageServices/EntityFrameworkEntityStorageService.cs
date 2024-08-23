@@ -33,6 +33,8 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
 
         return await query.Where(filter).ToListAsync();
     }
+    
+    public async Task<bool> Exists(Expression<Func<TEntity, bool>> filter) => await dbContext.Set<TEntity>().AnyAsync(filter);
 
     public async Task UpdateRange(ICollection<TEntity> entities)
     {

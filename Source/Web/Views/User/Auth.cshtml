@@ -1,6 +1,11 @@
 @{
     ViewBag.Title = "Auth";
-    Layout = "_Layout";
+    Layout = "_FullPageLayout";
+}
+
+@section ImportScripts
+{
+    <script src="https://unpkg.com/@@vkid/sdk@2.1.0/dist-sdk/umd/index.js"></script>
 }
 
 @section Scripts
@@ -26,7 +31,7 @@
       
       VKID.Config.init({
         app: 52175387,
-        redirectUrl: 'https://one290.ru/user',
+        redirectUrl: 'https://one290.ru/user/vk-login',
         state: generateCodeVerifier(64),
         codeVerifier: generateCodeVerifier(64),
         scope: 'vkid.personal_info',

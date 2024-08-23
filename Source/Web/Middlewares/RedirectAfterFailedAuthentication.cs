@@ -15,9 +15,9 @@ public class RedirectAfterFailedAuthentication : IAuthorizationMiddlewareResultH
             var requiredRoles = policy.Requirements.OfType<RolesAuthorizationRequirement>().ToList();
             
             if (requiredRoles.Any(r => r.AllowedRoles.Contains("Administrator")))
-                context.Response.Redirect("/login/administrator");
+                context.Response.Redirect("/admin/login");
             else if (requiredRoles.Any(r => r.AllowedRoles.Contains("User")))
-                context.Response.Redirect("/login/user");
+                context.Response.Redirect("/user/auth");
         }
     }
     

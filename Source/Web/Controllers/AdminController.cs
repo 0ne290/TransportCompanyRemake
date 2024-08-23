@@ -7,8 +7,8 @@ using Newtonsoft.Json;
 
 namespace Web.Controllers;
 
-[Route("test")]
-public class TestController(TransportCompanyContext dbContext, Administrator administrator) : Controller
+[Route("admin")]
+public class AdminController(TransportCompanyContext dbContext, Administrator administrator) : Controller
 {
     [Route("load-test-data-into-the-database")]
     public async Task Zxc()
@@ -71,10 +71,10 @@ public class TestController(TransportCompanyContext dbContext, Administrator adm
     }
 
     [HttpGet]
-    [Route("branches")]
-    public async Task<IActionResult> GetAdminPage()
+    [Route("administration")]
+    public async Task<IActionResult> GetAdministrationPage()
     {
-        return View("Branches",
+        return View("Administration",
             (await administrator.GetBranches(FilterParser.Parse<Branch>("true"), true, true))
             .Select(b => new ViewModels.Branch(b)).ToList());
     }

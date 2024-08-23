@@ -9,7 +9,7 @@ namespace Application.Actors;
 // TODO: Упростить получение связанных данных: заменить все булевы аргументы одним строковым аргументом, описывающим подтягиваемые связанные свойства
 // TODO: Заменить тип Expression<Func<TEntity, bool>> аргументов фильтрации на string - эти строки должны парситься на выражения в слое Application, а не в UI
 // TODO: Мой перфекционизм сыграл со мной злую шутку - пытаясь сделать универсальный супер-API, я бесмыссленно и неоправданно его переусложнил, тем самым выстрелив себе в ногу С ДРОБОВИКА %!?*№! В рамках Use Case'ов не будет задействована львиная доля системы. Этот комментарий останется, чтобы я всегда помнил эту ошибку и больше ее никогда не повторил
-public class Administrator(IEntityStorageService<Entities.Driver> driverStorageService, IEntityStorageService<Entities.Truck> truckStorageService, IEntityStorageService<Entities.User> userStorageService, IEntityStorageService<Entities.Branch> branchStorageService, IEntityStorageService<Entities.Order> orderStorageService, ICryptographicService cryptographicService, IGeolocationService geolocationService)
+public class Administrator(IEntityStorageService<Entities.Driver> driverStorageService, IEntityStorageService<Entities.Truck> truckStorageService, IEntityStorageService<Entities.Branch> branchStorageService, IEntityStorageService<Entities.Order> orderStorageService, ICryptographicService cryptographicService, IGeolocationService geolocationService)
 {
     public async Task CreateDrivers(IReadOnlyCollection<Dtos.Driver.CreateRequest> createRequests)
     {
@@ -249,7 +249,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         await truckStorageService.UpdateRange(trucks.Values);
     }
     
-    public async Task CreateVkUsers(IReadOnlyCollection<Dtos.User.CreateVkRequest> createRequests)
+    /*public async Task CreateVkUsers(IReadOnlyCollection<Dtos.User.CreateVkRequest> createRequests)
     {
         var users = createRequests.Select(cr => Entities.User.New(cr.Name, cr.Contact, cr.VkUserId));
 
@@ -313,7 +313,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         }
         
         await userStorageService.UpdateRange(users.Values);
-    }
+    }*/
     
     public async Task CreateBranches(IReadOnlyCollection<Dtos.Branch.CreateRequest> createRequests)
     {

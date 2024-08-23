@@ -3,8 +3,8 @@
 @model ICollection<Web.ViewModels.Branch>
 
 @{
-    ViewBag.Title = "Branches";
-    Layout = "_Layout";
+    ViewBag.Title = "Administrtion";
+    Layout = "_FullPageLayout";
     
     var branches = new StringBuilder(400 * Model.Count);
     var selectOfBranches = new StringBuilder(150 * Model.Count);
@@ -426,7 +426,7 @@
     
     async function saveChanges() {
         if (driverUpdateRequests.size > 0) {
-            let response = await fetch('http://192.168.0.103/test/drivers', {
+            let response = await fetch('https://one290.ru/admin/drivers', {
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -439,7 +439,7 @@
         }
         
         if (truckUpdateRequests.size > 0) {
-            let response = await fetch('http://192.168.0.103/test/trucks', {
+            let response = await fetch('https://one290.ru/admin/trucks', {
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -452,7 +452,7 @@
         }
         
         if (branchUpdateRequests.size > 0) {
-            let response = await fetch('http://192.168.0.103/test/branches', {
+            let response = await fetch('https://one290.ru/admin/branches', {
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -471,7 +471,7 @@
                 guids += `"${guid}", `;
             guids = guids.slice(0, -2) + ' }';
             
-            let response = await fetch(`http://192.168.0.103/test/drivers?filter=${guids}.Contains(Guid)`, {
+            let response = await fetch(`https://one290.ru/admin/drivers?filter=${guids}.Contains(Guid)`, {
                 method: 'DELETE'
             });
             if (response.status !== 200)
@@ -484,7 +484,7 @@
                 guids += `"${guid}", `;
             guids = guids.slice(0, -2) + ' }';
             
-            let response = await fetch(`http://192.168.0.103/test/trucks?filter=${guids}.Contains(Guid)`, {
+            let response = await fetch(`https://one290.ru/admin/trucks?filter=${guids}.Contains(Guid)`, {
                 method: 'DELETE'
             });
             if (response.status !== 200)
@@ -497,7 +497,7 @@
                 guids += `"${guid}", `;
             guids = guids.slice(0, -2) + ' }';
             
-            let response = await fetch(`http://192.168.0.103/test/branches?filter=${guids}.Contains(Guid)`, {
+            let response = await fetch(`https://one290.ru/admin/branches?filter=${guids}.Contains(Guid)`, {
                 method: 'DELETE'
             });
             if (response.status !== 200)
@@ -526,7 +526,7 @@
             driverCreateRequests.push(driverCreateRequest);
         }
         if (driverCreateRequests.length > 0) {
-            let response = await fetch(`http://192.168.0.103/test/drivers`, {
+            let response = await fetch(`https://one290.ru/admin/drivers`, {
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json',
@@ -561,7 +561,7 @@
             truckCreateRequests.push(truckCreateRequest);
         }
         if (truckCreateRequests.length > 0) {
-            let response = await fetch(`http://192.168.0.103/test/trucks`, {
+            let response = await fetch(`https://one290.ru/admin/trucks`, {
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json',
@@ -588,7 +588,7 @@
             branchCreateRequests.push(branchCreateRequest);
         }
         if (branchCreateRequests.length > 0) {
-            let response = await fetch(`http://192.168.0.103/test/branches`, {
+            let response = await fetch(`https://one290.ru/admin/branches`, {
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json',

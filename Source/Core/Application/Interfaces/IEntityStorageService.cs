@@ -10,6 +10,8 @@ public interface IEntityStorageService<TEntity>
     
     Task<ICollection<TEntity>> FindAll(Expression<Func<TEntity, bool>> filter, string includedData = "");
     
+    Task<bool> Exists(Expression<Func<TEntity, bool>> filter);
+    
     Task UpdateRange(ICollection<TEntity> entities);
     
     Task RemoveRange(IEnumerable<TEntity> entities);
