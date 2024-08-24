@@ -8,41 +8,57 @@
 }
 
 <script>
-const urlParams = new URLSearchParams(window.location.search);
+function generateCodeVerifier(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
 
-const code = urlParams.get('code');
-const deviceId = urlParams.get('device_id');
+async function vkLogin() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const code = urlParams.get('code');
+    const deviceId = urlParams.get('device_id');
+    
+    
+    const VKID = window.VKIDSDK;
+    
+    VKID.Config.init({
+      app: 52175387,
+      redirectUrl: 'https://one290.ru/user/vk-login',
+      state: generateCodeVerifier(64),
+      codeVerifier: generateCodeVerifier(64),
+      scope: 'vkid.personal_info phone',
+      mode: VKID.ConfigAuthMode.InNewTab
+    });
+    
+    const vkAuthMessage = await VKID.Auth.exchangeCode(code, deviceId);
+    const accessToken = vkAuthMessage.access_token;
+    const vkUserInfo = await VKID.Auth.userInfo(accessToken);
+    const userCreateRequest = { };
+    userCreateRequest.Name = vkUserInfo.user.first_name + ' ' + vkUserInfo.user.last_name;
+    userCreateRequest.Contact = vkUserInfo.user.phone;
+    userCreateRequest.VkUserId = vkUserInfo.user.user_id;
+    
+    let response = await fetch(`https://one290.ru/user/vk-login`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userCreateRequest)
+    });
+    if (response.status === 200)
+        window.location='https://one290.ru/user/orders';
+    else
+        alert('Баг: аутентификация через ВК не удалась.')
+}
 
-
-const VKID = window.VKIDSDK;
-      
-VKID.Config.init({
-  app: 52175387,
-  redirectUrl: 'https://one290.ru/user/vk-login',
-  state: generateCodeVerifier(64),
-  codeVerifier: generateCodeVerifier(64),
-  scope: 'vkid.personal_info',
-  mode: VKID.ConfigAuthMode.InNewTab
-});
-
-const vkAuthMessage = VKID.Auth.exchangeCode(code, deviceId);
-const accessToken = vkAuthMessage.access_token;
-const vkUserInfo = VKID.Auth.userInfo(accessToken);
-const userCreateRequest = { };
-userCreateRequest.Name = vkUserInfo.user.first_name + ' ' + vkUserInfo.user.last_name;
-userCreateRequest.Contact = vkUserInfo.user.phone;
-userCreateRequest.VkUserId = vkUserInfo.user.user_id;
-
-let response = await fetch(`https://one290.ru/user/vk-login`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(userCreateRequest)
-});
-if (response.status === 200)
-    window.location='https://one290.ru/user/orders';
-else
-    alert('Баг: аутентификация через ВК не удалась.')
+vkLogin();
 </script>

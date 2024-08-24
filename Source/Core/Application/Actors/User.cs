@@ -13,6 +13,12 @@ public class User(IEntityStorageService<Entities.User> userStorageService)
             user = Entities.User.New(createRequest.Name, createRequest.Contact, createRequest.VkUserId);
             await userStorageService.CreateRange(new[] { user });
         }
+        else if (user.Name != createRequest.Name || user.Contact != createRequest.Contact)
+        {
+            user.Name = createRequest.Name;
+            user.Contact = createRequest.Contact;
+            await userStorageService.UpdateRange(new[] { user });
+        }
 
         return new Dtos.User.Response(user.Guid, user.RegistrationDate, user.VkUserId, user.Login, user.Password, user.Name, user.Contact, null);
     }
