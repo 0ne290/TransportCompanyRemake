@@ -46,17 +46,24 @@
     </script>
 }
 
-<div class="container border border-2 rounded second-border-color p-0">
+<div class="container border border-2 rounded second-border-color p-0 w-25">
     <ul class="nav nav-tabs row m-0 p-0 second-background-color first-text-color" role="tablist">
         <li role="presentation" class="nav-item col text-center p-3 border-end first-border-color"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">Регистрация</button></li>
         <li role="presentation" class="nav-item col text-center p-3 border-start first-border-color"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">Вход</button></li>
     </ul>
     <div class="tab-content row m-0 p-0">
-        <div role="tabpanel" class="tab-pane fade show overflow-auto" id="tab1" style="height: 74vh">
-            Stub
+        <div role="tabpanel" class="tab-pane fade show overflow-auto" id="tab1">
+            <input class="w-100 active mt-3 mb-2" type="text" placeholder="Логин">
+            <input class="w-100 active mb-2" type="password" placeholder="Пароль">
+            <button class="w-100 active mb-3" type="button" value="ResetHoursWorkedPerWeek" onclick="resetDriverHoursWorkedPerWeek(this)">Зарегистрироваться</button>
         </div>
-        <div role="tabpanel" class="tab-pane fade show active overflow-auto" id="tab2" style="height: 74vh">
-            <div id="VkIdSdkOneTap"></div>
+        <div role="tabpanel" class="tab-pane fade show active overflow-auto" id="tab2">
+            <div class="border-bottom second-border-color pt-3 pb-3">
+                <input class="w-100 active mb-2" type="text" placeholder="Логин">
+                <input class="w-100 active mb-2" type="password" placeholder="Пароль">
+                <button class="w-100 active" type="button" value="ResetHoursWorkedPerWeek" onclick="resetDriverHoursWorkedPerWeek(this)">Войти</button>
+            </div>
+            <div id="VkIdSdkOneTap" class="pt-3 pb-3"></div>
         </div>
     </div>
 </div>

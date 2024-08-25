@@ -1,11 +1,12 @@
 using Entities = Domain.Entities;
 using Application.Interfaces;
+using Domain.Interfaces;
 
 namespace Application.Actors;
 
-public class User(IEntityStorageService<Entities.User> userStorageService)
+public class User(IEntityStorageService<Entities.User> userStorageService, ICryptographicService cryptographicService)
 {
-    public async Task<Dtos.User.Response> TryCreateVkUser(Dtos.User.CreateVkRequest createRequest)
+    public async Task<Dtos.User.Response> CreateOrUpdateAndGetVkUser(Dtos.User.CreateVkRequest createRequest)
     {
         Entities.User? user = await userStorageService.Find(u => u.VkUserId == createRequest.VkUserId);
         if (user == null)
@@ -21,6 +22,24 @@ public class User(IEntityStorageService<Entities.User> userStorageService)
         }
 
         return new Dtos.User.Response(user.Guid, user.RegistrationDate, user.VkUserId, user.Login, user.Password, user.Name, user.Contact, null);
+    }
+    
+    public async Task<Dtos.User.Response> CreateAndGetStandartUser(Dtos.User.CreateStandartRequest createRequest)
+    {
+        var user = Entities.User.New(createRequest.Name, createRequest.Contact, createRequest.Login, createRequest.Password, cryptographicService); 
+        await userStorageService.CreateRange(new[] { user });
+
+        return new Dtos.User.Response(user.Guid, user.RegistrationDate, user.VkUserId, user.Login, user.Password, user.Name, user.Contact, null);
+    }
+    
+    public async Task<Dtos.User.Response?> TryGetStandartUser(string login, string password)
+    {
+        var user = await userStorageService.Find(u => u.Login == login && u.Password == password);
+
+        return user == null
+            ? null
+            : new Dtos.User.Response(user.Guid, user.RegistrationDate, user.VkUserId, user.Login, user.Password,
+                user.Name, user.Contact, null);
     }
     
     /*public async Task CreateStandartUsers(IReadOnlyCollection<Dtos.User.CreateStandartRequest> createRequests)

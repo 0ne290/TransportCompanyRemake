@@ -27,7 +27,29 @@ public class UserController(User userActor) : Controller
     [Route("vk-login")]
     public async Task<IActionResult> VkLogin(Application.Dtos.User.CreateVkRequest createRequest)
     {
-        var user = await userActor.TryCreateVkUser(createRequest);
+        var user = await userActor.CreateOrUpdateAndGetVkUser(createRequest);
+        
+        var claims = new[] { new Claim(ClaimTypes.Name, user.Guid), new Claim(ClaimTypes.Role, "User") };
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+        var authProperties = new AuthenticationProperties
+        {
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7),
+            IsPersistent = true
+        };
+            
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authProperties);
+        
+        return Ok();
+    }
+    
+    [HttpPost]
+    [Route("standart-login")]
+    public async Task<IActionResult> StandartLogin(string login, string password)
+    {
+        var user = await userActor.CreateOrUpdateAndGetVkUser(createRequest);
         
         var claims = new[] { new Claim(ClaimTypes.Name, user.Guid), new Claim(ClaimTypes.Role, "User") };
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
