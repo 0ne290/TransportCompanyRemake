@@ -11,6 +11,44 @@
 @section Scripts
 {
     <script>
+      async function registerStandartUser() {
+          let registerForm = document.forms.register;
+          let createRequest = { };
+          createRequest.Name = registerForm.name;
+          createRequest.Contact = registerForm.contact;
+          createRequest.Login = registerForm.login;
+          createRequest.Password = registerForm.password;
+          
+          let response = await fetch(`https://one290.ru/user/standart-register`, {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(createRequest)
+          });
+          if (response.status === 200)
+              alert('Регистрация завершена успешно. Теперь выполните вход, используя только что введенные логин и пароль.');
+          else
+              alert('Регистрация не удалась. Измените логин и/или пароль и повторите попытку.');
+      }
+      
+      async function loginStandartUser() {
+          let loginForm = document.forms.register;
+          
+          let response = await fetch(`https://one290.ru/user/standart-login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: `login=${loginForm.login}&password=${loginForm.password}`
+          });
+          if (response.status === 200)
+              window.location='https://one290.ru/user/orders';
+          else
+              alert('Вход не удался. Измените логин и/или пароль и повторите попытку.');
+      }
+    
       function generateCodeVerifier(length) {
           let result = '';
           const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
