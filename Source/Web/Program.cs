@@ -81,16 +81,16 @@ internal static class Program
         
             var app = builder.Build();
 
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseSerilogRequestLogging();
+            app.UseMiddleware<ExceptionLoggingMiddleware>();
             app.UseHsts();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSerilogRequestLogging();
-            app.UseMiddleware<ExceptionLoggingMiddleware>();
+            
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseRouting();
-
+            
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Admin}/{action=GetAdministrationPage}");

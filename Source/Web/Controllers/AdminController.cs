@@ -2,11 +2,13 @@ using Application;
 using Application.Actors;
 using Domain.Entities;
 using EntityStorageServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Web.Controllers;
 
+[Authorize(Roles = "Administrator")]
 [Route("admin")]
 public class AdminController(TransportCompanyContext dbContext, Administrator administrator) : Controller
 {

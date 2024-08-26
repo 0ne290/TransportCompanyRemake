@@ -427,6 +427,7 @@
     async function saveChanges() {
         if (driverUpdateRequests.size > 0) {
             let response = await fetch('https://one290.ru/admin/drivers', {
+                credentials: 'same-origin',
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -440,6 +441,7 @@
         
         if (truckUpdateRequests.size > 0) {
             let response = await fetch('https://one290.ru/admin/trucks', {
+                credentials: 'same-origin',
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -453,6 +455,7 @@
         
         if (branchUpdateRequests.size > 0) {
             let response = await fetch('https://one290.ru/admin/branches', {
+                credentials: 'same-origin',
                 method: 'PATCH',
                 headers: {
                   'Accept': 'application/json',
@@ -472,6 +475,7 @@
             guids = guids.slice(0, -2) + ' }';
             
             let response = await fetch(`https://one290.ru/admin/drivers?filter=${guids}.Contains(Guid)`, {
+                credentials: 'same-origin',
                 method: 'DELETE'
             });
             if (response.status !== 200)
@@ -485,6 +489,7 @@
             guids = guids.slice(0, -2) + ' }';
             
             let response = await fetch(`https://one290.ru/admin/trucks?filter=${guids}.Contains(Guid)`, {
+                credentials: 'same-origin',
                 method: 'DELETE'
             });
             if (response.status !== 200)
@@ -498,6 +503,7 @@
             guids = guids.slice(0, -2) + ' }';
             
             let response = await fetch(`https://one290.ru/admin/branches?filter=${guids}.Contains(Guid)`, {
+                credentials: 'same-origin',
                 method: 'DELETE'
             });
             if (response.status !== 200)
@@ -527,6 +533,7 @@
         }
         if (driverCreateRequests.length > 0) {
             let response = await fetch(`https://one290.ru/admin/drivers`, {
+                credentials: 'same-origin',
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json',
@@ -562,6 +569,7 @@
         }
         if (truckCreateRequests.length > 0) {
             let response = await fetch(`https://one290.ru/admin/trucks`, {
+                credentials: 'same-origin',
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json',
@@ -589,6 +597,7 @@
         }
         if (branchCreateRequests.length > 0) {
             let response = await fetch(`https://one290.ru/admin/branches`, {
+                credentials: 'same-origin',
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json',

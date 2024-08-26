@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Application.Actors;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
@@ -23,9 +24,18 @@ public class UserController(User userActor) : Controller
         return View("VkLogin");
     }
     
+    [Authorize(Roles = "User")]
+    [HttpGet]
+    [Route("orders")]
+    public IActionResult GetOrdersPage()
+    {
+        return Ok();
+        //return View("Orders");
+    }
+    
     [HttpPost]
     [Route("vk-login")]
-    public async Task<IActionResult> VkLogin(Application.Dtos.User.CreateVkRequest createRequest)
+    public async Task<IActionResult> VkLogin([FromBody] Application.Dtos.User.CreateVkRequest createRequest)
     {
         var user = await userActor.CreateOrUpdateAndGetVkUser(createRequest);
         
@@ -70,7 +80,7 @@ public class UserController(User userActor) : Controller
 
     [HttpPost]
     [Route("standart-register")]
-    public async Task<IActionResult> StandartRegister(Application.Dtos.User.CreateStandartRequest createRequest)
+    public async Task<IActionResult> StandartRegister([FromBody] Application.Dtos.User.CreateStandartRequest createRequest)
     {
         await userActor.CreateAndGetStandartUser(createRequest);
         
