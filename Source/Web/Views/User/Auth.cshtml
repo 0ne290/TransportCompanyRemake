@@ -53,15 +53,21 @@
     </ul>
     <div class="tab-content row m-0 p-0">
         <div role="tabpanel" class="tab-pane fade show overflow-auto" id="tab1">
-            <input class="w-100 active mt-3 mb-2" type="text" placeholder="Логин">
-            <input class="w-100 active mb-2" type="password" placeholder="Пароль">
-            <button class="w-100 active mb-3" type="button" value="ResetHoursWorkedPerWeek" onclick="resetDriverHoursWorkedPerWeek(this)">Зарегистрироваться</button>
+            <form name="register">
+                <input class="w-100 active mt-3 mb-2" type="text" placeholder="Логин" name="login">
+                <input class="w-100 active mb-2" type="password" placeholder="Пароль" name="password">
+                <input class="w-100 active mt-3 mb-2" type="text" placeholder="ФИО" name="name">
+                <input class="w-100 active mb-2" type="password" placeholder="Контактные данные" name="contact">
+            </form>
+            <button class="w-100 active mb-3" type="button" onclick="registerStandartUser()">Зарегистрироваться</button>
         </div>
         <div role="tabpanel" class="tab-pane fade show active overflow-auto" id="tab2">
             <div class="border-bottom second-border-color pt-3 pb-3">
-                <input class="w-100 active mb-2" type="text" placeholder="Логин">
-                <input class="w-100 active mb-2" type="password" placeholder="Пароль">
-                <button class="w-100 active" type="button" value="ResetHoursWorkedPerWeek" onclick="resetDriverHoursWorkedPerWeek(this)">Войти</button>
+                <form name="login">
+                    <input class="w-100 active mb-2" type="text" placeholder="Логин" name="login">
+                    <input class="w-100 active mb-2" type="password" placeholder="Пароль" name="password">
+                </form>
+                <button class="w-100 active" type="button" value="ResetHoursWorkedPerWeek" onclick="loginStandartUser()">Войти</button>
             </div>
             <div id="VkIdSdkOneTap" class="pt-3 pb-3"></div>
         </div>

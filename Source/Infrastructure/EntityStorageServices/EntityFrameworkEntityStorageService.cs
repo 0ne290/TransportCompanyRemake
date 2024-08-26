@@ -12,7 +12,7 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<TEntity?> Find(Expression<Func<TEntity, bool>> filter, string includedData = "")
+    public async Task<TEntity> Find(Expression<Func<TEntity, bool>> filter, string includedData = "")
     {
         var includedProperties = includedData.Split(";");
         
@@ -20,7 +20,7 @@ public class EntityFrameworkEntityStorageService<TEntity>(TransportCompanyContex
         query = includedProperties.Where(includedProperty => !string.IsNullOrEmpty(includedProperty))
             .Aggregate(query, (current, includedProperty) => current.Include(includedProperty));
 
-        return await query.SingleOrDefaultAsync(filter);
+        return await query.FirstAsync(filter);
     }
 
     public async Task<ICollection<TEntity>> FindAll(Expression<Func<TEntity, bool>> filter, string includedData = "")

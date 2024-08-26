@@ -44,13 +44,13 @@ public class UserController(User userActor) : Controller
         
         return Ok();
     }
-    
+
     [HttpPost]
     [Route("standart-login")]
     public async Task<IActionResult> StandartLogin(string login, string password)
     {
-        var user = await userActor.CreateOrUpdateAndGetVkUser(createRequest);
-        
+        var user = await userActor.GetStandartUser(login, password);
+
         var claims = new[] { new Claim(ClaimTypes.Name, user.Guid), new Claim(ClaimTypes.Role, "User") };
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -60,9 +60,19 @@ public class UserController(User userActor) : Controller
             ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7),
             IsPersistent = true
         };
-            
+
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authProperties);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal,
+            authProperties);
+
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("standart-register")]
+    public async Task<IActionResult> StandartRegister(Application.Dtos.User.CreateStandartRequest createRequest)
+    {
+        await userActor.CreateAndGetStandartUser(createRequest);
         
         return Ok();
     }

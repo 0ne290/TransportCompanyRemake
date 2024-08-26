@@ -6,7 +6,7 @@ public interface IEntityStorageService<TEntity>
 {
     Task CreateRange(IEnumerable<TEntity> entities);
     
-    Task<TEntity?> Find(Expression<Func<TEntity, bool>> filter, string includedData = "");
+    Task<TEntity> Find(Expression<Func<TEntity, bool>> filter, string includedData = "");
     
     Task<ICollection<TEntity>> FindAll(Expression<Func<TEntity, bool>> filter, string includedData = "");
     

@@ -124,8 +124,6 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
             {
                 var branch = await branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
-                if (branch == null)
-                    throw new ArgumentException($"The branch {updateRequest.SetBranch} does not exist.", nameof(updateRequests));
                 
                 driver.SetBranch(branch);
             }
@@ -221,8 +219,6 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             if (updateRequest.PropertyIsSet(nameof(updateRequest.SetBranch)))
             {
                 var branch = await branchStorageService.Find(b => b.Guid == updateRequest.SetBranch);
-                if (branch == null)
-                    throw new ArgumentException($"The branch {updateRequest.SetBranch} does not exist.", nameof(updateRequests));
                 
                 truck.SetBranch(branch);
             }
@@ -421,8 +417,6 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
     public async Task<IEnumerable<Dtos.Branch.Response>> GetPotentialOrderPerformersByBranches(string orderGuid)
     {
         var order = await orderStorageService.Find(o => o.Guid == orderGuid);
-        if (order == null)
-            throw new ArgumentException($"The orded {orderGuid} does not exist.", nameof(orderGuid));
         
         Func<Entities.Truck, bool> truckPredicate;
         Func<Entities.Driver, bool> driverPredicate;
