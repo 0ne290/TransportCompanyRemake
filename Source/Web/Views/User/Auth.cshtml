@@ -12,12 +12,8 @@
 {
     <script>
       async function registerStandartUser() {
-          let registerForm = document.forms.register;
-          let createRequest = { };
-          createRequest.Name = registerForm.name;
-          createRequest.Contact = registerForm.contact;
-          createRequest.Login = registerForm.login;
-          createRequest.Password = registerForm.password;
+          let elementsOfRegisterForm = document.forms.register.elements;
+          let createRequest = { Name: elementsOfRegisterForm.name.value, Contact: elementsOfRegisterForm.contact.value, Login: elementsOfRegisterForm.login.value, Password: elementsOfRegisterForm.password.value };
           
           let response = await fetch(`https://one290.ru/user/standart-register`, {
               method: 'POST',
@@ -34,14 +30,14 @@
       }
       
       async function loginStandartUser() {
-          let loginForm = document.forms.register;
+          let elementsOfLoginForm = document.forms.login.elements;
           
           let response = await fetch(`https://one290.ru/user/standart-login`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
               },
-              body: `login=${loginForm.login}&password=${loginForm.password}`
+              body: `login=${elementsOfLoginForm.login.value}&password=${elementsOfLoginForm.password.value}`
           });
           if (response.status === 200)
               window.location='https://one290.ru/user/orders';
@@ -94,8 +90,8 @@
             <form name="register">
                 <input class="w-100 active mt-3 mb-2" type="text" placeholder="Логин" name="login">
                 <input class="w-100 active mb-2" type="password" placeholder="Пароль" name="password">
-                <input class="w-100 active mt-3 mb-2" type="text" placeholder="ФИО" name="name">
-                <input class="w-100 active mb-2" type="password" placeholder="Контактные данные" name="contact">
+                <input class="w-100 active mb-2" type="text" placeholder="ФИО" name="name">
+                <input class="w-100 active mb-2" type="text" placeholder="Контактные данные" name="contact">
             </form>
             <button class="w-100 active mb-3" type="button" onclick="registerStandartUser()">Зарегистрироваться</button>
         </div>

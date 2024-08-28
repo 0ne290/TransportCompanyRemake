@@ -1,23 +1,46 @@
+using System.Security.Claims;
 using Application;
 using Application.Actors;
 using Domain.Entities;
 using EntityStorageServices;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Web.Controllers;
 
-[Authorize(Roles = "Administrator")]
 [Route("admin")]
 public class AdminController(TransportCompanyContext dbContext, Administrator administrator) : Controller
 {
+    [Route("login/login=Rotartsinimda/password=VwXyZ90786")]
+    public async Task<IActionResult> Login()
+    {
+        var claims = new[] { new Claim(ClaimTypes.Name, "Admin"), new Claim(ClaimTypes.Role, "Administrator") };
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+        var authProperties = new AuthenticationProperties
+        {
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7),
+            IsPersistent = true
+        };
+            
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authProperties);
+        
+        return RedirectToAction("GetAdministrationPage");
+    }
+    
+    [Authorize(Roles = "Administrator")]
     [Route("load-test-data-into-the-database")]
     public async Task Zxc()
     {
         await TransportCompanyContext.LoadTestData(dbContext);
     }
 
+    [Authorize(Roles = "Administrator")]
     [Route("clear-database")]
     public async Task Cxz()
     {
@@ -25,6 +48,7 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         await dbContext.Database.EnsureCreatedAsync();
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpPost]
     [Route("drivers")]
     public async Task CreateDrivers(
@@ -33,15 +57,16 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         await administrator.CreateDrivers(createRequests);
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpPatch]
     [Route("drivers")]
     public async Task UpdateDrivers(
         [FromBody] IReadOnlyCollection<Application.Dtos.Driver.UpdateRequest> updateRequests)
     {
-        Console.WriteLine(JsonConvert.SerializeObject(updateRequests));
         await administrator.UpdateDrivers(updateRequests);
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpDelete]
     [Route("drivers")]
     public async Task DeleteDrivers(string filter)
@@ -49,6 +74,7 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         await administrator.DeleteDrivers(FilterParser.Parse<Driver>(filter));
     }
     
+    [Authorize(Roles = "Administrator")]
     [HttpPost]
     [Route("trucks")]
     public async Task CreateTrucks(
@@ -57,14 +83,15 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         await administrator.CreateTrucks(createRequests);
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpPatch]
     [Route("trucks")]
     public async Task UpdateTrucks([FromBody] IReadOnlyCollection<Application.Dtos.Truck.UpdateRequest> updateRequests)
     {
-        Console.WriteLine(JsonConvert.SerializeObject(updateRequests));
         await administrator.UpdateTrucks(updateRequests);
     }
     
+    [Authorize(Roles = "Administrator")]
     [HttpDelete]
     [Route("trucks")]
     public async Task DeleteTrucks(string filter)
@@ -72,6 +99,7 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         await administrator.DeleteTrucks(FilterParser.Parse<Truck>(filter));
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpGet]
     [Route("administration")]
     public async Task<IActionResult> GetAdministrationPage()
@@ -81,6 +109,7 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
             .Select(b => new ViewModels.Branch(b)).ToList());
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpPost]
     [Route("branches")]
     public async Task CreateBranches(
@@ -89,15 +118,16 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         await administrator.CreateBranches(createRequests);
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpPatch]
     [Route("branches")]
     public async Task UpdateBranches(
         [FromBody] IReadOnlyCollection<Application.Dtos.Branch.UpdateRequest> updateRequests)
     {
-        Console.WriteLine(JsonConvert.SerializeObject(updateRequests));
         await administrator.UpdateBranches(updateRequests);
     }
 
+    [Authorize(Roles = "Administrator")]
     [HttpDelete]
     [Route("branches")]
     public async Task DeleteBranches(string filter)

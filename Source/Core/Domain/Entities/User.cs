@@ -35,7 +35,7 @@ public class User
         Password = cryptographicService.EncryptAndHash(Salt(password));
     }
 
-    private string Salt(string value) => value + RegistrationDate.ToString(CultureInfo.InvariantCulture) + StaticPartOfSalt + Login + value + DynamicPartOfSalt + Login;
+    public string Salt(string value) => value + RegistrationDate.ToString(CultureInfo.InvariantCulture) + StaticPartOfSalt + Login + value + DynamicPartOfSalt + Login;
     
     public override string ToString() => Login == null ? $"VkUserId = {VkUserId}" : $"Login = {Login}";
 

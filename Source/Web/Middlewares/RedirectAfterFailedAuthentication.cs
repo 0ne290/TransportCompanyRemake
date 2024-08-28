@@ -14,9 +14,10 @@ public class RedirectAfterFailedAuthentication : IAuthorizationMiddlewareResultH
         {
             var requiredRoles = policy.Requirements.OfType<RolesAuthorizationRequirement>().ToList();
             
-            if (requiredRoles.Any(r => r.AllowedRoles.Contains("Administrator")))
-                context.Response.Redirect("/admin/login");
-            else if (requiredRoles.Any(r => r.AllowedRoles.Contains("User")))
+            // Это имело бы смысл, если на сайте была бы отдельная страница с формой для ввода данных для входа в админку, но у меня вход происходит просто с помощью правильного URL
+            // if (requiredRoles.Any(r => r.AllowedRoles.Contains("Administrator")))
+            //     context.Response.Redirect("/admin/login");
+            if (requiredRoles.Any(r => r.AllowedRoles.Contains("User")))
                 context.Response.Redirect("/user/auth");
         }
     }

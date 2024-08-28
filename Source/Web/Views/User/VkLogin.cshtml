@@ -41,10 +41,7 @@ async function vkLogin() {
     const vkAuthMessage = await VKID.Auth.exchangeCode(code, deviceId);
     const accessToken = vkAuthMessage.access_token;
     const vkUserInfo = await VKID.Auth.userInfo(accessToken);
-    const userCreateRequest = { };
-    userCreateRequest.Name = vkUserInfo.user.first_name + ' ' + vkUserInfo.user.last_name;
-    userCreateRequest.Contact = vkUserInfo.user.phone;
-    userCreateRequest.VkUserId = vkUserInfo.user.user_id;
+    const userCreateRequest = { Name: vkUserInfo.user.first_name + ' ' + vkUserInfo.user.last_name, Contact: vkUserInfo.user.phone, VkUserId: vkUserInfo.user.user_id };
     
     let response = await fetch(`https://one290.ru/user/vk-login`, {
         method: 'POST',

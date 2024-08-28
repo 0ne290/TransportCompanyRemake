@@ -42,7 +42,9 @@ public class User(IEntityStorageService<Entities.User> userStorageService, ICryp
     
     public async Task<Dtos.User.Response> GetStandartUser(string login, string password)
     {
-        var user = await userStorageService.Find(u => u.Login == login && u.Password == password);
+        var users = await userStorageService.FindAll(_ => true);
+        var user = users.First(u =>
+            u.Login == login && u.Password == cryptographicService.EncryptAndHash(u.Salt(password)));
 
         return new Dtos.User.Response(user.Guid, user.RegistrationDate, user.VkUserId, user.Login, user.Password,
             user.Name, user.Contact, null);
