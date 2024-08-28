@@ -34,6 +34,14 @@ public class UserController(User userActor) : Controller
         //return View("Orders");
     }
     
+    [Authorize(Roles = "User")]
+    [HttpGet]
+    [Route("create-order")]
+    public IActionResult GetOrderCreationPage()
+    {
+        return View("CreateOrder");
+    }
+    
     [HttpPost]
     [Route("vk-login")]
     public async Task<IActionResult> VkLogin([FromBody] Application.Dtos.User.CreateVkRequest createRequest)

@@ -13,7 +13,7 @@
     <script>
       async function registerStandartUser() {
           let elementsOfRegisterForm = document.forms.register.elements;
-          let createRequest = { Name: elementsOfRegisterForm.name.value, Contact: elementsOfRegisterForm.contact.value, Login: elementsOfRegisterForm.login.value, Password: elementsOfRegisterForm.password.value };
+          let createRequest = { Name: elementsOfRegisterForm.name, Contact: elementsOfRegisterForm.contact, Login: elementsOfRegisterForm.login, Password: elementsOfRegisterForm.password };
           
           let response = await fetch(`https://one290.ru/user/standart-register`, {
               method: 'POST',
@@ -37,7 +37,7 @@
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
               },
-              body: `login=${elementsOfLoginForm.login.value}&password=${elementsOfLoginForm.password.value}`
+              body: `login=${elementsOfLoginForm.login}&password=${elementsOfLoginForm.password}`
           });
           if (response.status === 200)
               window.location='https://one290.ru/user/orders';

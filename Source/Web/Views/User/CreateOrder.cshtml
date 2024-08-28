@@ -1,0 +1,29 @@
+@{
+    ViewBag.Title = "Create order";
+    Layout = "_FullPageLayout";
+}
+
+<div class="container border border-2 rounded second-border-color p-0 w-25">
+    <div class="row m-0 p-0">
+        <div class="col">
+            <form name="create-order">
+                <input class="w-100 active mt-3 mb-2" type="text" placeholder="Откуда забрать груз (адрес)" name="start-address">
+                <input class="w-100 active mb-2" type="text" placeholder="Куда отвезти груз (адрес)" name="end-address">
+                <input class="w-100 active mb-2" type="text" placeholder="Описание груза" name="cargo-description">
+                <input class="w-100 active mb-2" type="text" placeholder="Откуда забрать груз (градусы широты)" name="start-point-latitude">
+                <input class="w-100 active mb-2" type="text" placeholder="Откуда забрать груз (градусы долготы)" name="start-point-longitude">
+                <input class="w-100 active mb-2" type="text" placeholder="Куда отвезти груз (градусы широты)" name="end-point-latitude">
+                <input class="w-100 active mb-2" type="text" placeholder="Куда отвезти груз (градусы долготы)" name="end-point-longitude">
+                <input class="w-100 active mb-2" type="text" placeholder="Объем груза (кубометры)" name="cargo-volume">
+                <input class="w-100 active mb-2" type="text" placeholder="Вес груза (килограммы)" name="cargo-weight">
+                <select class="w-100 active mb-2" name="tank-required">
+                    <option selected>В каком полуприцепе перевозить</option>
+                    <option value="true">Цистерна</option>
+                    <option value="false">Тент</option>
+                </select>
+                <input class="w-100 active mb-2" type="text" placeholder="Класс опасности груза" name="hazard-class-flag">
+            </form>
+            <button class="w-100 active mb-3" type="button" onclick="createOrder()">Сделать заказ</button>
+        </div>
+    </div>
+</div>
