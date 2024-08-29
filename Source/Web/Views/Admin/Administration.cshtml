@@ -1,6 +1,6 @@
 @using System.Text
 
-@model ICollection<Web.ViewModels.Branch>
+@model ICollection<Web.Dtos.Branch>
 
 @{
     ViewBag.Title = "Administrtion";
@@ -630,7 +630,7 @@
                     <th scope="col">Адрес</th>
                     <th scope="col">Широта</th>
                     <th scope="col">Долгота</th>
-                    <th scope="col"><button class="active\" type="button" onclick="createBranch()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
+                    <th scope="col"><button class="active" type="button" onclick="createBranch()"><i class="fa-solid fa-plus second-text-color"></i></button></th>
                 </tr>
                 </thead>
                 <tbody id="branch-table">
@@ -652,7 +652,7 @@
                     <th scope="col">Часов отработано за неделю</th>
                     <th scope="col">Всего часов отработано</th>
                     <th scope="col" colspan="3" class="text-center">Действия</th>
-                    <th scope="col"><button class="active\" type="button" onclick="createDriver()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
+                    <th scope="col"><button class="active" type="button" onclick="createDriver()"><i class="fa-solid fa-plus second-text-color"></i></button></th>
                 </tr>
                 </thead>
                 <tbody id="driver-table">
@@ -677,7 +677,7 @@
                     <th scope="col">Цена кг/км (₽)</th>
                     <th scope="col">Ценовой коэффициент (₽)</th>
                     <th scope="col">Действия</th>
-                    <th scope="col"><button class="active\" type="button" onclick="createTruck()"><i class="fa-solid fa-plus second-text-color\"></i></button></th>
+                    <th scope="col"><button class="active" type="button" onclick="createTruck()"><i class="fa-solid fa-plus second-text-color"></i></button></th>
                 </tr>
                 </thead>
                 <tbody id="truck-table">

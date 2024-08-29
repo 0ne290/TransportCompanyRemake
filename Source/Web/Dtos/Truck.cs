@@ -1,7 +1,7 @@
 using System.Globalization;
 using Application.Dtos.Truck;
 
-namespace Web.ViewModels;
+namespace Web.Dtos;
 
 public record Truck
 {

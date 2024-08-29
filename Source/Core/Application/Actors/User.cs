@@ -1,10 +1,11 @@
 using Entities = Domain.Entities;
 using Application.Interfaces;
+using Domain.Constants;
 using Domain.Interfaces;
 
 namespace Application.Actors;
 
-public class User(IEntityStorageService<Entities.User> userStorageService, ICryptographicService cryptographicService)
+public class User(IEntityStorageService<Entities.User> userStorageService, IEntityStorageService<Entities.Order> orderStorageService, ICryptographicService cryptographicService)
 {
     public async Task<Dtos.User.Response> CreateOrUpdateAndGetVkUser(Dtos.User.CreateVkRequest createRequest)
     {
@@ -55,10 +56,21 @@ public class User(IEntityStorageService<Entities.User> userStorageService, ICryp
         var users = createRequests.Select(cr => Entities.User.New(cr.Name, cr.Contact, cr.Login, cr.Password, cryptographicService));
 
         await userStorageService.CreateRange(users);
-    }
-    
-    public void CreateOrder()
-    {
-        
     }*/
+    
+    public async Task CreateOrder(Dtos.Order.CreateRequest createRequest)
+    {
+        var user = await userStorageService.Find(u => u.Guid == createRequest.UserGuid);
+
+        await orderStorageService.CreateRange(new[]
+        {
+            Entities.Order.New(user, createRequest.StartAddress, createRequest.EndAddress,
+                createRequest.CargoDescription, (createRequest.StartPointLatitude, createRequest.StartPointLongitude),
+                (createRequest.EndPointLatitude, createRequest.EndPointLongitude), createRequest.CargoVolume,
+                createRequest.CargoWeight, createRequest.TankRequired,
+                createRequest.HazardClassFlag == null
+                    ? null
+                    : HazardClassesFlags.StringToFlagCombination(createRequest.HazardClassFlag))
+        });
+    }
 }

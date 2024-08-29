@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Web.Controllers;
 
@@ -106,7 +105,17 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
     {
         return View("Administration",
             (await administrator.GetBranches(FilterParser.Parse<Branch>("true"), true, true))
-            .Select(b => new ViewModels.Branch(b)).ToList());
+            .Select(b => new Dtos.Branch(b)).ToList());
+    }
+    
+    [Authorize(Roles = "Administrator")]
+    [HttpGet]
+    [Route("assignment-of-performers-to-order")]
+    public async Task<IActionResult> GetPageForAssignmentOfPerformersToOrder(string orderGuid)
+    {
+        return View("AssignmentOfPerformersToOrder",
+            (await administrator.GetPotentialOrderPerformersByBranches(orderGuid))
+            .Select(b => new Dtos.Branch(b)).ToList());
     }
 
     [Authorize(Roles = "Administrator")]

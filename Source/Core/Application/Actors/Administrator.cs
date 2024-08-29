@@ -427,10 +427,10 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 (order.HazardClassFlag & t.PermittedHazardClassesFlags ?? 0) > 0;
             if (order.TankRequired)
                 driverPredicate = d =>
-                    d.IsAvailable && (order.HazardClassFlag & d.AdrQualificationFlag ?? 0) > 1 &&
+                    d.IsAvailable && (order.HazardClassFlag & d.AdrQualificationFlag ?? 0) > 0 &&
                     d.AdrQualificationOfTank;
             else
-                driverPredicate = d => d.IsAvailable && (order.HazardClassFlag & d.AdrQualificationFlag ?? 0) > 1;
+                driverPredicate = d => d.IsAvailable && (order.HazardClassFlag & d.AdrQualificationFlag ?? 0) > 0;
         }
         else
         {

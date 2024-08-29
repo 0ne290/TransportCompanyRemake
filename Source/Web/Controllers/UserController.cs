@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Web.Dtos;
 
 namespace Web.Controllers;
 
@@ -40,6 +41,30 @@ public class UserController(User userActor) : Controller
     public IActionResult GetOrderCreationPage()
     {
         return View("CreateOrder");
+    }
+    
+    [Authorize(Roles = "User")]
+    [HttpPost]
+    [Route("create-order")]
+    public async Task<IActionResult> CreateOrder([FromBody] RequestToCreateOrder createRequest)
+    {
+        await userActor.CreateOrder(new Application.Dtos.Order.CreateRequest
+        {
+            UserGuid = HttpContext.User.FindFirst(ClaimTypes.Name)!.Value,
+            StartAddress = createRequest.StartAddress,
+            EndAddress = createRequest.EndAddress,
+            CargoDescription = createRequest.CargoDescription,
+            StartPointLatitude = createRequest.StartPointLatitude,
+            StartPointLongitude = createRequest.StartPointLongitude,
+            EndPointLatitude = createRequest.EndPointLatitude,
+            EndPointLongitude = createRequest.EndPointLongitude,
+            CargoVolume = createRequest.CargoVolume,
+            CargoWeight = createRequest.CargoWeight,
+            TankRequired = createRequest.TankRequired,
+            HazardClassFlag = createRequest.HazardClassFlag
+        });
+        
+        return Ok();
     }
     
     [HttpPost]

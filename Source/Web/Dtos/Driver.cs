@@ -1,7 +1,7 @@
 using System.Globalization;
 using Application.Dtos.Driver;
 
-namespace Web.ViewModels;
+namespace Web.Dtos;
 
 public record Driver
 {
