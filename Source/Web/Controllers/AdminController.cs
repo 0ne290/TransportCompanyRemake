@@ -111,6 +111,16 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
     
     [Authorize(Roles = "Administrator")]
     [HttpGet]
+    [Route("orders")]
+    public async Task<IActionResult> GetOrdersPage()
+    {
+        return View("Orders",
+            (await administrator.GetOrders(FilterParser.Parse<Order>("true")))
+            .Select(o => new Dtos.Order(o)).ToList());
+    }
+    
+    [Authorize(Roles = "Administrator")]
+    [HttpGet]
     [Route("assignment-of-performers-to-order")]
     public async Task<IActionResult> GetPageForAssignmentOfPerformersToOrder(string orderGuid)
     {
