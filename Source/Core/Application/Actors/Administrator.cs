@@ -423,7 +423,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         if (order.HazardClassFlag != null)
         {
             truckPredicate = t =>
-                t.IsAvailable && t.TrailerIsTank == order.TankRequired &&
+                t.IsAvailable && t.VolumeMax >= order.CargoVolume && t.WeightMax >= order.CargoWeight && t.TrailerIsTank == order.TankRequired &&
                 (order.HazardClassFlag & t.PermittedHazardClassesFlags ?? 0) > 0;
             if (order.TankRequired)
                 driverPredicate = d =>
@@ -435,7 +435,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         else
         {
             truckPredicate = t =>
-                t.IsAvailable && t.TrailerIsTank == order.TankRequired;
+                t.IsAvailable && t.VolumeMax >= order.CargoVolume && t.WeightMax >= order.CargoWeight && t.TrailerIsTank == order.TankRequired;
             driverPredicate = d => d.IsAvailable;
         }
 
