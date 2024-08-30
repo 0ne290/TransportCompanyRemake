@@ -80,3 +80,25 @@
 .third-border-color {
     border-color: var(--third-color) !important;
 }
+
+.attention3-border-color {
+    border-color: var(--first-color) !important;
+}
+
+.attention1-border-color {
+    border-color: var(--second-color) !important;
+}
+
+.attention2-border-color {
+    border-color: var(--third-color) !important;
+}
+
+.nav-link {
+    color: var(--first-color) !important;
+    background-color: var(--second-color) !important;
+}
+
+.nav-link .active {
+    color: var(--second-color) !important;
+    background-color: var(--first-color) !important;
+}

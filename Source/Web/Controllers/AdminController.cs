@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Claims;
 using Application;
 using Application.Actors;
@@ -113,9 +114,32 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
     [Route("assignment-of-performers-to-order")]
     public async Task<IActionResult> GetPageForAssignmentOfPerformersToOrder(string orderGuid)
     {
-        return View("AssignmentOfPerformersToOrder",
-            (await administrator.GetPotentialOrderPerformersByBranches(orderGuid))
-            .Select(b => new Dtos.Branch(b)).ToList());
+        var branches = (await administrator.GetPotentialOrderPerformersByBranches(orderGuid))
+            .Select(b => new Dtos.Branch(b)).ToList();
+        foreach (var branch in branches)
+        {
+            branch.Color = "first-border-color";
+            
+            var limitOfPermissibleHoursForOneDriver = 45d - double.Parse(branch.DrivingHours, CultureInfo.InvariantCulture);
+            var limitOfPermissibleHoursForTwoDrivers = 45d - double.Parse(branch.DrivingHours, CultureInfo.InvariantCulture) / 2d;
+            foreach (var driver in branch.Drivers)
+            {
+                if (double.Parse(driver.HoursWorkedPerWeek) <= limitOfPermissibleHoursForOneDriver)
+                    driver.Color = "border border-2 second-border-color";
+                else if (double.Parse(driver.HoursWorkedPerWeek) <= limitOfPermissibleHoursForTwoDrivers)
+                    driver.Color = "border border-2 third-border-color";
+                else
+                    driver.Color = "first-border-color";
+            }
+
+            foreach (var truck in branch.Trucks)
+                truck.Color = "first-border-color";
+            if (branch.Trucks.Count > 0)
+                branch.Trucks.MinBy(t => double.Parse(t.OrderPrice, CultureInfo.InvariantCulture))!.Color = "border border-2 second-border-color";
+        }
+        branches.MinBy(b => double.Parse(b.LengthInKm, CultureInfo.InvariantCulture))!.Color = "first-background-color";
+        
+        return View("AssignmentOfPerformersToOrder", branches);
     }
 
     [Authorize(Roles = "Administrator")]

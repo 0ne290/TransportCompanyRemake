@@ -51,4 +51,6 @@ public record Driver
     public string ButtonValue { get; }
     
     public string ButtonText { get; }
+    
+    public string? Color { get; set; }
 }

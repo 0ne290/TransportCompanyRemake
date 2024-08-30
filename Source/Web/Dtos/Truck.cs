@@ -18,6 +18,7 @@ public record Truck
         WeightMax = truck.WeightMax.ToString("F6", CultureInfo.InvariantCulture);
         WeightPrice = truck.WeightPrice.ToString("F6", CultureInfo.InvariantCulture);
         PricePerKm = truck.PricePerKm.ToString("F6", CultureInfo.InvariantCulture);
+        OrderPrice = truck.OrderPrice?.ToString("F6", CultureInfo.InvariantCulture) ?? "null";
 
         if (truck.DecommissionedDate == null)
         {
@@ -55,9 +56,13 @@ public record Truck
     
     public string WeightPrice { get; }
     
+    public string OrderPrice { get; }
+    
     public string PricePerKm { get; }
     
     public string ButtonValue { get; }
     
     public string ButtonText { get; }
+    
+    public string? Color { get; set; }
 }
