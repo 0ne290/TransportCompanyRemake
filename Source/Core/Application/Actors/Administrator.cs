@@ -471,4 +471,16 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
 
         return branchResponses;
     }
+
+    public async Task AssignPerformersToOrder(string orderGuid, string truckGuid, string driver1Guid, string? driver2Guid)
+    {
+        var order = await orderStorageService.Find(o => o.Guid == orderGuid);
+        var truck = await truckStorageService.Find(t => t.Guid == truckGuid, "Branch");
+        var driver1 = await driverStorageService.Find(d => d.Guid == driver1Guid, "Branch");
+        var driver2 = driver2Guid == null ? null : await driverStorageService.Find(d => d.Guid == driver2Guid, "Branch");
+        
+        order.AssignPerformers(geolocationService, truck, driver1, driver2);
+
+        await orderStorageService.UpdateRange(new[] { order });
+    }
 }

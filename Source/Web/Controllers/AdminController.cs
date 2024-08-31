@@ -2,12 +2,16 @@ using System.Globalization;
 using System.Security.Claims;
 using Application;
 using Application.Actors;
-using Domain.Entities;
 using EntityStorageServices;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Web.Dtos;
+using Branch = Domain.Entities.Branch;
+using Driver = Domain.Entities.Driver;
+using Order = Domain.Entities.Order;
+using Truck = Domain.Entities.Truck;
 
 namespace Web.Controllers;
 
@@ -166,6 +170,18 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         branches.MinBy(b => double.Parse(b.LengthInKm, CultureInfo.InvariantCulture))!.Color = "first-background-color";
         
         return View("AssignmentOfPerformersToOrder", branches);
+    }
+    
+    [Authorize(Roles = "Administrator")]
+    [HttpPost]
+    [Route("assignment-of-performers-to-order")]
+    public async Task<IActionResult> AssignmentOfPerformersToOrder([FromBody] RequestToAssignmentOfPerformersToOrder requestToAssignmentOfPerformersToOrder)
+    {
+        await administrator.AssignPerformersToOrder(requestToAssignmentOfPerformersToOrder.OrderGuid,
+            requestToAssignmentOfPerformersToOrder.TruckGuid, requestToAssignmentOfPerformersToOrder.Driver1Guid,
+            requestToAssignmentOfPerformersToOrder.Driver2Guid);
+        
+        return Ok();
     }
 
     [Authorize(Roles = "Administrator")]
