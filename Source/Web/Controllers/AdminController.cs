@@ -140,10 +140,26 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
                     driver.Color = "border border-2 third-border-color";
                 else
                     driver.Color = "first-border-color";
+
+                driver.IsAvailable = driver.IsAvailable == "true" ? "Да" : "Нет";
+                driver.AdrQualificationOfTank = driver.AdrQualificationOfTank == "true" ? "Да" : "Нет";
+                driver.AdrQualificationFlag = driver.AdrQualificationFlag switch
+                {
+                    "null" => "Нет",
+                    "Base" => "Базовая",
+                    "BaseAnd1" => "Базовая + класс 1",
+                    "BaseAnd7" => "Базовая + класс 7",
+                    "Full" => "Полная",
+                    _ => throw new InvalidOperationException("Driver.AdrQualificationFlag is invalid.")
+                };
             }
 
             foreach (var truck in branch.Trucks)
+            {
                 truck.Color = "first-border-color";
+                truck.IsAvailable = truck.IsAvailable == "true" ? "Да" : "Нет";
+                truck.TrailerIsTank = truck.TrailerIsTank == "true" ? "Да" : "Нет";
+            }
             if (branch.Trucks.Count > 0)
                 branch.Trucks.MinBy(t => double.Parse(t.OrderPrice, CultureInfo.InvariantCulture))!.Color = "border border-2 second-border-color";
         }

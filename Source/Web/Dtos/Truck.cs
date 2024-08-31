@@ -44,9 +44,9 @@ public record Truck
     
     public string Number { get; }
     
-    public string IsAvailable { get; }
+    public string IsAvailable { get; set; }
     
-    public string TrailerIsTank { get; }
+    public string TrailerIsTank { get; set; }
     
     public string VolumeMax { get; }
     

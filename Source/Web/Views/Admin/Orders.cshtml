@@ -1,8 +1,13 @@
-@model TModel
+@model ICollection<Web.Dtos.Order>
 
 @{
     ViewBag.Title = "Orders";
     Layout = "_FullPageLayout";
+}
+
+@section Scripts
+{
+    
 }
 
 <div class="container border border-2 rounded second-border-color p-0">
@@ -40,8 +45,44 @@
                     <th scope="col">Действия</th>
                 </tr>
                 </thead>
-                <tbody id="truck-table">
-                @Html.Raw(trucks.ToString())
+                <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.Status</td>
+                        <td>@order.DateCreated</td>
+                        <td>@order.DateAssignmentOfPerformers</td>
+                        <td>@order.DatePaymentAndBegin</td>
+                        <td>@order.DateEnd</td>
+                        <td>@order.HazardClassFlag</td>
+                        <td>@order.TankRequired</td>
+                        <td>@order.LengthInKm</td>
+                        <td>@order.Price</td>
+                        <td>@order.ExpectedHoursWorkedByDrivers</td>
+                        <td>@order.ActualHoursWorkedByDriver1</td>
+                        <td>@order.ActualHoursWorkedByDriver2</td>
+                        <td>@order.UserName</td>
+                        <td>@order.TruckNumber</td>
+                        <td>@order.Driver1Name</td>
+                        <td>@order.Driver2Name</td>
+                        <td>@order.BranchAddress</td>
+                        <td>@order.StartAddress</td>
+                        <td>@order.EndAddress</td>
+                        <td>@order.CargoDescription</td>
+                        <td>@order.StartPointLatitude</td>
+                        <td>@order.StartPointLongitude</td>
+                        <td>@order.EndPointLatitude</td>
+                        <td>@order.EndPointLongitude</td>
+                        <td>@order.CargoVolume</td>
+                        <td>@order.CargoWeight</td>
+                        <td>
+                            @if (order.Status == "Ожидает назначения")
+                            {
+                               <button class="active" type="button" onclick="window.location='https://one290.ru/admin/assignment-of-performers-to-order?orderGuid=@order.Guid';">Назначить исполнителей</button> 
+                            }
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         </div>

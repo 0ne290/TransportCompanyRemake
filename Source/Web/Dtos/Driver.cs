@@ -40,13 +40,13 @@ public record Driver
     
     public string TotalHoursWorked { get; }
     
-    public string AdrQualificationFlag { get; }
+    public string AdrQualificationFlag { get; set; }
     
-    public string AdrQualificationOfTank { get; }
+    public string AdrQualificationOfTank { get; set; }
     
     public string Name { get; }
     
-    public string IsAvailable { get; }
+    public string IsAvailable { get; set; }
     
     public string ButtonValue { get; }
     

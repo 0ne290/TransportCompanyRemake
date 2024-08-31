@@ -1,6 +1,62 @@
 @using System.Text
 @model ICollection<Web.Dtos.Branch>
 
+@section Scripts
+{
+    <script>
+    let guidOfCurrentBranch = 'stub';
+    let driver1 = null;
+    let driver2 = null;
+    
+    function selectDriver(button) {
+        let branchGuid = button.dataset.branchGuid;
+        if (guidOfCurrentBranch !== branchGuid) {
+            if (driver1 != null) {
+                driver1.classList.replace('active', 'inactive');
+                driver1.textContent = 'Назначить';
+            }
+            if (driver2 != null) {
+                driver2.classList.replace('active', 'inactive');
+                driver2.textContent = 'Назначить';
+            }
+            
+            guidOfCurrentBranch = branchGuid;
+            driver1 = null;
+            driver2 = null;
+        }
+        
+        if (driver1 == null) {
+            driver1 = button;
+            driver1.classList.replace('inactive', 'active');
+            driver1.textContent = 'Назначен первым водителем';
+        }
+        else if (button === driver1 && driver2 == null) {
+            driver1 = null;
+            button.classList.replace('active', 'inactive');
+            button.textContent = 'Назначить';
+        }
+        else if (button === driver1 && driver2 != null) {
+            driver1 = driver2;
+            driver2 = null;
+            button.classList.replace('active', 'inactive');
+            button.textContent = 'Назначить';
+            driver1.classList.replace('inactive', 'active');
+            driver1.textContent = 'Назначен первым водителем';
+        }
+        else if (driver2 == null) {
+            driver2 = button;
+            driver2.classList.replace('inactive', 'active');
+            driver2.textContent = 'Назначен вторым водителем';
+        }
+        else if (button === driver2) {
+            driver2 = null;
+            button.classList.replace('active', 'inactive');
+            button.textContent = 'Назначить';
+        }
+    }
+    </script>
+}
+
 @{
     ViewBag.Title = "Assignment of performers to order";
     Layout = "_FullPageLayout";
@@ -16,13 +72,13 @@
         contentOfBranchTabs.Append($"<div role=\"tabpanel\" class=\"tab-pane fade show overflow-auto\" id=\"tab{tabCounter}\" style=\"height: 74vh\"><ul class=\"nav nav-tabs m-0 p-0 second-background-color first-text-color\" role=\"tablist\"><li role=\"presentation\" class=\"nav-item text-center p-3 border-start border-end first-border-color w-50\"><button class=\"nav-link\" data-bs-toggle=\"tab\" data-bs-target=\"#tab{tabCounter}1\" type=\"button\" role=\"tab\">Водители</button></li><li role=\"presentation\" class=\"nav-item text-center p-3 border-start border-end first-border-color w-50\"><button class=\"nav-link\" data-bs-toggle=\"tab\" data-bs-target=\"#tab{tabCounter}2\" type=\"button\" role=\"tab\">Фуры</button></li></ul><div class=\"tab-content row m-0 p-0\"><div role=\"tabpanel\" class=\"tab-pane fade show overflow-auto\" id=\"tab{tabCounter}1\" style=\"height: 74vh\">");
         var drivers = new StringBuilder(1600 * branch.Drivers.Count);
         @foreach (var driver in branch.Drivers)
-            drivers.Append($"<tr class=\"border {driver.Color}\"><th scope=\"row\">{driver.Name}</th><th scope=\"row\">{branch.Address}</th><td>{driver.HireDate}</td><td>{driver.DismissalDate}</td><th scope=\"row\">{driver.AdrQualificationFlag}</th><td>{driver.IsAvailable}</td><td>{driver.AdrQualificationOfTank}</td><td>{driver.HoursWorkedPerWeek}</td><td>{driver.TotalHoursWorked}</td></tr>");
+            drivers.Append($"<tr class=\"border {driver.Color}\"><th scope=\"row\">{driver.Name}</th><th scope=\"row\">{branch.Address}</th><td>{driver.HireDate}</td><td>{driver.DismissalDate}</td><th scope=\"row\">{driver.AdrQualificationFlag}</th><td>{driver.IsAvailable}</td><td>{driver.AdrQualificationOfTank}</td><td>{driver.HoursWorkedPerWeek}</td><td>{driver.TotalHoursWorked}</td><td><button data-branch-guid=\"{branch.Guid}\" data-driver-guid=\"{driver.Guid}\" onclick=\"selectDriver(this)\" class=\"inactive\" type=\"button\">Назначить</button></td></tr>");
         
-        contentOfBranchTabs.Append($"<table class=\"table my-table m-0 p-0\"><thead class=\"sticky-top\"><tr class=\"active\"><th scope=\"col\">ФИО</th><th scope=\"col\">Филиал</th><th scope=\"col\">Дата приема на работу</th><th scope=\"col\">Дата увольнения</th><th scope=\"col\">Квалификация ДОПОГ</th><th scope=\"col\">Готов к выполнению заказа</th><th scope=\"col\">Есть квалификация ДОПОГ на перевозку цистерн</th><th scope=\"col\">Часов отработано за неделю</th><th scope=\"col\">Всего часов отработано</th></tr></thead><tbody>{drivers.ToString()}</tbody></table></div><div role=\"tabpanel\" class=\"tab-pane fade show overflow-auto\" id=\"tab{tabCounter}2\" style=\"height: 74vh\">");
+        contentOfBranchTabs.Append($"<table class=\"table my-table m-0 p-0\"><thead class=\"sticky-top\"><tr class=\"active\"><th scope=\"col\">ФИО</th><th scope=\"col\">Филиал</th><th scope=\"col\">Дата приема на работу</th><th scope=\"col\">Дата увольнения</th><th scope=\"col\">Квалификация ДОПОГ</th><th scope=\"col\">Готов к выполнению заказа</th><th scope=\"col\">Есть квалификация ДОПОГ на перевозку цистерн</th><th scope=\"col\">Часов отработано за неделю</th><th scope=\"col\">Всего часов отработано</th><th scope=\"col\">Действия</th></tr></thead><tbody>{drivers.ToString()}</tbody></table></div><div role=\"tabpanel\" class=\"tab-pane fade show overflow-auto\" id=\"tab{tabCounter}2\" style=\"height: 74vh\">");
         var trucks = new StringBuilder(1600 * branch.Trucks.Count);
         @foreach (var truck in branch.Trucks)
             trucks.Append($"<tr class=\"border {truck.Color}\"><th scope=\"row\">{truck.Number}</th><th scope=\"row\">{branch.Address}</th><td>{truck.CommissionedDate}</td><td>{truck.DecommissionedDate}</td><th scope=\"row\">{truck.PermittedHazardClassesFlags}</th><td>{truck.IsAvailable}</td><td>{truck.TrailerIsTank}</td><th scope=\"row\">{truck.VolumeMax}</th><td>{truck.VolumePrice}</td><td>{truck.WeightMax}</td><th scope=\"row\">{truck.WeightPrice}</th><td>{truck.PricePerKm}</td><td>{truck.OrderPrice}</td></tr>");
-        contentOfBranchTabs.Append($"<table class=\"table my-table m-0 p-0\"><thead class=\"sticky-top\"><tr class=\"active\"><th scope=\"col\">Номер</th><th scope=\"col\">Филиал</th><th scope=\"col\">Дата начала эксплуатации</th><th scope=\"col\">Дата конца эксплуатации</th><th scope=\"col\">Допустимые классы опасности</th><th scope=\"col\">Готов к выполнению заказа</th><th scope=\"col\">Тип полуприцепа</th><th scope=\"col\">Максимальный объем груза (м^3)</th><th scope=\"col\">Цена м^3/км (\u20bd)</th><th scope=\"col\">Максимальный вес груза (кг)</th><th scope=\"col\">Цена кг/км (\u20bd)</th><th scope=\"col\">Ценовой коэффициент (\u20bd)</th><th scope=\"col\">Цена выполнения заказа (\u20bd)</th></tr></thead><tbody id=\"truck-table\">{trucks.ToString()}</tbody></table></div></div></div>");
+        contentOfBranchTabs.Append($"<table class=\"table my-table m-0 p-0\"><thead class=\"sticky-top\"><tr class=\"active\"><th scope=\"col\">Номер</th><th scope=\"col\">Филиал</th><th scope=\"col\">Дата начала эксплуатации</th><th scope=\"col\">Дата конца эксплуатации</th><th scope=\"col\">Допустимые классы опасности</th><th scope=\"col\">Готов к выполнению заказа</th><th scope=\"col\">Тип полуприцепа</th><th scope=\"col\">Максимальный объем груза (м^3)</th><th scope=\"col\">Цена м^3/км (\u20bd)</th><th scope=\"col\">Максимальный вес груза (кг)</th><th scope=\"col\">Цена кг/км (\u20bd)</th><th scope=\"col\">Ценовой коэффициент (\u20bd)</th><th scope=\"col\">Цена выполнения заказа (\u20bd)</th><th scope=\"col\">Действия</th></tr></thead><tbody id=\"truck-table\">{trucks.ToString()}</tbody></table></div></div></div>");
         
         tabCounter++;
     }
