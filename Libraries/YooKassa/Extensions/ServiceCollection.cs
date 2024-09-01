@@ -30,7 +30,7 @@ public static class ServiceCollection
             httpClient.DefaultRequestHeaders.Clear();
             httpClient.BaseAddress = new Uri(paymentApiUrl);
             httpClient.SetBasicAuthentication(shopId, secretKey);
-            httpClient.AddAcceptHeaderValue("application/json");
+            httpClient.AddValueOfAcceptHeader("application/json");
         });
     }
 }

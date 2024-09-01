@@ -5,6 +5,22 @@
     Layout = "_FullPageLayout";
 }
 
+@section Scripts
+{
+    <script>
+    async function redirectToPaymentPage(orderGuid) {
+        let response = await fetch(`https://one290.ru/payment-confirmation/get-payment-url?orderGuid=${orderGuid}`, {
+            credentials: 'same-origin',
+            method: 'GET'
+        });
+        let responseBody = await response.json();
+        let paymentUrl = responseBody.PaymentUrl;
+        
+        window.location = paymentUrl;
+    }
+    </script>
+}
+
 <div class="container border border-2 rounded second-border-color p-0">
     <div class="row m-0 p-0">
         <div class="col overflow-auto" style="height: 74vh">
@@ -71,9 +87,9 @@
                         <td>@order.CargoVolume</td>
                         <td>@order.CargoWeight</td>
                         <td>
-                            @if (order.Status == "Ожидает назначения")
+                            @if (order.Status == "Ожидает оплаты")
                             {
-                               <button class="active" type="button" onclick="window.location='https://one290.ru/admin/assignment-of-performers-to-order?orderGuid=@order.Guid';">Назначить исполнителей</button> 
+                               <button class="active" type="button" onclick="redirectToPaymentPage('@order.Guid')">Оплатить</button> 
                             }
                         </td>
                     </tr>

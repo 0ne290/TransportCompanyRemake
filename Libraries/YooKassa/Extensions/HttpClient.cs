@@ -9,8 +9,11 @@ public static class HttpClient
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
             Convert.ToBase64String(Encoding.ASCII.GetBytes($"{login}:{password}")));
 
-    public static void AddAcceptHeaderValue(this System.Net.Http.HttpClient httpClient, string value) =>
+    public static void AddValueOfAcceptHeader(this System.Net.Http.HttpClient httpClient, string value) =>
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(value));
+    
+    public static void AddValueOfIdempotenceKeyHeader(this System.Net.Http.HttpClient httpClient, string value) =>
+        httpClient.DefaultRequestHeaders.Add("Idempotence-Key", value);
     
     public static async Task<HttpResponseMessage> PostJson(this System.Net.Http.HttpClient httpClient, string json) =>
         await httpClient.PostAsync((string?)null, new StringContent(json, Encoding.UTF8, "application/json"));

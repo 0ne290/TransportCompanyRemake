@@ -7,6 +7,7 @@ using EntityStorageServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using OrderPaymentServices;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
@@ -14,6 +15,7 @@ using Serilog.Exceptions.Core;
 using Serilog.Exceptions.EntityFrameworkCore.Destructurers;
 using Serilog.Formatting.Json;
 using Web.Middlewares;
+using YooKassa.Extensions;
 using User = Application.Actors.User;
 
 namespace Web;
@@ -70,6 +72,8 @@ internal static class Program
             builder.Services.AddScoped<IEntityStorageService<Order>, EntityFrameworkEntityStorageService<Order>>();
             builder.Services.AddScoped<ICryptographicService, DefaultCryptographicService>();
             builder.Services.AddScoped<IGeolocationService, DefaultGeolocationService>();
+            builder.Services.AddScopedYooKassa("425405", "test_VBAhLQn73Zoy6ZZFF5AePDkAglOORzocQpo-EmAVxb8", "https://api.yookassa.ru/v3/payments");
+            builder.Services.AddScoped<IOrderPaymentService, YooKassaOrderPaymentService>(sp => new YooKassaOrderPaymentService(sp.GetService<YooKassa.Entities.PaymentService>()!, "https://one290.ru/user/orders"));
             builder.Services.AddScoped<Administrator>();
             builder.Services.AddScoped<User>();
             builder.Services.AddDbContext<TransportCompanyContext>((serviceProvider, options) =>

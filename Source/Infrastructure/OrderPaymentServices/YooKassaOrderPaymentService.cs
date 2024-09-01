@@ -18,6 +18,7 @@ public class YooKassaOrderPaymentService : IOrderPaymentService
     
     public async Task<string> GetPaymentUrl(Order order)
     {
+        // TODO: Эта проверка - ответственность Application Layer, т. к. именно на этом слое реализуются юзкейсы, а оплата - это юзкейс
         if (order.Status != OrderStatuses.PerformersAssigned)
             throw new ArgumentException("Order.Status is invalid", nameof(order));
         
@@ -33,10 +34,11 @@ public class YooKassaOrderPaymentService : IOrderPaymentService
                 Type = ConfirmationTypes.Redirect,
                 ReturnUrl = _returnUrl
             },
-            Description = $"Оплата заказа {order.Guid}."
+            Description = $"Оплата заказа {order.Guid}.",
+            Metadata = new { OrderGuid = order.Guid }
         };
         
-        var issuedPayment = await _paymentService.IssuePayment(unissuedPayment);
+        var issuedPayment = await _paymentService.IssuePayment(unissuedPayment, order.Guid);
 
         return issuedPayment.Confirmation.ConfirmationUrl;
     }
