@@ -483,4 +483,22 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
 
         await orderStorageService.UpdateRange(new[] { order });
     }
+    
+    public async Task FinishOrders(IReadOnlyCollection<Dtos.Order.RequestForFinish> requestsForFinish)
+    {
+        var orderGuids = new HashSet<string>(requestsForFinish.Count);
+        foreach (var requestForFinish in requestsForFinish)
+            orderGuids.Add(requestForFinish.OrderGuid);
+        var orders = (await orderStorageService.FindAll(o => orderGuids.Contains(o.Guid))).ToDictionary(o => o.Guid);
+        
+        foreach (var requestForFinish in requestsForFinish)
+        {
+            if (!orders.TryGetValue(requestForFinish.OrderGuid, out var order))
+                throw new ArgumentException($"The order {requestForFinish.OrderGuid} does not exist.", nameof(requestsForFinish));
+            
+            order.Finish(requestForFinish.ActualHoursWorkedByDriver1, requestForFinish.ActualHoursWorkedByDriver2);
+        }
+        
+        await orderStorageService.UpdateRange(orders.Values);
+    }
 }
