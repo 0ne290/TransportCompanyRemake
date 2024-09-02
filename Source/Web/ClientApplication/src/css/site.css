@@ -24,6 +24,29 @@
     width: 210mm !important;
 }
 
+.report-table td {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    text-align: center !important;
+    background-color: var(--third-color) !important;
+    color: var(--first-color) !important;
+}
+
+.report-table th {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    text-align: center !important;
+    background-color: var(--first-color) !important;
+    color: var(--third-color) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1020 !important;
+}
+
 .my-table th, td {
     background-color: var(--first-color) !important;
     color: var(--third-color) !important;
