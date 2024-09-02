@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Security.Claims;
 using Application;
 using Application.Actors;
+using Application.Dtos.Order;
 using EntityStorageServices;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -180,6 +181,16 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
         await administrator.AssignPerformersToOrder(requestToAssignmentOfPerformersToOrder.OrderGuid,
             requestToAssignmentOfPerformersToOrder.TruckGuid, requestToAssignmentOfPerformersToOrder.Driver1Guid,
             requestToAssignmentOfPerformersToOrder.Driver2Guid);
+        
+        return Ok();
+    }
+    
+    [Authorize(Roles = "Administrator")]
+    [HttpPost]
+    [Route("finish-orders")]
+    public async Task<IActionResult> FinishOrders([FromBody] IReadOnlyCollection<RequestForFinish> requests)
+    {
+        await administrator.FinishOrders(requests);
         
         return Ok();
     }

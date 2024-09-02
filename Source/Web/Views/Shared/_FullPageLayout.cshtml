@@ -14,9 +14,24 @@
 <header class="header second-background-color first-text-color">
   <div class="container-fluid h-100">
     <div class="row h-100">
-      <div class="col d-flex justify-content-center align-items-center h-100 border-end first-border-color" style="cursor: pointer"><h2>Заказы</h2></div>
-      <div class="col d-flex justify-content-center align-items-center h-100 border-start border-end first-border-color" style="cursor: pointer"><h2>Администрирование</h2></div>
-      <div class="col-2 d-flex justify-content-center align-items-center h-100 border-start first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/user/auth';"><h2>Вход</h2></div>
+      @if (Context.User.IsInRole("Administrator"))
+      {
+        <div class="col d-flex justify-content-center align-items-center h-100 border-end first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/admin/orders';">
+          <h2>Заказы</h2></div>
+        <div class="col d-flex justify-content-center align-items-center h-100 border-start border-end first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/admin/administration';">
+          <h2>Администрирование</h2></div>
+        <div class="col-2 d-flex justify-content-center align-items-center h-100 border-start first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/reports';">
+          <h2>Отчеты</h2></div>
+      }
+      else
+      {
+        <div class="col d-flex justify-content-center align-items-center h-100 border-end first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/user/orders';">
+          <h2>Заказы</h2></div>
+        <div class="col d-flex justify-content-center align-items-center h-100 border-start border-end first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/user/create-order';">
+          <h2>Создать заказ</h2></div>
+        <div class="col-2 d-flex justify-content-center align-items-center h-100 border-start first-border-color" style="cursor: pointer" onclick="window.location='https://one290.ru/user/auth';">
+          <h2>Вход</h2></div>
+      }
     </div>
   </div>
 </header>

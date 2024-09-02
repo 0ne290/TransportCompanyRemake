@@ -489,7 +489,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
         var orderGuids = new HashSet<string>(requestsForFinish.Count);
         foreach (var requestForFinish in requestsForFinish)
             orderGuids.Add(requestForFinish.OrderGuid);
-        var orders = (await orderStorageService.FindAll(o => orderGuids.Contains(o.Guid))).ToDictionary(o => o.Guid);
+        var orders = (await orderStorageService.FindAll(o => orderGuids.Contains(o.Guid), "Truck;Driver1;Driver2")).ToDictionary(o => o.Guid);
         
         foreach (var requestForFinish in requestsForFinish)
         {

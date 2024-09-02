@@ -9,20 +9,48 @@
 {
     <script>
     async function finishOrders() {
-        for (let form of document.forms) {
+        let requestsForFinishOrder = [];
+        for (let form of Array.from(document.forms)) {
             let actualHoursWorkedByDriver1 = form.elements.actualHoursWorkedByDriver1.value === '' ? null : Number(form.elements.actualHoursWorkedByDriver1.value);
             actualHoursWorkedByDriver1 = isNaN(actualHoursWorkedByDriver1) ? null : actualHoursWorkedByDriver1;
-            let actualHoursWorkedByDriver2 = typeof form.elements.actualHoursWorkedByDriver2 === 'undefined' ? null : form.elements.actualHoursWorkedByDriver2.value ;
+            let actualHoursWorkedByDriver2 = typeof form.elements.actualHoursWorkedByDriver2 === 'undefined' ? null : form.elements.actualHoursWorkedByDriver2.value;
+            let actualHoursWorkedByDriver2IsRequired = actualHoursWorkedByDriver2 != null;
             actualHoursWorkedByDriver2 = actualHoursWorkedByDriver2 === '' ? null : Number(actualHoursWorkedByDriver2);
             actualHoursWorkedByDriver2 = isNaN(actualHoursWorkedByDriver2) ? null : actualHoursWorkedByDriver2;
+            
+            if (actualHoursWorkedByDriver2IsRequired) {
+                if (actualHoursWorkedByDriver1 != null && actualHoursWorkedByDriver2 != null)
+                    requestsForFinishOrder.push({ OrderGuid: form.dataset.orderGuid, ActualHoursWorkedByDriver1: actualHoursWorkedByDriver1, ActualHoursWorkedByDriver2: actualHoursWorkedByDriver2 });
+            }
+            else if (actualHoursWorkedByDriver1 != null)
+                requestsForFinishOrder.push({ OrderGuid: form.dataset.orderGuid, ActualHoursWorkedByDriver1: actualHoursWorkedByDriver1, ActualHoursWorkedByDriver2: null });
+        }
+        
+        alert(requestsForFinishOrder.length);
+        
+        if (requestsForFinishOrder.length > 0) {
+            let response = await fetch(`https://one290.ru/admin/finish-orders`, {
+                credentials: 'same-origin',
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestsForFinishOrder)
+            });
+            if (response.status !== 200)
+                alert('Не удалось завершить заказы. Это баг.');
+            else
+                location.reload();
         }
     }
-    
-    document.addEventListener("beforeunload", finishOrders);
     </script>
 }
 
 <div class="container border border-2 rounded second-border-color p-0">
+    <div class="row m-0 p-0 text-center second-background-color first-text-color" onclick="finishOrders()" style="cursor: pointer">
+        <div class="col text-center second-background-color first-text-color">Завершить заказы</div>
+    </div>
     <div class="row m-0 p-0">
         <div class="col overflow-auto" style="height: 74vh">
             <table class="table my-table m-0 p-0">
@@ -37,7 +65,7 @@
                     <th scope="col">Тип полуприцепа</th>
                     <th scope="col">Длина маршрута (км)</th>
                     <th scope="col">Цена (₽)</th>
-                    <th scope="col">Ожидаемое кол-во часов езды фуры</th>
+                    <th scope="col">Ожидаемое кол-во часов вождения фуры</th>
                     <th scope="col">Фактическое кол-во часов вождения фуры первого водителя</th>
                     <th scope="col">Фактическое кол-во часов вождения фуры второго водителя</th>
                     <th scope="col">Кто сделал заказ</th>
@@ -90,11 +118,11 @@
                         <td class="text-center">
                             @if (order.Status == "Ожидает назначения")
                             {
-                               <button class="active" type="button" onclick="window.location='https://one290.ru/admin/assignment-of-performers-to-order?orderGuid=@order.Guid';">Назначить исполнителей</button>
+                                <button class="active" type="button" onclick="window.location='https://one290.ru/admin/assignment-of-performers-to-order?orderGuid=@order.Guid';">Назначить исполнителей</button>
                             }
                             else if (order.Status == "Выполняется")
                             {
-                                <form>
+                                <form data-order-guid="@order.Guid">
                                     <input class="active" type="text" placeholder="Часы вождения первого водителя" size="30" name="actualHoursWorkedByDriver1"/>
                                     @if (!string.IsNullOrEmpty(order.Driver2Name))
                                     {

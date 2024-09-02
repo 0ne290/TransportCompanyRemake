@@ -20,6 +20,10 @@
     padding-top: 10vh !important;
 }
 
+.report {
+    width: 210mm !important;
+}
+
 .my-table th, td {
     background-color: var(--first-color) !important;
     color: var(--third-color) !important;
