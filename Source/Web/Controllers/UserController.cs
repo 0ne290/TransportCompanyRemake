@@ -1,18 +1,15 @@
 using System.Security.Claims;
-using Application;
 using Application.Actors;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Web.Dtos;
-using Order = Domain.Entities.Order;
 
 namespace Web.Controllers;
 
 [Route("user")]
-public class UserController(User userActor, Administrator administrator) : Controller
+public class UserController(User userActor) : Controller
 {
     [HttpGet]
     [Route("auth")]
@@ -27,15 +24,13 @@ public class UserController(User userActor, Administrator administrator) : Contr
     {
         return View("VkLogin");
     }
-    
+
     [Authorize(Roles = "User")]
     [HttpGet]
     [Route("orders")]
-    public async Task<IActionResult> GetOrdersPage()
-    {
-        return View("Orders", (await administrator.GetOrders(FilterParser.Parse<Order>("true")))
-            .Select(o => new Dtos.Order(o)).ToList());
-    }
+    public async Task<IActionResult> GetOrdersPage() => View("Orders",
+        (await userActor.GetOrders(HttpContext.User.FindFirst(ClaimTypes.Name)!.Value)).Select(o => new Order(o))
+        .ToList());
     
     [Authorize(Roles = "User")]
     [HttpGet]

@@ -1,0 +1,31 @@
+@using System.Globalization
+@model ICollection<Application.Dtos.Truck.ByEfficiency>
+
+@{
+    ViewBag.Title = "Trucks by efficiency";
+    Layout = "_ReportPageLayout";
+}
+
+<div class="w-100">
+    <table class="w-100 m-0 p-0 report-table">
+        <thead>
+        <tr>
+            <th scope="col">Номер</th>
+            <th scope="col">Стоимость всех заказов (₽)</th>
+            <th scope="col">Длина пройденного пути (км)</th>
+            <th scope="col">Прибыль за км</th>
+        </tr>
+        </thead>
+    <tbody>
+    @foreach (var truckByEfficiency in Model)
+    {
+        <tr>
+            <td>@truckByEfficiency.TruckNumber</td>
+            <td>@truckByEfficiency.PriceOfAllOrders.ToString("F6", CultureInfo.InvariantCulture)</td>
+            <td>@truckByEfficiency.LengthInKm.ToString("F6", CultureInfo.InvariantCulture)</td>
+            <td>@truckByEfficiency.PriceOfAllOrdersPerKm.ToString("F6", CultureInfo.InvariantCulture)</td>
+        </tr>
+    }
+    </tbody>
+    </table>
+</div>

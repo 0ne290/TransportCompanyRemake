@@ -1,0 +1,31 @@
+@using System.Globalization
+@model ICollection<Application.Dtos.Driver.ByEfficiency>
+
+@{
+    ViewBag.Title = "Drivers by efficiency";
+    Layout = "_ReportPageLayout";
+}
+
+<div class="w-100">
+    <table class="w-100 m-0 p-0 report-table">
+        <thead>
+        <tr>
+            <th scope="col">ФИО</th>
+            <th scope="col">Стоимость всех заказов (₽)</th>
+            <th scope="col">Часы работы</th>
+            <th scope="col">Прибыль в час</th>
+        </tr>
+        </thead>
+    <tbody>
+    @foreach (var driverByEfficiency in Model)
+    {
+        <tr>
+            <td>@driverByEfficiency.DriverName</td>
+            <td>@driverByEfficiency.PriceOfAllOrders.ToString("F6", CultureInfo.InvariantCulture)</td>
+            <td>@driverByEfficiency.HoursWorked.ToString("F6", CultureInfo.InvariantCulture)</td>
+            <td>@driverByEfficiency.PriceOfAllOrdersPerHour.ToString("F6", CultureInfo.InvariantCulture)</td>
+        </tr>
+    }
+    </tbody>
+    </table>
+</div>

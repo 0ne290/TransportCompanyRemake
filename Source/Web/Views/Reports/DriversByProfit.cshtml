@@ -1,0 +1,29 @@
+@using System.Globalization
+@model ICollection<Application.Dtos.Driver.ByProfit>
+
+@{
+    ViewBag.Title = "Drivers by profit";
+    Layout = "_ReportPageLayout";
+}
+
+<div class="w-100">
+    <table class="w-100 m-0 p-0 report-table">
+        <thead>
+        <tr>
+            <th scope="col">ФИО</th>
+            <th scope="col">Кол-во заказов</th>
+            <th scope="col">Стоимость всех заказов (₽)</th>
+        </tr>
+        </thead>
+    <tbody>
+    @foreach (var driverByProfit in Model)
+    {
+        <tr>
+            <td>@driverByProfit.DriverName</td>
+            <td>@driverByProfit.OrderCount</td>
+            <td>@driverByProfit.PriceOfAllOrders.ToString("F6", CultureInfo.InvariantCulture)</td>
+        </tr>
+    }
+    </tbody>
+    </table>
+</div>

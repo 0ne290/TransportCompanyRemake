@@ -1,0 +1,29 @@
+@using System.Globalization
+@model ICollection<Application.Dtos.Truck.ByRouteTraveled>
+
+@{
+    ViewBag.Title = "Trucks by route traveled";
+    Layout = "_ReportPageLayout";
+}
+
+<div class="w-100">
+    <table class="w-100 m-0 p-0 report-table">
+        <thead>
+        <tr>
+            <th scope="col">Номер</th>
+            <th scope="col">Кол-во заказов</th>
+            <th scope="col">Длина пройденного пути (км)</th>
+        </tr>
+        </thead>
+    <tbody>
+    @foreach (var truckByRouteTraveled in Model)
+    {
+        <tr>
+            <td>@truckByRouteTraveled.TruckNumber</td>
+            <td>@truckByRouteTraveled.OrderCount</td>
+            <td>@truckByRouteTraveled.LengthInKm.ToString("F6", CultureInfo.InvariantCulture)</td>
+        </tr>
+    }
+    </tbody>
+    </table>
+</div>

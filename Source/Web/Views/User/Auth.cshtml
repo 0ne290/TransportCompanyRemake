@@ -13,8 +13,16 @@
     <script>
       async function registerStandartUser() {
           let elementsOfRegisterForm = document.forms.register.elements;
-          let createRequest = { Name: elementsOfRegisterForm.name, Contact: elementsOfRegisterForm.contact, Login: elementsOfRegisterForm.login, Password: elementsOfRegisterForm.password };
+          let name = elementsOfRegisterForm.name.value;
+          let contact = elementsOfRegisterForm.contact.value;
+          let login = elementsOfRegisterForm.login.value;
+          let password = elementsOfRegisterForm.password.value;
+          if (name === '' || contact === '' || login === '' || password === '') {
+              alert('Все поля являются обязательными. Проверьте ввод и повторите попытку.');
+              return;
+          }
           
+          let createRequest = { Name: name, Contact: contact, Login: login, Password: password };
           let response = await fetch(`https://one290.ru/user/standart-register`, {
               method: 'POST',
               headers: {
@@ -31,13 +39,19 @@
       
       async function loginStandartUser() {
           let elementsOfLoginForm = document.forms.login.elements;
+          let login = elementsOfLoginForm.login.value;
+          let password = elementsOfLoginForm.password.value;
+          if (login === '' || password === '') {
+              alert('Все поля являются обязательными. Проверьте ввод и повторите попытку.');
+              return;
+          }
           
           let response = await fetch(`https://one290.ru/user/standart-login`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
               },
-              body: `login=${elementsOfLoginForm.login}&password=${elementsOfLoginForm.password}`
+              body: `login=${login}&password=${password}`
           });
           if (response.status === 200)
               window.location='https://one290.ru/user/orders';
