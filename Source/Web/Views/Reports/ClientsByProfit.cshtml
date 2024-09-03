@@ -1,3 +1,6 @@
+@using System.Globalization
+@model ICollection<Application.Dtos.User.ByProfit>
+
 @{
     ViewBag.Title = "Clients by profit";
     Layout = "_ReportPageLayout";
@@ -9,210 +12,18 @@
         <tr>
             <th scope="col">ФИО</th>
             <th scope="col">Кол-во заказов</th>
-            <th scope="col">Стоимость всех заказов</th>
+            <th scope="col">Стоимость всех заказов (₽)</th>
         </tr>
         </thead>
     <tbody>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
-    <tr>
-        <td>Альберт Кужугетович</td>
-        <td>7</td>
-        <td>704000</td>
-    </tr>
+    @foreach (var userByProfit in Model)
+    {
+        <tr>
+            <td>@userByProfit.UserName</td>
+            <td>@userByProfit.OrderCount</td>
+            <td>@userByProfit.PriceOfAllOrders.ToString("F6", CultureInfo.InvariantCulture)</td>
+        </tr>
+    }
     </tbody>
     </table>
 </div>
