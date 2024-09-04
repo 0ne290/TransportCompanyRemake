@@ -505,7 +505,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
     public async Task<ICollection<Dtos.User.ByProfit>> AggregateAllUsersByProfit() =>
         (from user in await userStorageService.FindAll(_ => true, "Orders")
             let userOrders = user.Orders.Where(o => o.Status == OrderStatuses.Completed).ToList()
-            select new Dtos.User.ByProfit(user.Name, userOrders.Count, userOrders.Sum(o => o.Price!.Value))).ToList();
+            select new Dtos.User.ByProfit(user.Name, userOrders.Count, userOrders.Sum(o => o.Price!.Value))).OrderByDescending(r => r.PriceOfAllOrders).ToList();
 
     public async Task<ICollection<Dtos.Driver.ByProfit>> AggregateAllDriversByProfit() =>
         (from driver in await driverStorageService.FindAll(_ => true, "PrimaryOrders;SecondaryOrders")
@@ -513,7 +513,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
                 driver.PrimaryOrders.Where(o => o.Status == OrderStatuses.Completed)
                     .Concat(driver.SecondaryOrders.Where(o => o.Status == OrderStatuses.Completed)).ToList()
             select new Dtos.Driver.ByProfit(driver.Name, driverOrders.Count, driverOrders.Sum(o => o.Price!.Value)))
-        .ToList();
+        .OrderByDescending(r => r.PriceOfAllOrders).ToList();
 
     public async Task<ICollection<Dtos.Driver.ByWorkload>> AggregateAllDriversByWeeklyWorkload() =>
         (from driver in await driverStorageService.FindAll(_ => true, "PrimaryOrders;SecondaryOrders")
@@ -521,7 +521,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             let secondaryOrders = driver.SecondaryOrders.Where(o => o.DateEnd >= DateTime.Now - TimeSpan.FromDays(7)).ToList()
             select new Dtos.Driver.ByWorkload(driver.Name, primaryOrders.Count + secondaryOrders.Count,
                 primaryOrders.Sum(o => o.ActualHoursWorkedByDriver1!.Value) +
-                secondaryOrders.Sum(o => o.ActualHoursWorkedByDriver2!.Value))).ToList();
+                secondaryOrders.Sum(o => o.ActualHoursWorkedByDriver2!.Value))).OrderByDescending(r => r.HoursWorked).ToList();
     
     public async Task<ICollection<Dtos.Driver.ByWorkload>> AggregateAllDriversByTotalWorkload() =>
         (from driver in await driverStorageService.FindAll(_ => true, "PrimaryOrders;SecondaryOrders")
@@ -529,7 +529,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             let secondaryOrders = driver.SecondaryOrders.Where(o => o.Status == OrderStatuses.Completed).ToList()
             select new Dtos.Driver.ByWorkload(driver.Name, primaryOrders.Count + secondaryOrders.Count,
                 primaryOrders.Sum(o => o.ActualHoursWorkedByDriver1!.Value) +
-                secondaryOrders.Sum(o => o.ActualHoursWorkedByDriver2!.Value))).ToList();
+                secondaryOrders.Sum(o => o.ActualHoursWorkedByDriver2!.Value))).OrderByDescending(r => r.HoursWorked).ToList();
 
     public async Task<ICollection<Dtos.Driver.ByEfficiency>> AggregateAllDriversByEfficiency() =>
         (from driver in await driverStorageService.FindAll(_ => true, "PrimaryOrders;SecondaryOrders")
@@ -539,12 +539,12 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             let hoursWorked = primaryOrders.Sum(o => o.ActualHoursWorkedByDriver1!.Value) +
                               secondaryOrders.Sum(o => o.ActualHoursWorkedByDriver2!.Value)
             select new Dtos.Driver.ByEfficiency(driver.Name, priceOfAllOrders, hoursWorked,
-                priceOfAllOrders == 0 ? 0 : priceOfAllOrders / (decimal)hoursWorked)).ToList();
+                priceOfAllOrders == 0 ? 0 : priceOfAllOrders / (decimal)hoursWorked)).OrderByDescending(r => r.PriceOfAllOrdersPerHour).ToList();
     
     public async Task<ICollection<Dtos.Truck.ByRouteTraveled>> AggregateAllTrucksByRouteTraveled() =>
         (from truck in await truckStorageService.FindAll(_ => true, "Orders")
             let truckOrders = truck.Orders.Where(o => o.Status == OrderStatuses.Completed).ToList()
-            select new Dtos.Truck.ByRouteTraveled(truck.Number, truckOrders.Count, truckOrders.Sum(o => o.LengthInKm!.Value))).ToList();
+            select new Dtos.Truck.ByRouteTraveled(truck.Number, truckOrders.Count, truckOrders.Sum(o => o.LengthInKm!.Value))).OrderByDescending(r => r.LengthInKm).ToList();
     
     public async Task<ICollection<Dtos.Truck.ByEfficiency>> AggregateAllTrucksByEfficiency() =>
         (from truck in await truckStorageService.FindAll(_ => true, "Orders")
@@ -552,7 +552,7 @@ public class Administrator(IEntityStorageService<Entities.Driver> driverStorageS
             let priceOfAllOrders = truckOrders.Sum(o => o.Price!.Value)
             let lengthInKm = truckOrders.Sum(o => o.LengthInKm!.Value)
             select new Dtos.Truck.ByEfficiency(truck.Number, priceOfAllOrders, lengthInKm,
-                priceOfAllOrders == 0 ? 0 : priceOfAllOrders/ (decimal)lengthInKm)).ToList();
+                priceOfAllOrders == 0 ? 0 : priceOfAllOrders/ (decimal)lengthInKm)).OrderByDescending(r => r.PriceOfAllOrdersPerKm).ToList();
 
     // Aggregate template
     // public async Task<ICollection<Dtos.Driver.ByWorkload>> AggregateAllDriversByWeeklyWorkload()
