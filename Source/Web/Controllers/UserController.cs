@@ -8,18 +8,17 @@ using Web.Dtos;
 
 namespace Web.Controllers;
 
-[Route("user")]
 public class UserController(User userActor) : Controller
 {
     [HttpGet]
-    [Route("auth")]
+    [Route("user/auth")]
     public IActionResult GetAuthPage()
     {
         return View("Auth");
     }
     
     [HttpGet]
-    [Route("vk-login")]
+    [Route("user/vk-login")]
     public IActionResult GetVkLoginScriptPage()
     {
         return View("VkLogin");
@@ -27,14 +26,15 @@ public class UserController(User userActor) : Controller
 
     [Authorize(Roles = "User")]
     [HttpGet]
-    [Route("orders")]
+    [Route("user/orders")]
+    [Route("")]
     public async Task<IActionResult> GetOrdersPage() => View("Orders",
         (await userActor.GetOrders(HttpContext.User.FindFirst(ClaimTypes.Name)!.Value)).Select(o => new Order(o))
         .ToList());
     
     [Authorize(Roles = "User")]
     [HttpGet]
-    [Route("create-order")]
+    [Route("user/create-order")]
     public IActionResult GetOrderCreationPage()
     {
         return View("CreateOrder");
@@ -42,7 +42,7 @@ public class UserController(User userActor) : Controller
     
     [Authorize(Roles = "User")]
     [HttpPost]
-    [Route("create-order")]
+    [Route("user/create-order")]
     public async Task<IActionResult> CreateOrder([FromBody] RequestToCreateOrder createRequest)
     {
         await userActor.CreateOrder(new Application.Dtos.Order.CreateRequest
@@ -65,7 +65,7 @@ public class UserController(User userActor) : Controller
     }
     
     [HttpPost]
-    [Route("vk-login")]
+    [Route("user/vk-login")]
     public async Task<IActionResult> VkLogin([FromBody] Application.Dtos.User.CreateVkRequest createRequest)
     {
         var user = await userActor.CreateOrUpdateAndGetVkUser(createRequest);
@@ -87,7 +87,7 @@ public class UserController(User userActor) : Controller
     }
 
     [HttpPost]
-    [Route("standart-login")]
+    [Route("user/standart-login")]
     public async Task<IActionResult> StandartLogin(string login, string password)
     {
         var user = await userActor.GetStandartUser(login, password);
@@ -110,7 +110,7 @@ public class UserController(User userActor) : Controller
     }
 
     [HttpPost]
-    [Route("standart-register")]
+    [Route("user/standart-register")]
     public async Task<IActionResult> StandartRegister([FromBody] Application.Dtos.User.CreateStandartRequest createRequest)
     {
         await userActor.CreateAndGetStandartUser(createRequest);

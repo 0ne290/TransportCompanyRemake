@@ -139,9 +139,9 @@ public class AdminController(TransportCompanyContext dbContext, Administrator ad
             var limitOfPermissibleHoursForTwoDrivers = 45d - double.Parse(branch.DrivingHours, CultureInfo.InvariantCulture) / 2d;
             foreach (var driver in branch.Drivers)
             {
-                if (double.Parse(driver.HoursWorkedPerWeek) <= limitOfPermissibleHoursForOneDriver)
+                if (double.Parse(driver.HoursWorkedPerWeek, CultureInfo.InvariantCulture) <= limitOfPermissibleHoursForOneDriver)
                     driver.Color = "border border-2 second-border-color";
-                else if (double.Parse(driver.HoursWorkedPerWeek) <= limitOfPermissibleHoursForTwoDrivers)
+                else if (double.Parse(driver.HoursWorkedPerWeek, CultureInfo.InvariantCulture) <= limitOfPermissibleHoursForTwoDrivers)
                     driver.Color = "border border-2 third-border-color";
                 else
                     driver.Color = "first-border-color";

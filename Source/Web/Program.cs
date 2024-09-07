@@ -97,7 +97,7 @@ internal static class Program
             
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Admin}/{action=GetAdministrationPage}");
+                pattern: "{controller=User}/{action=GetOrdersPage}/{id?}");
             
             Log.Information("Success to build host. Starting web application");
 
