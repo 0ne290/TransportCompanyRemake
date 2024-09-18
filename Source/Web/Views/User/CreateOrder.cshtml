@@ -6,34 +6,51 @@
 @section Scripts
 {
     <script>
+    function isNullOrWhiteSpace(str) {
+        return str === null || str.match(/^ *$/) !== null;
+    }
+    
+    function isNotNumber(str) {
+        return isNullOrWhiteSpace(str) || !isFinite(str);
+    }
+    
     async function createOrder() {
         let elementsOfOrderCreationForm = document.forms['create-order'].elements;
-        
         let selectOfTankRequired = elementsOfOrderCreationForm['tank-required'];
-        let valueofSelectedOptionOfSelectOfTankRequired = selectOfTankRequired.options[selectOfTankRequired.selectedIndex].value;
-        let tankRequired = 'Invalid value';
-        if (valueofSelectedOptionOfSelectOfTankRequired === 'true')
-            tankRequired = true;
-        else if (valueofSelectedOptionOfSelectOfTankRequired === 'false')
-            tankRequired = false;
-        
         let selectOfHazardClassFlag = elementsOfOrderCreationForm['hazard-class-flag'];
+        
+        let startAddress = elementsOfOrderCreationForm['start-address'].value;
+        let endAddress = elementsOfOrderCreationForm['end-address'].value;
+        let cargoDescription = elementsOfOrderCreationForm['cargo-description'].value;
+        let startPointLatitude = elementsOfOrderCreationForm['start-point-latitude'].value;
+        let startPointLongitude = elementsOfOrderCreationForm['start-point-longitude'].value;
+        let endPointLatitude = elementsOfOrderCreationForm['end-point-latitude'].value;
+        let endPointLongitude = elementsOfOrderCreationForm['end-point-longitude'].value;
+        let cargoVolume = elementsOfOrderCreationForm['cargo-volume'].value;
+        let cargoWeight = elementsOfOrderCreationForm['cargo-weight'].value;
+        let tankRequired = selectOfTankRequired.options[selectOfTankRequired.selectedIndex].value;
         let hazardClassFlag = selectOfHazardClassFlag.options[selectOfHazardClassFlag.selectedIndex].value;
-        if (hazardClassFlag === 'null')
-            hazardClassFlag = null;
+        
+        if (isNullOrWhiteSpace(startAddress) || isNullOrWhiteSpace(endAddress) || isNullOrWhiteSpace(cargoDescription)
+        || isNotNumber(startPointLatitude) || isNotNumber(startPointLongitude) || isNotNumber(endPointLatitude) ||
+        isNotNumber(endPointLongitude) || isNotNumber(cargoVolume) || isNotNumber(cargoWeight) ||
+        isNullOrWhiteSpace(tankRequired) || isNullOrWhiteSpace(hazardClassFlag)) {
+            alert("Не удалось создать заказ. Вероятно, какое-то поле пустое и/или Вы не выбрали тип полуприцепа и/или класс опасности груза. Проверьте корректность данных в форме и повторите попытку.");
+            return;
+        }
         
         let requestToCreateOrder = {
-            StartAddress: elementsOfOrderCreationForm['start-address'].value,
-            EndAddress: elementsOfOrderCreationForm['end-address'].value,
-            CargoDescription: elementsOfOrderCreationForm['cargo-description'].value,
-            StartPointLatitude: Number(elementsOfOrderCreationForm['start-point-latitude'].value),
-            StartPointLongitude: Number(elementsOfOrderCreationForm['start-point-longitude'].value),
-            EndPointLatitude: Number(elementsOfOrderCreationForm['end-point-latitude'].value),
-            EndPointLongitude: Number(elementsOfOrderCreationForm['end-point-longitude'].value),
-            CargoVolume: Number(elementsOfOrderCreationForm['cargo-volume'].value),
-            CargoWeight: Number(elementsOfOrderCreationForm['cargo-weight'].value),
-            TankRequired: tankRequired,
-            HazardClassFlag: hazardClassFlag
+            StartAddress: startAddress,
+            EndAddress: endAddress,
+            CargoDescription: cargoDescription,
+            StartPointLatitude: Number(startPointLatitude),
+            StartPointLongitude: Number(startPointLongitude),
+            EndPointLatitude: Number(endPointLatitude),
+            EndPointLongitude: Number(endPointLongitude),
+            CargoVolume: Number(cargoVolume),
+            CargoWeight: Number(cargoWeight),
+            TankRequired: tankRequired === 'true',
+            HazardClassFlag: hazardClassFlag === 'null' ? null : hazardClassFlag
         };
         
         let response = await fetch('https://one290.ru/user/create-order', {
@@ -48,7 +65,7 @@
         if (response.status === 200)
             alert('Заказ успешно создан. С Вами может связаться наш диспетчер, если ему потребуется уточнить детали заказа. После того, как диспетчер назначит исполнителей на заказ, Вы должны будете его оплатить (доступна онлайн-оплата на сайте - на странице Ваших заказов появится кнопка "Оплатить" в строке этого заказа). После оплаты заказ перейдет в стадию "Исполнение". Вы сможете отслеживать статус заказа на странице заказов. После доставки груза в место назначения с Вами свяжется диспетчер для подтверждения факта получения груза. Если Вы подтвердите, заказ перейдет в стадию "Завершен". В любое время и на любом этапе Вы можете связаться с диспетчером и обсудить любые детали. Благодарим Вас за выбор нашей компании.');
         else
-            alert("Не удалось создать заказ. Вероятно, какое-то поле пустое и/или Вы не выбрали тип полуприцепа и/или класс опасности груза. Проверьте корректность данных в форме и повторите попытку.");
+            alert("Не удалось создать заказ. Вероятно, это баг.");
     }
     </script>
 }
@@ -67,12 +84,12 @@
                 <input class="w-100 active mb-2" type="text" placeholder="Объем груза (кубометры)" name="cargo-volume">
                 <input class="w-100 active mb-2" type="text" placeholder="Вес груза (килограммы)" name="cargo-weight">
                 <select class="w-100 active mb-2" name="tank-required">
-                    <option selected value="Invalid value">В каком полуприцепе перевозить</option>
+                    <option selected value="">В каком полуприцепе перевозить</option>
                     <option value="true">Цистерна</option>
                     <option value="false">Тент</option>
                 </select>
                 <select class="w-100 active mb-2" name="hazard-class-flag">
-                    <option selected value="Invalid value">Класс опасности груза</option>
+                    <option selected value="">Класс опасности груза</option>
                     <option value="null">Нет</option>
                     <option value="11">1.1</option>
                     <option value="12">1.2</option>
