@@ -43,6 +43,14 @@
     let driverTable = document.getElementById('driver-table');
     let truckTable = document.getElementById('truck-table');
     
+    function isNullOrWhiteSpace(str) {
+        return str === null || str.match(/^ *$/) !== null;
+    }
+    
+    function isNotNumber(str) {
+        return isNullOrWhiteSpace(str) || !isFinite(str);
+    }
+    
     function setBranchAddress(input) {
         let branchGuid = input.dataset.branchGuid;
         let newAddress = input.value;
@@ -426,6 +434,26 @@
     
     async function saveChanges() {
         if (driverUpdateRequests.size > 0) {
+            let arrayOfDriverUpdateRequests = Array.from(driverUpdateRequests.values());
+            for (let driverUpdateRequest of arrayOfDriverUpdateRequests) {
+                for (let property in driverUpdateRequest) {
+                    switch (property) {
+                        case 'SetName':
+                            if (isNullOrWhiteSpace(driverUpdateRequest[property])) {
+                                alert('Изменения не сохранены: имя водителя не может быть пустым. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'AddHoursWorked':
+                            if (isNotNumber(driverUpdateRequest[property])) {
+                                alert('Изменения не сохранены: кол-во отработанных часов водителя должно быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                    }
+                }
+            }
+            
             let response = await fetch('https://one290.ru/admin/drivers', {
                 credentials: 'same-origin',
                 method: 'PATCH',
@@ -433,13 +461,57 @@
                   'Accept': 'application/json',
                   'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(Array.from(driverUpdateRequests.values()))
+                body: JSON.stringify(arrayOfDriverUpdateRequests)
             });
             if (response.status !== 200)
                 alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
         
         if (truckUpdateRequests.size > 0) {
+            let arrayOfTruckUpdateRequests = Array.from(truckUpdateRequests.values());
+            for (let truckUpdateRequest of arrayOfTruckUpdateRequests) {
+                for (let property in truckUpdateRequest) {
+                    switch (property) {
+                        case 'SetNumber':
+                            if (isNullOrWhiteSpace(truckUpdateRequest[property])) {
+                                alert('Изменения не сохранены: номер фуры не может быть пустым. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'SetVolumeMax':
+                            if (isNotNumber(truckUpdateRequest[property])) {
+                                alert('Изменения не сохранены: максимальный объем груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'SetVolumePrice':
+                            if (isNotNumber(truckUpdateRequest[property])) {
+                                alert('Изменения не сохранены: тариф за объем груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'SetWeightMax':
+                            if (isNotNumber(truckUpdateRequest[property])) {
+                                alert('Изменения не сохранены: максимальный вес груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'SetWeightPrice':
+                            if (isNotNumber(truckUpdateRequest[property])) {
+                                alert('Изменения не сохранены: тариф за вес груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'SetPricePerKm':
+                            if (isNotNumber(truckUpdateRequest[property])) {
+                                alert('Изменения не сохранены: ценовой коэффициент фуры должен быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                    }
+                }
+            }
+            
             let response = await fetch('https://one290.ru/admin/trucks', {
                 credentials: 'same-origin',
                 method: 'PATCH',
@@ -447,7 +519,7 @@
                   'Accept': 'application/json',
                   'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(Array.from(truckUpdateRequests.values()))
+                body: JSON.stringify(arrayOfTruckUpdateRequests)
             });
             if (response.status !== 200)
                 alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
