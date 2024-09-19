@@ -67,7 +67,7 @@
     
     function setBranchLatitude(input) {
         let branchGuid = input.dataset.branchGuid;
-        let newLatitude = Number(input.value);
+        let newLatitude = isNotNumber(input.value) ? NaN : Number(input.value);
         
         if (branchUpdateRequests.has(branchGuid)) {
             let branchUpdateRequest = branchUpdateRequests.get(branchGuid);
@@ -81,7 +81,7 @@
     
     function setBranchLongitude(input) {
         let branchGuid = input.dataset.branchGuid;
-        let newLongitude = Number(input.value);
+        let newLongitude = isNotNumber(input.value) ? NaN : Number(input.value);
         
         if (branchUpdateRequests.has(branchGuid)) {
             let branchUpdateRequest = branchUpdateRequests.get(branchGuid);
@@ -187,7 +187,7 @@
    
    function addDriverHoursWorked(input) {
        let driverGuid = input.dataset.driverGuid;
-       let hoursWorked = Number(input.value);
+       let hoursWorked = isNotNumber(input.value) ? NaN : Number(input.value);
        
        if (driverUpdateRequests.has(driverGuid)) {
            let driverUpdateRequest = driverUpdateRequests.get(driverGuid);
@@ -293,7 +293,7 @@
    
    function setTruckVolumeMax(input) {
        let truckGuid = input.dataset.truckGuid;
-       let newVolumeMax = Number(input.value);
+       let newVolumeMax = isNotNumber(input.value) ? NaN : Number(input.value);
        
        if (truckUpdateRequests.has(truckGuid)) {
            let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
@@ -307,7 +307,7 @@
    
    function setTruckVolumePrice(input) {
        let truckGuid = input.dataset.truckGuid;
-       let newVolumePrice = Number(input.value);
+       let newVolumePrice = isNotNumber(input.value) ? NaN : Number(input.value);
        
        if (truckUpdateRequests.has(truckGuid)) {
            let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
@@ -321,7 +321,7 @@
    
    function setTruckWeightMax(input) {
        let truckGuid = input.dataset.truckGuid;
-       let newWeightMax = Number(input.value);
+       let newWeightMax = isNotNumber(input.value) ? NaN : Number(input.value);
        
        if (truckUpdateRequests.has(truckGuid)) {
            let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
@@ -335,7 +335,7 @@
    
    function setTruckWeightPrice(input) {
        let truckGuid = input.dataset.truckGuid;
-       let newWeightPrice = Number(input.value);
+       let newWeightPrice = isNotNumber(input.value) ? NaN : Number(input.value);
        
        if (truckUpdateRequests.has(truckGuid)) {
            let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
@@ -349,7 +349,7 @@
    
    function setTruckPricePerKm(input) {
        let truckGuid = input.dataset.truckGuid;
-       let newPricePerKm = Number(input.value);
+       let newPricePerKm = isNotNumber(input.value) ? NaN : Number(input.value);
        
        if (truckUpdateRequests.has(truckGuid)) {
            let truckUpdateRequest = truckUpdateRequests.get(truckGuid);
@@ -445,7 +445,7 @@
                             }
                             break;
                         case 'AddHoursWorked':
-                            if (isNotNumber(driverUpdateRequest[property])) {
+                            if (isNaN(driverUpdateRequest[property])) {
                                 alert('Изменения не сохранены: кол-во отработанных часов водителя должно быть числом. Проверьте ввод и повторите попытку.');
                                 return;
                             }
@@ -479,31 +479,31 @@
                             }
                             break;
                         case 'SetVolumeMax':
-                            if (isNotNumber(truckUpdateRequest[property])) {
+                            if (isNaN(truckUpdateRequest[property])) {
                                 alert('Изменения не сохранены: максимальный объем груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
                                 return;
                             }
                             break;
                         case 'SetVolumePrice':
-                            if (isNotNumber(truckUpdateRequest[property])) {
+                            if (isNaN(truckUpdateRequest[property])) {
                                 alert('Изменения не сохранены: тариф за объем груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
                                 return;
                             }
                             break;
                         case 'SetWeightMax':
-                            if (isNotNumber(truckUpdateRequest[property])) {
+                            if (isNaN(truckUpdateRequest[property])) {
                                 alert('Изменения не сохранены: максимальный вес груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
                                 return;
                             }
                             break;
                         case 'SetWeightPrice':
-                            if (isNotNumber(truckUpdateRequest[property])) {
+                            if (isNaN(truckUpdateRequest[property])) {
                                 alert('Изменения не сохранены: тариф за вес груза фуры должен быть числом. Проверьте ввод и повторите попытку.');
                                 return;
                             }
                             break;
                         case 'SetPricePerKm':
-                            if (isNotNumber(truckUpdateRequest[property])) {
+                            if (isNaN(truckUpdateRequest[property])) {
                                 alert('Изменения не сохранены: ценовой коэффициент фуры должен быть числом. Проверьте ввод и повторите попытку.');
                                 return;
                             }
@@ -522,10 +522,36 @@
                 body: JSON.stringify(arrayOfTruckUpdateRequests)
             });
             if (response.status !== 200)
-                alert("При попытке внесения изменений в записи таблицы водителей произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
+                alert("При попытке внесения изменений в записи таблицы фур произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
         }
         
         if (branchUpdateRequests.size > 0) {
+            let arrayOfBranchUpdateRequests = Array.from(branchUpdateRequests.values());
+            for (let branchUpdateRequest of arrayOfBranchUpdateRequests) {
+                for (let property in branchUpdateRequest) {
+                    switch (property) {
+                        case 'SetAddress':
+                            if (isNullOrWhiteSpace(branchUpdateRequest[property])) {
+                                alert('Изменения не сохранены: адрес филиала не может быть пустым. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'SetLatitude':
+                            if (isNaN(branchUpdateRequest[property])) {
+                                alert('Изменения не сохранены: широта филиала должна быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                        case 'SetLongitude':
+                            if (isNaN(branchUpdateRequest[property])) {
+                                alert('Изменения не сохранены: долгота филиала должна быть числом. Проверьте ввод и повторите попытку.');
+                                return;
+                            }
+                            break;
+                    }
+                }
+            }
+            
             let response = await fetch('https://one290.ru/admin/branches', {
                 credentials: 'same-origin',
                 method: 'PATCH',
@@ -533,7 +559,7 @@
                   'Accept': 'application/json',
                   'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(Array.from(branchUpdateRequests.values()))
+                body: JSON.stringify(arrayOfBranchUpdateRequests)
             });
             if (response.status !== 200)
                 alert("При попытке внесения изменений в записи таблицы филиалов произошла ошибка. Изменения не сохранены. Проверьте корректность входных данных и повторите попытку.");
@@ -597,8 +623,12 @@
                     value = fieldOfNewDriver.value;
                 if (fieldOfNewDriver.dataset.fieldType === "string?" && value === "null")
                     value = null;
-                if (fieldOfNewDriver.dataset.fieldType === "bool")
+                else if (fieldOfNewDriver.dataset.fieldType === "bool")
                     value = value === "true";
+                else if (fieldOfNewDriver.dataset.fieldType === "string" && isNullOrWhiteSpace(value)) {
+                    alert('Изменения не сохранены: имя водителя не может быть пустым. Проверьте ввод и повторите попытку.');
+                    return;
+                }
                 driverCreateRequest[key] = value;
             }
             driverCreateRequests.push(driverCreateRequest);
@@ -631,10 +661,23 @@
                     value = fieldOfNewTruck.value;
                 if (fieldOfNewTruck.dataset.fieldType === "string?" && value === "null")
                     value = null;
-                if (fieldOfNewTruck.dataset.fieldType === "bool")
+                else if (fieldOfNewTruck.dataset.fieldType === "string?" && isNullOrWhiteSpace(value)) {
+                    alert('Изменения не сохранены: поле "Допустимые классы опасности" фуры не может быть пустым (возможно Вы имели ввиду значение "null"?). Проверьте ввод и повторите попытку.');
+                    return;
+                }
+                else if (fieldOfNewTruck.dataset.fieldType === "bool")
                     value = value === "true";
-                if (fieldOfNewTruck.dataset.fieldType === "number")
+                else if (fieldOfNewTruck.dataset.fieldType === "number") {
+                    if (isNotNumber(value)) {
+                        alert('Изменения не сохранены: одно из числовых полей фуры содержит НЕ число. Проверьте ввод и повторите попытку.');
+                        return;
+                    }
                     value = Number(value);
+                }
+                else if (fieldOfNewTruck.dataset.fieldType === "string" && isNullOrWhiteSpace(value)) {
+                    alert('Изменения не сохранены: номер фуры не может быть пустым. Проверьте ввод и повторите попытку.');
+                    return;
+                }
                 truckCreateRequest[key] = value;
             }
             truckCreateRequests.push(truckCreateRequest);
@@ -661,8 +704,17 @@
             for (let fieldOfNewBranch of fieldsOfNewBranch) {
                 let key = fieldOfNewBranch.dataset.fieldName;
                 let value = fieldOfNewBranch.value;
-                if (fieldOfNewBranch.dataset.fieldType === "number")
+                if (fieldOfNewBranch.dataset.fieldType === "number") {
+                    if (isNotNumber(value)) {
+                        alert('Изменения не сохранены: одно из числовых полей филиала содержит НЕ число. Проверьте ввод и повторите попытку.');
+                        return;
+                    }
                     value = Number(value);
+                }
+                else if (isNullOrWhiteSpace(value)) {
+                    alert('Изменения не сохранены: адрес филиала не может быть пустым. Проверьте ввод и повторите попытку.');
+                    return;
+                }
                 branchCreateRequest[key] = value;
             }
             branchCreateRequests.push(branchCreateRequest);
