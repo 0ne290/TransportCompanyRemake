@@ -65,6 +65,8 @@ public class Driver
     {
         if (DismissalDate != null)
             throw new InvalidOperationException($"Driver {Guid}. A dismissed driver can only use the reinstatement operation.");
+        if (hoursWorked < 0)
+            throw new ArgumentOutOfRangeException(nameof(hoursWorked), hoursWorked, "The number of hours of work added must be greater than zero.");
         
         HoursWorkedPerWeek += hoursWorked;
         TotalHoursWorked += hoursWorked;

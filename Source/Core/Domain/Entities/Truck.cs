@@ -95,6 +95,8 @@ public class Truck
     {
         if (DecommissionedDate != null)
             throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        if (volumeMax < 0)
+            throw new ArgumentOutOfRangeException(nameof(volumeMax), volumeMax, "The volume max value must be greater than zero.");
             
         VolumeMax = volumeMax;
     }
@@ -103,6 +105,8 @@ public class Truck
     {
         if (DecommissionedDate != null)
             throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        if (volumePrice < 0)
+            throw new ArgumentOutOfRangeException(nameof(volumePrice), volumePrice, "The volume price value must be greater than zero.");
             
         VolumePrice = volumePrice;
     }
@@ -111,6 +115,8 @@ public class Truck
     {
         if (DecommissionedDate != null)
             throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        if (weightMax < 0)
+            throw new ArgumentOutOfRangeException(nameof(weightMax), weightMax, "The weight max value must be greater than zero.");
             
         WeightMax = weightMax;
     }
@@ -119,6 +125,8 @@ public class Truck
     {
         if (DecommissionedDate != null)
             throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        if (weightPrice < 0)
+            throw new ArgumentOutOfRangeException(nameof(weightPrice), weightPrice, "The weight price value must be greater than zero.");
             
         WeightPrice = weightPrice;
     }
@@ -127,6 +135,8 @@ public class Truck
     {
         if (DecommissionedDate != null)
             throw new InvalidOperationException($"Truck {Guid}. A decommissioned truck can only use the recommission operation.");
+        if (pricePerKm < 0)
+            throw new ArgumentOutOfRangeException(nameof(pricePerKm), pricePerKm, "The price per km value must be greater than zero.");
         
         PricePerKm = pricePerKm;
     }

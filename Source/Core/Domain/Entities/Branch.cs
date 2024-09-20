@@ -23,14 +23,38 @@ public class Branch
     public string Guid { get; private set; } = null!;
     
     public string Address { get; set; } = null!;
-    
-    public double Latitude { get; set; }
 
-    public double Longitude { get; set; }
-    
+    public double Latitude
+    {
+        get => _latitude;
+        set
+        {
+            if (value is < -90 or > 90)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The latitude value must be in the range [-90;90].");
+            
+            _latitude = value;
+        }
+    }
+
+    public double Longitude
+    {
+        get => _longitude;
+        set
+        {
+            if (value is < -180 or > 180)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The longitude value must be in the range [-180;180].");
+            
+            _longitude = value;
+        }
+    }
+
     public virtual ICollection<Truck> Trucks { get; private set; } = new List<Truck>();
     
     public virtual ICollection<Driver> Drivers { get; private set; } = new List<Driver>();
     
     public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
+    
+    private double _latitude;
+    
+    private double _longitude;
 }

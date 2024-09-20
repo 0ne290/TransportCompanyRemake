@@ -158,9 +158,29 @@ public class Order
 
     public double? ExpectedHoursWorkedByDrivers { get; private set; }
 
-    public double? ActualHoursWorkedByDriver1 { get; private set; }
+    public double? ActualHoursWorkedByDriver1
+    {
+        get => _actualHoursWorkedByDriver1;
+        private set
+        {
+            if (value is < 0)
+                throw new ArgumentOutOfRangeException(nameof(ActualHoursWorkedByDriver1), value, "The actual hours worked by driver1 value must be greater than zero.");
+            
+            _actualHoursWorkedByDriver1 = value;
+        }
+    }
 
-    public double? ActualHoursWorkedByDriver2 { get; private set; }
+    public double? ActualHoursWorkedByDriver2
+    {
+        get => _actualHoursWorkedByDriver2;
+        private set
+        {
+            if (value is < 0)
+                throw new ArgumentOutOfRangeException(nameof(ActualHoursWorkedByDriver2), value, "The actual hours worked by driver2 value must be greater than zero.");
+            
+            _actualHoursWorkedByDriver2 = value;
+        }
+    }
 
     public string UserGuid { get; private set; } = null!;
 
@@ -188,15 +208,91 @@ public class Order
 
     public string CargoDescription { get; private set; } = null!;
 
-    public double StartPointLatitude { get; private set; }
+    public double StartPointLatitude
+    {
+        get => _startPointLatitude;
+        private set
+        {
+            if (value is < -90 or > 90)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The start point latitude value must be in the range [-90;90].");
+            
+            _startPointLatitude = value;
+        }
+    }
 
-    public double StartPointLongitude { get; private set; }
+    public double StartPointLongitude
+    {
+        get => _startPointLongitude;
+        private set
+        {
+            if (value is < -180 or > 180)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The start point longitude value must be in the range [-180;180].");
+            
+            _startPointLongitude = value;
+        }
+    }
 
-    public double EndPointLatitude { get; private set; }
+    public double EndPointLatitude
+    {
+        get => _endPointLatitude;
+        private set
+        {
+            if (value is < -90 or > 90)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The end point latitude value must be in the range [-90;90].");
+            
+            _endPointLatitude = value;
+        }
+    }
 
-    public double EndPointLongitude { get; private set; }
+    public double EndPointLongitude
+    {
+        get => _endPointLongitude;
+        private set
+        {
+            if (value is < -180 or > 180)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The end point longitude value must be in the range [-180;180].");
+            
+            _endPointLongitude = value;
+        }
+    }
 
-    public decimal CargoVolume { get; private set; }
+    public decimal CargoVolume
+    {
+        get => _cargoVolume;
+        private set
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(CargoVolume), value, "The cargo volume value must be greater than zero.");
+            
+            _cargoVolume = value;
+        }
+    }
 
-    public decimal CargoWeight { get; private set; }
+    public decimal CargoWeight
+    {
+        get => _cargoWeight;
+        private set
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(CargoWeight), value, "The cargo weight value must be greater than zero.");
+            
+            _cargoWeight = value;
+        }
+    }
+    
+    private double _startPointLatitude;
+    
+    private double _startPointLongitude;
+    
+    private double _endPointLatitude;
+    
+    private double _endPointLongitude;
+    
+    private decimal _cargoVolume;
+    
+    private decimal _cargoWeight;
+    
+    private double? _actualHoursWorkedByDriver1;
+    
+    private double? _actualHoursWorkedByDriver2;
 }
